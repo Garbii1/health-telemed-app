@@ -22,6 +22,7 @@ db.sqlite3  # Ignore local SQLite database
 staticfiles/ # Ignore collected static files locally if desired
 *.egg-info/
 .env
+.gitignore
 
 # Django
 *.log
