@@ -1,25 +1,21 @@
 // src/app/features/patient/appointments/appointments.component.ts
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common'; // <<< ADDED: For *ngIf, *ngFor, async pipe, ngClass
-import { RouterLink } from '@angular/router'; // <<< ADDED: For routerLink
+import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { ApiService } from '../../../core/services/api.service';
 import { Observable, BehaviorSubject, of } from 'rxjs';
-import { switchMap, map, catchError, startWith } from 'rxjs/operators'; // <<< ADDED: startWith
-import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component'; // <<< ADDED
+import { switchMap, map, catchError, startWith } from 'rxjs/operators'; // <<< Import startWith
+import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
 
 @Component({
   selector: 'app-patient-appointments',
   standalone: true,
-  imports: [
-      CommonModule,
-      RouterLink,
-      LoadingSpinnerComponent // <<< ADDED
-  ],
+  imports: [ CommonModule, RouterLink, LoadingSpinnerComponent ],
   templateUrl: './appointments.component.html',
   styleUrls: ['./appointments.component.scss']
 })
 export class PatientAppointmentsComponent implements OnInit {
-  appointments$: Observable<any[] | null> | undefined; // Allow null
+  appointments$: Observable<any[] | null> | undefined;
   isLoading = true;
   errorMessage: string | null = null;
   filterStatus = new BehaviorSubject<string>('ALL');
@@ -31,8 +27,20 @@ export class PatientAppointmentsComponent implements OnInit {
   ngOnInit(): void { this.loadAppointments(); }
 
   loadAppointments(): void {
-      // ... (logic from previous correct version) ...
-       this.isLoading = true; this.errorMessage = null; this.cancelError = null; const obs$ = this.filterStatus.pipe( startWith(this.filterStatus.value), switchMap(status => { this.isLoading = true; let params: ApiParams = {}; if (status && status !== 'ALL') { params['status'] = status; } return this.apiService.getAppointments(params).pipe( map(data => { this.isLoading = false; return data.sort((a, b) => new Date(b.appointment_time).getTime() - new Date(a.appointment_time).getTime()); }), catchError(err => { /* ... */ this.isLoading = false; return of([]); }) ); }) ); this.appointments$ = obs$;
+     this.isLoading = true; this.errorMessage = null; this.cancelError = null;
+     const obs$ = this.filterStatus.pipe(
+       startWith(this.filterStatus.value), // <<< Now recognized
+       switchMap(status => {
+         this.isLoading = true;
+         let params: ApiParams = {};
+         if (status && status !== 'ALL') { params['status'] = status; }
+         return this.apiService.getAppointments(params).pipe(
+            map(data => { /* ... */ this.isLoading = false; return data; }),
+            catchError(err => { /* ... */ this.isLoading = false; return of([]); })
+         );
+       })
+     );
+     this.appointments$ = obs$;
   }
 
   onFilterChange(event: Event): void { /* ... */ }

@@ -1,26 +1,22 @@
 // src/app/features/patient/book-appointment/book-appointment.component.ts
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common'; // <<< ADDED: For *ngIf, *ngFor, async pipe
-import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms'; // <<< ADDED: For forms
+import { CommonModule } from '@angular/common';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms'; // Ensure ReactiveFormsModule
 import { Router } from '@angular/router';
 import { ApiService } from '../../../core/services/api.service';
 import { Observable, of } from 'rxjs';
 import { catchError, finalize } from 'rxjs/operators';
-import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component'; // <<< ADDED
+import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
 
 @Component({
   selector: 'app-book-appointment',
   standalone: true,
-  imports: [
-      CommonModule,
-      ReactiveFormsModule, // <<< ADDED
-      LoadingSpinnerComponent // <<< ADDED
-  ],
+  imports: [ CommonModule, ReactiveFormsModule, LoadingSpinnerComponent ], // Ensure ReactiveFormsModule
   templateUrl: './book-appointment.component.html',
   styleUrls: ['./book-appointment.component.scss']
 })
 export class BookAppointmentComponent implements OnInit {
-  // Fix: Initialize FormGroup immediately
+  // Initialize form properly
   appointmentForm: FormGroup = this.fb.group({
       doctor_id: ['', Validators.required],
       appointment_time: ['', Validators.required],
@@ -34,11 +30,11 @@ export class BookAppointmentComponent implements OnInit {
   minDateTime: string = '';
 
   constructor(
-    private fb: FormBuilder, // Inject FormBuilder here
+    private fb: FormBuilder, // Inject
     private apiService: ApiService,
     private router: Router
   ) {
-    // Form initialization moved to declaration for definite assignment
+    // Init moved to declaration
     this.setMinDateTime();
   }
 
@@ -47,7 +43,7 @@ export class BookAppointmentComponent implements OnInit {
   loadDoctors(): void { /* ... */ }
   onSubmit(): void { /* ... */ }
 
-   // Fix: Use correct getters for the template
+   // Getters are needed for the template bindings
    get doctor_id() { return this.appointmentForm.get('doctor_id'); }
    get appointment_time() { return this.appointmentForm.get('appointment_time'); }
    get reason() { return this.appointmentForm.get('reason'); }

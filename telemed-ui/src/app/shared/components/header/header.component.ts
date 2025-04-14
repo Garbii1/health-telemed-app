@@ -1,18 +1,14 @@
 // src/app/shared/components/header/header.component.ts
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common'; // <<< ADDED: For *ngIf
-import { RouterLink, RouterLinkActive, Router } from '@angular/router'; // <<< ADDED: For routing directives
+import { CommonModule } from '@angular/common';
+import { RouterLink, RouterLinkActive, Router } from '@angular/router';
 import { AuthService, UserInfo } from '../../../core/services/auth.service';
 import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [
-      CommonModule,
-      RouterLink,
-      RouterLinkActive // <<< ADDED
-  ],
+  imports: [ CommonModule, RouterLink, RouterLinkActive ],
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.scss']
 })
