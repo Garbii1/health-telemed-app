@@ -1,9 +1,10 @@
+// src/app/core/services/auth.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
 import { Router } from '@angular/router';
 import { environment } from '../../../environments/environment';
-import { jwtDecode } from 'jwt-decode'; // Install: npm install jwt-decode
+import { jwtDecode } from 'jwt-decode';
 
 interface LoginResponse {
   access: string;
@@ -13,12 +14,12 @@ interface LoginResponse {
 interface UserPayload {
   user_id: number;
   exp: number;
-  // Add other payload fields if needed (e.g., username, role - depends on JWT config)
+  // Add other payload fields if needed
 }
 
 // Interface for user data we might want to store/expose
 export interface UserInfo {
-  id: number;
+  id: number; // id is required
   username?: string;
   email?: string;
   role?: string; // We'll fetch this separately from profile endpoint
@@ -32,20 +33,18 @@ export class AuthService {
   private accessTokenKey = 'accessToken';
   private refreshTokenKey = 'refreshToken';
 
-  // BehaviorSubject to track authentication status and user info
   private loggedIn = new BehaviorSubject<boolean>(this.hasToken());
   private currentUser = new BehaviorSubject<UserInfo | null>(null);
-  private currentUserRole = new BehaviorSubject<string | null>(null); // Patient | Doctor
+  private currentUserRole = new BehaviorSubject<string | null>(null);
 
   loggedIn$ = this.loggedIn.asObservable();
   currentUser$ = this.currentUser.asObservable();
   currentUserRole$ = this.currentUserRole.asObservable();
 
   constructor(private http: HttpClient, private router: Router) {
-    // If token exists on init, try to decode it and fetch profile
      if (this.hasToken()) {
        this.decodeAndSetUser();
-       this.fetchAndSetUserProfile(); // Fetch profile on load if logged in
+       this.fetchAndSetUserProfile();
      }
   }
 
@@ -61,13 +60,12 @@ export class AuthService {
   }
 
   logout(): void {
-    // Optionally: Call a backend endpoint to blacklist the token if needed
     localStorage.removeItem(this.accessTokenKey);
     localStorage.removeItem(this.refreshTokenKey);
     this.loggedIn.next(false);
     this.currentUser.next(null);
     this.currentUserRole.next(null);
-    this.router.navigate(['/login']); // Redirect to login page
+    this.router.navigate(['/login']);
   }
 
   getAccessToken(): string | null {
@@ -86,8 +84,6 @@ export class AuthService {
      return this.currentUserRole.value;
    }
 
-  // --- Private Helper Methods ---
-
   private hasToken(): boolean {
     return !!localStorage.getItem(this.accessTokenKey);
   }
@@ -97,11 +93,11 @@ export class AuthService {
       localStorage.setItem(this.accessTokenKey, response.access);
       localStorage.setItem(this.refreshTokenKey, response.refresh);
       this.loggedIn.next(true);
-      this.decodeAndSetUser(); // Decode token immediately
-      this.fetchAndSetUserProfile(); // Fetch profile info after login
+      this.decodeAndSetUser();
+      this.fetchAndSetUserProfile();
     } else {
       console.error('Authentication failed: No tokens received.');
-      this.logout(); // Ensure clean state if login fails partially
+      this.logout();
     }
   }
 
@@ -110,47 +106,59 @@ export class AuthService {
      if (token) {
        try {
          const decoded: UserPayload = jwtDecode(token);
-         const userInfo: UserInfo = { id: decoded.user_id };
-         // Check if token is expired (optional, interceptor usually handles this)
-         const expiry = decoded.exp * 1000; // Convert to milliseconds
-         if (Date.now() >= expiry) {
-            console.warn('Token expired');
-            this.logout(); // Or trigger refresh token logic
-            return;
+         // Ensure id is present before creating UserInfo
+         if (decoded.user_id) {
+             const userInfo: UserInfo = { id: decoded.user_id }; // id is guaranteed here
+             const expiry = decoded.exp * 1000;
+             if (Date.now() >= expiry) {
+                console.warn('Token expired');
+                this.logout();
+                return;
+             }
+             this.currentUser.next(userInfo);
+         } else {
+            console.error("JWT does not contain user_id claim.");
+            this.logout();
          }
-         this.currentUser.next(userInfo); // Set basic info from token
        } catch (error) {
          console.error('Error decoding token:', error);
-         this.logout(); // Log out if token is invalid
+         this.logout();
        }
      }
    }
 
-  // Method to fetch user profile (including role) after login or on app load
   fetchAndSetUserProfile(): void {
     if (!this.isLoggedIn()) return;
 
     this.http.get<any>(`${this.apiUrl}/profile/`).subscribe({
       next: (profile) => {
-        // Update currentUser with more details if needed
-        this.currentUser.next({
-            ...this.currentUser.value, // Keep existing id
-            username: profile.user.username,
-            email: profile.user.email,
-            // add other fields as needed
-        });
-        this.currentUserRole.next(profile.role); // Store the role
+        const currentVal = this.currentUser.value;
+        // FIX: Check currentVal exists before spreading
+        if (currentVal) {
+            this.currentUser.next({
+                ...currentVal, // Now safe to spread
+                username: profile.user.username,
+                email: profile.user.email,
+            });
+        } else {
+            // Handle case where currentUser was null (e.g., token decoded but profile fetched before value set)
+            console.warn("Current user was null when profile fetched, setting basic info.");
+             this.currentUser.next({ // Set directly from profile data
+                 id: profile.user.id, // Assuming profile has user.id
+                 username: profile.user.username,
+                 email: profile.user.email,
+                 // role: profile.role // Role is set below anyway
+             });
+        }
+        this.currentUserRole.next(profile.role);
       },
       error: (err) => {
         console.error('Failed to fetch user profile:', err);
-        // Potentially log out if profile fetch fails consistently (maybe token invalid?)
-         if (err.status === 401) { // Unauthorized
+         if (err.status === 401) {
             this.logout();
          }
       }
     });
   }
 
-  // Add refresh token logic here if needed (more complex)
-  // refreshToken(): Observable<any> { ... }
 }

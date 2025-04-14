@@ -1,3 +1,5 @@
+/* src/styles.scss */
+@use 'sass:color'; // Import the built-in sass:color module
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
 // --- Variables ---
@@ -83,7 +85,8 @@ a {
   transition: color 0.2s ease-in-out;
 
   &:hover {
-    color: darken(var(--link-color), 10%);
+    // Use color.adjust instead of deprecated darken
+    color: color.adjust(var(--link-color), $lightness: -10%);
     text-decoration: underline;
   }
 }
@@ -128,6 +131,23 @@ button, input, select, textarea {
 .p-2 { padding: 1rem; }
 .p-3 { padding: 1.5rem; }
 .p-4 { padding: 2rem; }
+.me-1 { margin-right: .25rem !important; }
+.me-2 { margin-right: .5rem !important; }
+.ms-2 { margin-left: .5rem !important; }
+.d-block { display: block !important; }
+.text-end { text-align: right !important; }
+.text-muted { color: var(--text-color-light) !important; }
+.text-primary { color: var(--primary-color) !important; }
+.text-success { color: var(--success-color) !important; }
+.text-danger { color: var(--error-color) !important; }
+.text-info { color: #0dcaf0 !important; } /* Define info color if needed */
+.text-secondary { color: var(--secondary-color) !important; }
+.bg-primary { background-color: var(--primary-color) !important; }
+.bg-success { background-color: var(--success-color) !important; }
+.bg-secondary { background-color: var(--text-color-light) !important; } /* Use a neutral grey for cancelled */
+.badge { display: inline-block; padding: .35em .65em; font-size: .75em; font-weight: 700; line-height: 1; color: #fff; text-align: center; white-space: nowrap; vertical-align: baseline; border-radius: .25rem; }
+.visually-hidden { position: absolute !important; width: 1px !important; height: 1px !important; padding: 0 !important; margin: -1px !important; overflow: hidden !important; clip: rect(0,0,0,0) !important; white-space: nowrap !important; border: 0 !important; }
+
 
 // --- Buttons ---
 .btn {
@@ -154,8 +174,8 @@ button, input, select, textarea {
   border-color: var(--primary-color);
 
   &:hover:not(:disabled) {
-    background-color: darken(var(--primary-color), 10%);
-    border-color: darken(var(--primary-color), 10%);
+    background-color: color.adjust(var(--primary-color), $lightness: -10%);
+    border-color: color.adjust(var(--primary-color), $lightness: -12%);
   }
 }
 
@@ -165,8 +185,8 @@ button, input, select, textarea {
    border-color: var(--secondary-color);
 
    &:hover:not(:disabled) {
-     background-color: darken(var(--secondary-color), 10%);
-     border-color: darken(var(--secondary-color), 10%);
+     background-color: color.adjust(var(--secondary-color), $lightness: -10%);
+     border-color: color.adjust(var(--secondary-color), $lightness: -12%);
    }
  }
 
@@ -181,16 +201,59 @@ button, input, select, textarea {
   }
 }
 
+.btn-outline-secondary {
+   color: var(--text-color-light);
+   border-color: var(--text-color-light);
+   &:hover:not(:disabled) {
+     color: #fff;
+     background-color: var(--text-color-light);
+     border-color: var(--text-color-light);
+   }
+ }
+
+
 .btn-danger {
    color: #fff;
    background-color: var(--error-color);
    border-color: var(--error-color);
 
    &:hover:not(:disabled) {
-     background-color: darken(var(--error-color), 10%);
-     border-color: darken(var(--error-color), 10%);
+     background-color: color.adjust(var(--error-color), $lightness: -10%);
+     border-color: color.adjust(var(--error-color), $lightness: -12%);
    }
  }
+
+.btn-outline-danger {
+   color: var(--error-color);
+   border-color: var(--error-color);
+    &:hover:not(:disabled) {
+     color: #fff;
+     background-color: var(--error-color);
+   }
+ }
+
+.btn-success {
+    color: #fff;
+    background-color: var(--success-color);
+    border-color: var(--success-color);
+     &:hover:not(:disabled) {
+        background-color: color.adjust(var(--success-color), $lightness: -10%);
+        border-color: color.adjust(var(--success-color), $lightness: -12%);
+    }
+}
+
+.btn-sm {
+  padding: .25rem .5rem;
+  font-size: .875rem;
+  border-radius: .2rem;
+}
+
+.btn-lg {
+   padding: .5rem 1rem;
+   font-size: 1.25rem;
+   border-radius: .3rem;
+}
+
 
 // --- Forms ---
 .form-group {
@@ -208,28 +271,60 @@ button, input, select, textarea {
   width: 100%;
   padding: 0.75rem 1rem;
   font-size: 1rem;
+  font-weight: 400;
   line-height: 1.5;
   color: var(--text-color);
   background-color: var(--bg-color-alt);
   background-clip: padding-box;
   border: 1px solid var(--border-color);
+  appearance: none; // Reset default styling
   border-radius: var(--border-radius);
   transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 
   &:focus {
     border-color: var(--primary-color);
     outline: 0;
-    box-shadow: 0 0 0 0.2rem rgba(var(--primary-color), 0.25); // Use RGB for transparency if needed
+    // Use rgba with CSS variables for the focus shadow
+    box-shadow: 0 0 0 0.2rem rgba(var(--primary-color), 0.25);
   }
 
   &::placeholder {
     color: #aaa;
+  }
+
+  // Style invalid state based on Angular classes
+  &.ng-invalid.ng-touched {
+      border-color: var(--error-color);
+      &:focus {
+         // Use rgba with CSS variables for the focus shadow
+        box-shadow: 0 0 0 0.2rem rgba(var(--error-color), 0.25);
+      }
   }
 }
 
 textarea.form-control {
   min-height: 120px;
   resize: vertical;
+}
+
+.form-select {
+    /* Basic styling if not using Bootstrap's default */
+    display: block;
+    width: 100%;
+    padding: .75rem 2.25rem .75rem 1rem;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: var(--text-color);
+    background-color: #fff;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    background-size: 16px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    appearance: none;
+    &.ng-invalid.ng-touched { border-color: var(--error-color); }
 }
 
 .form-check {
@@ -256,19 +351,22 @@ textarea.form-control {
   color: var(--error-color);
 }
 
-// Show feedback when input is invalid
-.form-control.ng-invalid.ng-touched {
-  border-color: var(--error-color);
-   &:focus {
-     box-shadow: 0 0 0 0.2rem rgba(var(--error-color), 0.25); // Use RGB if needed
-   }
-}
-
+// Show feedback when related control is invalid and touched
 .form-control.ng-invalid.ng-touched + .invalid-feedback,
-.ng-invalid.ng-touched .invalid-feedback // For custom controls or groups
+.form-select.ng-invalid.ng-touched + .invalid-feedback,
+.ng-invalid.ng-touched .invalid-feedback /* For custom controls or groups */
 {
   display: block;
 }
+
+.input-group { display: flex; flex-wrap: nowrap; align-items: stretch; width: 100%; }
+.input-group .form-control { position: relative; flex: 1 1 auto; width: 1%; min-width: 0; }
+.input-group .form-control:not(:first-child) { border-top-left-radius: 0; border-bottom-left-radius: 0; }
+.input-group .form-control:not(:last-child) { border-top-right-radius: 0; border-bottom-right-radius: 0; }
+.input-group-text { display: flex; align-items: center; padding: .75rem 1rem; margin-bottom: 0; font-size: 1rem; font-weight: 400; line-height: 1.5; color: #495057; text-align: center; white-space: nowrap; background-color: #e9ecef; border: 1px solid #ced4da; border-radius: var(--border-radius); }
+.input-group > .input-group-text { border-top-left-radius: 0; border-bottom-left-radius: 0; border-left: 0;}
+.input-group > .form-control { border-right: 0;}
+
 
 // --- Cards ---
 .card {
@@ -307,25 +405,67 @@ textarea.form-control {
   position: relative; // For potential close buttons
 
   &.alert-success {
-    color: darken(var(--success-color), 15%);
-    background-color: lighten(var(--success-color), 45%);
-    border-color: lighten(var(--success-color), 35%);
+    color: color.adjust(var(--success-color), $lightness: -15%, $saturation: -5%);
+    background-color: color.adjust(var(--success-color), $lightness: 45%);
+    border-color: color.adjust(var(--success-color), $lightness: 35%);
   }
   &.alert-danger {
-    color: darken(var(--error-color), 15%);
-    background-color: lighten(var(--error-color), 45%);
-    border-color: lighten(var(--error-color), 35%);
-  }
+     color: color.adjust(var(--error-color), $lightness: -15%, $saturation: -5%);
+     background-color: color.adjust(var(--error-color), $lightness: 45%);
+     border-color: color.adjust(var(--error-color), $lightness: 35%);
+   }
   &.alert-info {
-     color: darken(var(--primary-color), 15%);
-     background-color: lighten(var(--primary-color), 45%);
-     border-color: lighten(var(--primary-color), 35%);
+      color: color.adjust(var(--primary-color), $lightness: -15%, $saturation: -5%);
+      background-color: color.adjust(var(--primary-color), $lightness: 45%);
+      border-color: color.adjust(var(--primary-color), $lightness: 35%);
+   }
+   &.alert-warning {
+        color: color.adjust(var(--accent-color), $lightness: -15%, $saturation: -5%);
+        background-color: color.adjust(var(--accent-color), $lightness: 45%);
+        border-color: color.adjust(var(--accent-color), $lightness: 35%);
+     }
+   &.alert-light {
+        color: var(--text-color-light);
+        background-color: #f8f9fa;
+        border-color: #dee2e6;
    }
 }
 
+// --- Spinners ---
+.spinner-border {
+    display: inline-block;
+    width: 2rem;
+    height: 2rem;
+    vertical-align: text-bottom;
+    border: .25em solid currentColor;
+    border-right-color: transparent;
+    border-radius: 50%;
+    -webkit-animation: .75s linear infinite spinner-border;
+    animation: .75s linear infinite spinner-border;
+}
+.spinner-border-sm {
+  width: 1rem;
+  height: 1rem;
+  border-width: 0.2em;
+}
+
+@keyframes spinner-border {
+    to { transform: rotate(360deg); }
+}
+
+// --- List Group ---
+.list-group { display: flex; flex-direction: column; padding-left: 0; margin-bottom: 0; border-radius: var(--border-radius); }
+.list-group-item { position: relative; display: block; padding: .75rem 1.25rem; background-color: #fff; border: 1px solid var(--border-color); text-decoration: none; color: var(--text-color); }
+.list-group-item-action { width: 100%; color: var(--text-color); text-align: inherit; }
+.list-group-item-action:hover, .list-group-item-action:focus { z-index: 1; color: var(--text-color); text-decoration: none; background-color: #f8f9fa; }
+.list-group-item:first-child { border-top-left-radius: inherit; border-top-right-radius: inherit; }
+.list-group-item:last-child { border-bottom-right-radius: inherit; border-bottom-left-radius: inherit; }
+.list-group-item + .list-group-item { border-top-width: 0; } /* Collapse borders */
+
+
 // --- Responsive Design ---
 @media (max-width: 768px) {
-  html { font-size: 15px; } // Slightly smaller base font on smaller screens
+  html { font-size: 15px; } /* Slightly smaller base font on smaller screens */
   h1 { font-size: 1.8rem; }
   h2 { font-size: 1.6rem; }
   h3 { font-size: 1.3rem; }
@@ -334,7 +474,7 @@ textarea.form-control {
 
   .btn { padding: 0.6rem 1.2rem; }
 
-  main { padding-top: calc(var(--header-height) - 10px); } // Adjust if header shrinks
+  main { padding-top: calc(var(--header-height) - 10px); } /* Adjust if header shrinks */
 }
 
 @media (max-width: 576px) {
@@ -346,4 +486,4 @@ textarea.form-control {
    .form-control { padding: 0.6rem 0.8rem;}
 }
 
-// --- Specific Component Styles (Add later in component SCSS files) ---
+// --- Specific Component Styles (Should be in component SCSS files) ---

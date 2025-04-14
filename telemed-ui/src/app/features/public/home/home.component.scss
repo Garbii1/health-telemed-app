@@ -1,4 +1,5 @@
-@import '../../../../styles/variables'; // Adjust path as needed to access variables
+/* features/public/home/home.component.scss */
+/* Remove the deprecated @import if only using CSS variables from styles.scss */
 
 .home-page {
   width: 100%;
@@ -19,7 +20,7 @@
   text-align: center;
   color: #fff;
 
-  // Overlay for better text contrast
+  /* Overlay for better text contrast */
   .hero-overlay {
     position: absolute;
     top: 0;
@@ -31,7 +32,7 @@
   }
 
   .hero-content {
-    position: relative; // Position above overlay
+    position: relative; /* Position above overlay */
     z-index: 2;
     max-width: 800px;
 
@@ -39,7 +40,7 @@
       font-size: 3rem;
       font-weight: 700;
       margin-bottom: 1rem;
-      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); // Add shadow to text
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); /* Add shadow to text */
     }
 
     p {
@@ -82,10 +83,10 @@
     margin-bottom: 2rem;
 
     .feature-icon {
-      font-size: 3rem; // Make icons larger
-      color: var(--secondary-color); // Use accent color
+      font-size: 3rem; /* Make icons larger */
+      color: var(--secondary-color); /* Use accent color */
       margin-bottom: 1.5rem;
-      display: inline-block; // Needed for margin
+      display: inline-block; /* Needed for margin */
     }
 
     h3 {
@@ -96,7 +97,7 @@
 
     p {
        color: var(--text-color-light);
-       max-width: 300px; // Limit width for readability
+       max-width: 300px; /* Limit width for readability */
        margin-left: auto;
        margin-right: auto;
     }
@@ -106,7 +107,7 @@
 // --- How it Works Section ---
 .how-it-works-section {
   padding: 3rem 0;
-  background-color: var(--bg-color-alt); // Alternate background
+  background-color: var(--bg-color-alt); /* Alternate background */
 
   h2 {
     margin-bottom: 3rem;
@@ -143,7 +144,7 @@
   }
 }
 
-// Responsive adjustments for Home page
+// --- Responsive adjustments for Home page ---
 @media (max-width: 768px) {
   .hero-section {
     height: 60vh;
@@ -160,8 +161,18 @@
   }
 }
 
-// Add Bootstrap grid styles if not global
+/* Add Bootstrap grid styles if not global (using classes defined in styles.scss) */
 .row { display: flex; flex-wrap: wrap; margin-right: -15px; margin-left: -15px; }
 .col-md-4 { position: relative; width: 100%; padding-right: 15px; padding-left: 15px; }
-@media (min-width: 768px) { .col-md-4 { flex: 0 0 33.33333%; max-width: 33.33333%; } }
-.text-center { text-align: center !important; }
+.col-lg-6 { position: relative; width: 100%; padding-right: 15px; padding-left: 15px; } /* Added for consistency */
+.col-md-6 { position: relative; width: 100%; padding-right: 15px; padding-left: 15px; } /* Added for consistency */
+.col-md-8 { position: relative; width: 100%; padding-right: 15px; padding-left: 15px; } /* Added for consistency */
+
+@media (min-width: 768px) {
+    .col-md-4 { flex: 0 0 33.33333%; max-width: 33.33333%; }
+    .col-md-6 { flex: 0 0 50%; max-width: 50%; }
+    .col-md-8 { flex: 0 0 66.66667%; max-width: 66.66667%; }
+}
+@media (min-width: 992px) {
+    .col-lg-6 { flex: 0 0 50%; max-width: 50%; }
+}

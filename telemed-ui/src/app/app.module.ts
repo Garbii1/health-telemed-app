@@ -3,61 +3,47 @@ import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms'; // Import Forms Modules
+// FormsModule/ReactiveFormsModule are imported by standalone components now
 
-import { AppRoutingModule } from './app-routing.module';
-import { AppComponent } from './app.component';
+// AppRoutingModule is removed, routing provided in main.ts
+// import { AppRoutingModule } from './app-routing.module';
+
+import { AppComponent } from './app.component'; // Import standalone AppComponent
 
 // Core
 import { JwtInterceptor } from './core/interceptors/jwt.interceptor';
 
-// Shared Components
+// Import standalone components USED IN AppComponent's template
 import { HeaderComponent } from './shared/components/header/header.component';
 import { FooterComponent } from './shared/components/footer/footer.component';
-import { LoadingSpinnerComponent } from './shared/components/loading-spinner/loading-spinner.component'; // Import Spinner
 
-// Eagerly Loaded Page Components (declared directly for AppRoutingModule)
-import { HomeComponent } from './features/public/home/home.component';
-import { NotFoundComponent } from './features/public/not-found/not-found.component';
-
-// Feature Modules (Imported for lazy loading configuration in AppRoutingModule, no need to import components from them here)
-// AuthModule will be imported because login/register routes are handled directly in app-routing
-import { AuthModule } from './features/auth/auth.module';
-// PatientModule and DoctorModule are lazy-loaded via AppRoutingModule loadChildren
-
-// Third-party Modules (like NgxChartsModule should be imported in the feature modules where they are used, e.g., PatientModule, DoctorModule)
+// AuthModule likely removed if Login/Register are standalone
+// import { AuthModule } from './features/auth/auth.module';
 
 @NgModule({
   declarations: [
-    AppComponent,
-    // Shared Components available globally
-    HeaderComponent,
-    FooterComponent,
-    LoadingSpinnerComponent, // Declare Spinner
-    // Eagerly loaded components used by AppRoutingModule directly
-    HomeComponent,
-    NotFoundComponent,
-    // Components from AuthModule (Login, Register) are declared within AuthModule
-    // Components from PatientModule/DoctorModule are declared within their respective modules
+    // NO declarations here if all components are standalone
   ],
   imports: [
-    BrowserModule,
-    AppRoutingModule, // Must be after BrowserModule
-    HttpClientModule,
-    BrowserAnimationsModule, // Required for some Angular features and ngx-charts animations
-    FormsModule, // Needed for template-driven forms (if any) and ngModel
-    ReactiveFormsModule, // Needed for reactive forms (used extensively)
+    // Angular Core Modules needed across the app (often provided by bootstrapApplication)
+    BrowserModule, // Typically needed once
+    // AppRoutingModule, // REMOVED
+    HttpClientModule, // Needed if not provided elsewhere
+    BrowserAnimationsModule, // Needed if not provided elsewhere
 
-    // Import AuthModule because login/register routes are defined directly in app-routing
-    AuthModule,
+    // Standalone components used directly by AppComponent template
+    HeaderComponent,
+    FooterComponent,
+    AppComponent // Import the root component itself
 
-    // PatientModule and DoctorModule are lazy-loaded in AppRoutingModule, no need to import here.
-    // NgxChartsModule is imported within PatientModule and DoctorModule where charts are used.
+    // AuthModule, // REMOVE if components are standalone & routing is functional
   ],
   providers: [
-    // Provide the JWT Interceptor globally
-    { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true }
+    // Interceptors are often provided via provideHttpClient in main.ts now
+    // Keep here if using older provide methods or specific DI needs
+     { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true }
   ],
-  bootstrap: [AppComponent]
+  // NO bootstrap array needed for standalone bootstrapApplication
+  // bootstrap: [AppComponent]
 })
-export class AppModule { }
+export class AppModule { } // Note: This AppModule might become unnecessary if AppComponent is fully standalone and providers are moved to main.ts
