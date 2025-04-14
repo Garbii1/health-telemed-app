@@ -1,0 +1,24 @@
+<div class="container mt-4">
+    <div class="page-header d-flex justify-content-between align-items-center mb-4">
+       <h2>My Health Vitals</h2>
+       <button class="btn btn-primary" (click)="toggleVitalForm()">
+         {{ showForm ? 'Cancel Entry' : 'Add New Vital Record' }}
+       </button>
+     </div>
+  
+    <!-- Vitals Form (conditionally shown) -->
+    <app-vitals-form *ngIf="showForm" (vitalSubmitted)="onVitalSubmitted()"></app-vitals-form>
+  
+    <!-- Vitals History/Chart -->
+     <app-vitals-history [vitalsData]="vitalsHistory$ | async"></app-vitals-history>
+  
+  </div>
+  
+  <!-- Utility class styles if not global -->
+  <style>
+  .d-flex { display: flex !important; }
+  .justify-content-between { justify-content: space-between !important; }
+  .align-items-center { align-items: center !important; }
+  .mt-4 { margin-top: 1.5rem !important; } /* Adjust spacing */
+  .mb-4 { margin-bottom: 1.5rem !important; }
+  </style>

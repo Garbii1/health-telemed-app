@@ -1,0 +1,16 @@
+// telemed-ui/tsconfig.app.json
+/* To learn more about this file see: https://angular.io/config/tsconfig. */
+{
+  "extends": "./tsconfig.json", // Inherits from base tsconfig
+  "compilerOptions": {
+    "outDir": "./out-tsc/app", // Output directory for this config
+    "types": [] // Specify types if needed (e.g., "node")
+  },
+  "files": [
+    "src/main.ts", // Entry point
+    "src/polyfills.ts" // Polyfills (path may differ in newer Angular versions)
+  ],
+  "include": [
+    "src/**/*.d.ts" // Include declaration files
+  ]
+}

@@ -1,0 +1,48 @@
+.auth-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: calc(100vh - var(--header-height) - var(--footer-height)); // Adjust based on layout
+    padding: 2rem 0;
+  }
+  
+  .auth-card {
+    width: 100%;
+    max-width: 450px; // Limit width of the auth card
+    margin: auto;
+  }
+  
+  .card-header h2 {
+    margin-bottom: 0;
+    text-align: center;
+    color: var(--primary-color);
+  }
+  
+  .w-100 {
+    width: 100%;
+  }
+  
+  // Small spinner for loading state
+  .spinner-border-sm {
+    width: 1rem;
+    height: 1rem;
+    border-width: 0.2em;
+    vertical-align: -0.125em; // Align with text
+  }
+  
+  // From Bootstrap for spinner animation
+  .spinner-border {
+      display: inline-block;
+      width: 2rem;
+      height: 2rem;
+      vertical-align: text-bottom;
+      border: .25em solid currentColor;
+      border-right-color: transparent;
+      border-radius: 50%;
+      -webkit-animation: .75s linear infinite spinner-border;
+      animation: .75s linear infinite spinner-border;
+  }
+  
+  @keyframes spinner-border {
+      to { transform: rotate(360deg); }
+  }

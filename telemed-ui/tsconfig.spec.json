@@ -1,0 +1,18 @@
+// telemed-ui/tsconfig.spec.json
+/* To learn more about this file see: https://angular.io/config/tsconfig. */
+{
+  "extends": "./tsconfig.json", // Inherits from base tsconfig
+  "compilerOptions": {
+    "outDir": "./out-tsc/spec", // Output directory for tests
+    "types": [
+      "jasmine" // Include Jasmine types for testing
+    ]
+  },
+  "files": [
+    "src/polyfills.ts" // Polyfills needed for tests (path may differ)
+  ],
+  "include": [
+    "src/**/*.spec.ts", // Include all spec files
+    "src/**/*.d.ts" // Include declaration files
+  ]
+}

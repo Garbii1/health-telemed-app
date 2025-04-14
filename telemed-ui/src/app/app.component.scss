@@ -1,0 +1,17 @@
+/* Styles specific to the app component layout if needed */
+/* For example, ensuring main content pushes footer down */
+:host {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+  
+  main {
+    flex: 1 0 auto; // Makes main content grow and prevents footer overlap
+    width: 100%;
+    // Container logic might be applied *inside* routed components or here if needed globally
+  }
+  
+  app-header, app-footer {
+     flex-shrink: 0; // Prevent header/footer from shrinking
+  }

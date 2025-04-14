@@ -1,0 +1,192 @@
+.app-header {
+    background-color: var(--bg-color-alt);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    position: fixed; // Fixed header
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000; // Ensure it's above other content
+    height: var(--header-height);
+  }
+  
+  .header-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 100%;
+  }
+  
+  .logo {
+    display: flex;
+    align-items: center;
+    a {
+      display: flex;
+      align-items: center;
+      text-decoration: none;
+      color: var(--text-color);
+      &:hover {
+        text-decoration: none; // Remove underline for logo link
+      }
+    }
+  }
+  
+  .logo-img {
+    height: 40px; // Adjust size as needed
+    width: auto;
+    margin-right: 10px;
+  }
+  
+  .logo-text {
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: var(--primary-color);
+  }
+  
+  .nav-links {
+    list-style: none;
+    display: flex;
+    align-items: center;
+    margin: 0;
+    padding: 0;
+  
+    li {
+      margin-left: 1.5rem; // Spacing between nav items
+  
+      a, button {
+        text-decoration: none;
+        color: var(--text-color-light);
+        font-weight: 500;
+        transition: color 0.2s ease;
+        padding: 0.5rem 0; // Vertical padding for larger clickable area
+        position: relative; // For active link indicator
+  
+        &:hover {
+          color: var(--primary-color);
+          text-decoration: none;
+        }
+  
+        &.active {
+          color: var(--primary-color);
+          font-weight: 600;
+          // Optional: Add an underline indicator for active links
+          &::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background-color: var(--primary-color);
+            border-radius: 2px;
+          }
+        }
+      }
+  
+      // Styling for auth buttons within the nav
+      &.auth-link {
+          margin-left: 1rem;
+          a.btn, button.btn {
+              padding: 0.4rem 1rem; // Smaller buttons in header
+              font-size: 0.9rem;
+              &.active::after { display: none; } // Don't show underline on buttons
+          }
+      }
+  
+      // Styling for Welcome message
+      &.user-info-nav {
+          color: var(--text-color-light);
+          font-size: 0.9rem;
+      }
+    }
+  }
+  
+  // --- Mobile Menu ---
+  .menu-toggle {
+    display: none; // Hidden by default on larger screens
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.5rem;
+  
+    span {
+      display: block;
+      width: 25px;
+      height: 3px;
+      background-color: var(--text-color);
+      margin: 5px 0;
+      transition: all 0.3s ease;
+    }
+  }
+  
+  // Responsive adjustments
+  @media (max-width: 992px) { // Adjust breakpoint as needed
+    .nav-links {
+      position: absolute;
+      top: var(--header-height); // Position below the header
+      left: 0;
+      width: 100%;
+      background-color: var(--bg-color-alt);
+      flex-direction: column;
+      align-items: stretch; // Stretch items full width
+      padding: 1rem 0;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      max-height: 0; // Hidden by default
+      overflow: hidden;
+      transition: max-height 0.3s ease-out, padding 0.3s ease-out;
+  
+      &.open {
+        max-height: 500px; // Adjust max height as needed
+        padding: 1rem 0; // Add padding back when open
+      }
+  
+      li {
+        margin: 0;
+        text-align: center;
+  
+        a, button {
+          display: block; // Make links take full width
+          padding: 1rem;
+          border-bottom: 1px solid var(--border-color);
+          width: 100%;
+  
+          &.active::after {
+            display: none; // Hide underline indicator on mobile
+          }
+          &:hover {
+             background-color: var(--bg-color); // Highlight on hover
+          }
+        }
+        // Remove border from last item
+        &:last-child a, &:last-child button {
+            border-bottom: none;
+        }
+  
+        &.auth-link {
+            padding: 1rem;
+            a.btn, button.btn {
+                width: calc(100% - 2rem); // Make button slightly less wide
+                margin: 0.5rem auto;
+                display: block;
+            }
+        }
+      }
+    }
+  
+    .menu-toggle {
+      display: block; // Show hamburger icon
+    }
+  
+    // Animation for hamburger icon (optional)
+    .menu-toggle[aria-expanded="true"] {
+      span:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
+      span:nth-child(2) { opacity: 0; }
+      span:nth-child(3) { transform: rotate(-45deg) translate(7px, -6px); }
+    }
+  }
+  
+  @media (max-width: 768px) {
+     .app-header { height: calc(var(--header-height) - 10px); } // Slightly smaller header
+     .logo-img { height: 35px; }
+     .logo-text { font-size: 1.2rem;}
+     .nav-links.open { top: calc(var(--header-height) - 10px); }
+  }

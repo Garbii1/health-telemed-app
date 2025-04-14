@@ -1,0 +1,72 @@
+<!-- features/doctor/dashboard/dashboard.component.html -->
+<div class="container mt-4">
+    <h2>Doctor Dashboard</h2>
+    <p *ngIf="currentUser">Welcome back, Dr. {{ currentUser?.username }}!</p>
+    <hr>
+  
+    <div *ngIf="isLoading" class="text-center mt-5">
+        <div class="spinner-border text-primary" role="status">
+           <span class="visually-hidden">Loading dashboard data...</span>
+         </div>
+    </div>
+  
+    <div *ngIf="!isLoading && (dashboardStats$ | async) as stats; else errorState">
+  
+      <!-- Quick Stats -->
+      <div class="row mb-4 quick-stats">
+        <div class="col-md-6">
+          <div class="card text-center stat-card">
+            <div class="card-body">
+              <h5 class="card-title">Total Assigned Patients</h5>
+              <p class="card-text display-4">{{ stats.totalPatients }}</p>
+              <a routerLink="../patients" class="btn btn-sm btn-outline-primary">View Patient List</a>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="card text-center stat-card">
+             <div class="card-body">
+                <h5 class="card-title">Upcoming Appointments</h5>
+                <p class="card-text display-4">{{ stats.upcomingAppointments?.length || 0 }}</p>
+                <a routerLink="../appointments" class="btn btn-sm btn-outline-primary">View Schedule</a>
+              </div>
+           </div>
+        </div>
+        <!-- Add more stat cards here -->
+      </div>
+  
+      <!-- Upcoming Appointments List -->
+      <div class="upcoming-appointments mt-4" *ngIf="stats.upcomingAppointments && stats.upcomingAppointments.length > 0">
+        <h4>Next Few Appointments</h4>
+         <div class="list-group">
+           <a *ngFor="let appt of stats.upcomingAppointments"
+              routerLink="../appointments"
+              class="list-group-item list-group-item-action">
+              <div class="d-flex w-100 justify-content-between">
+                 <h6 class="mb-1">{{ appt.patient_name }}</h6>
+                 <small>{{ formatDate(appt.appointment_time) }}</small>
+               </div>
+               <small class="text-muted">{{ appt.reason || 'No reason specified' }}</small>
+           </a>
+         </div>
+      </div>
+       <div *ngIf="stats.upcomingAppointments?.length === 0" class="alert alert-light">
+           No upcoming scheduled appointments found.
+       </div>
+  
+    </div>
+  
+    <ng-template #errorState>
+       <div *ngIf="!isLoading" class="alert alert-warning">
+          Could not load dashboard data. Please try again later.
+       </div>
+     </ng-template>
+  
+  </div>
+  
+  <style>
+  .stat-card .card-body { padding: 1.5rem 1rem;}
+  .stat-card .display-4 { font-size: 2.8rem; font-weight: 600; color: var(--primary-color); margin-bottom: 0.5rem;}
+  .stat-card h5 { color: var(--text-color-light); }
+  .quick-stats .col-md-6 { margin-bottom: 1rem;} /* Spacing for cards */
+  </style>

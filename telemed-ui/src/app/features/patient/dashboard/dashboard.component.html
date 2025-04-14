@@ -1,0 +1,154 @@
+<!-- features/patient/dashboard/dashboard.component.html -->
+<div class="container mt-4">
+    <h2>Patient Dashboard</h2>
+    <p *ngIf="currentUser">Welcome, {{ currentUser?.username }}!</p>
+    <hr>
+  
+    <div *ngIf="isLoading" class="text-center mt-5">
+        <app-loading-spinner [isLoading]="true" message="Loading dashboard data..."></app-loading-spinner>
+    </div>
+  
+    <div *ngIf="errorMessage && !isLoading" class="alert alert-warning">
+       {{ errorMessage }}
+     </div>
+  
+    <div *ngIf="!isLoading && (dashboardData$ | async) as data">
+  
+      <!-- Quick Links/Actions -->
+      <div class="row mb-4 quick-actions">
+          <div class="col-md-4 mb-3">
+              <div class="card action-card h-100">
+                  <div class="card-body text-center">
+                      <i class="fas fa-calendar-plus fa-2x text-primary mb-3"></i>
+                      <h5 class="card-title">Book Appointment</h5>
+                      <p class="card-text"><small>Find a doctor and schedule your next consultation.</small></p>
+                      <a routerLink="../book-appointment" class="btn btn-primary stretched-link">Book Now</a>
+                  </div>
+              </div>
+          </div>
+          <div class="col-md-4 mb-3">
+              <div class="card action-card h-100">
+                  <div class="card-body text-center">
+                       <i class="fas fa-heartbeat fa-2x text-danger mb-3"></i>
+                      <h5 class="card-title">Add Vitals</h5>
+                       <p class="card-text"><small>Record your latest health measurements.</small></p>
+                      <a routerLink="../vitals" class="btn btn-danger stretched-link">Add Vital Record</a>
+                  </div>
+              </div>
+          </div>
+          <div class="col-md-4 mb-3">
+              <div class="card action-card h-100">
+                  <div class="card-body text-center">
+                       <i class="fas fa-user-edit fa-2x text-success mb-3"></i>
+                      <h5 class="card-title">My Profile</h5>
+                      <p class="card-text"><small>View or update your personal information.</small></p>
+                      <a routerLink="../profile" class="btn btn-success stretched-link">View Profile</a>
+                  </div>
+              </div>
+          </div>
+      </div>
+  
+      <div class="row">
+          <!-- Upcoming Appointments List -->
+          <div class="col-lg-6">
+              <div class="upcoming-appointments mb-4">
+                  <h4><i class="fas fa-calendar-check me-2 text-primary"></i>Upcoming Appointments</h4>
+                  <div *ngIf="data.upcomingAppointments && data.upcomingAppointments.length > 0; else noAppointments">
+                      <div class="list-group">
+                          <a *ngFor="let appt of data.upcomingAppointments"
+                             routerLink="../appointments"
+                             class="list-group-item list-group-item-action">
+                              <div class="d-flex w-100 justify-content-between">
+                                  <h6 class="mb-1">Dr. {{ appt.doctor_name || 'N/A' }}</h6>
+                                  <small class="text-success">{{ formatDate(appt.appointment_time) }}</small>
+                              </div>
+                              <small class="text-muted">{{ appt.reason || 'No reason specified' }}</small>
+                          </a>
+                      </div>
+                       <div class="text-center mt-2">
+                           <a routerLink="../appointments" class="btn btn-sm btn-outline-secondary">View All Appointments</a>
+                       </div>
+                  </div>
+                   <ng-template #noAppointments>
+                       <div class="alert alert-light text-center">
+                          <i class="fas fa-calendar-times fa-lg me-2 text-muted"></i> No upcoming appointments scheduled.
+                       </div>
+                   </ng-template>
+              </div>
+          </div>
+  
+          <!-- Recent Vitals Summary -->
+          <div class="col-lg-6">
+              <div class="recent-vitals mb-4">
+                  <h4><i class="fas fa-notes-medical me-2 text-danger"></i>Recent Vitals</h4>
+                  <div *ngIf="data.recentVitals && data.recentVitals.length > 0; else noVitals">
+                      <div class="list-group">
+                          <a *ngFor="let vital of data.recentVitals"
+                              routerLink="../vitals"
+                              class="list-group-item list-group-item-action">
+                              <div class="d-flex w-100 justify-content-between align-items-center">
+                                  <div>
+                                      <span class="me-3" title="Blood Pressure"><i class="fas fa-tint me-1 text-muted"></i> BP: <strong>{{ formatBP(vital.blood_pressure_systolic, vital.blood_pressure_diastolic) }}</strong></span>
+                                      <span class="me-3" title="Heart Rate"><i class="fas fa-heartbeat me-1 text-muted"></i> HR: <strong>{{ vital.heart_rate ?? 'N/A' }}</strong> bpm</span>
+                                      <span title="Glucose"><i class="fas fa-prescription-bottle me-1 text-muted"></i> Glucose: <strong>{{ vital.glucose_level ?? 'N/A' }}</strong> mg/dL</span>
+                                       <!-- Add Temp if needed -->
+                                       <!-- <span class="ms-3" title="Temperature"><i class="fas fa-thermometer-half me-1 text-muted"></i> Temp: <strong>{{ vital.temperature ?? 'N/A' }}</strong> °C</span> -->
+                                  </div>
+                                  <small class="text-info flex-shrink-0 ms-2">{{ formatDate(vital.record_time) }}</small>
+                              </div>
+                              <small *ngIf="vital.notes" class="text-muted d-block mt-1"><em>Notes: {{ vital.notes | slice:0:50 }}...</em></small>
+                          </a>
+                      </div>
+                       <div class="text-center mt-2">
+                           <a routerLink="../vitals" class="btn btn-sm btn-outline-secondary">View Vitals History</a>
+                       </div>
+                  </div>
+                  <ng-template #noVitals>
+                      <div class="alert alert-light text-center">
+                           <i class="fas fa-file-medical-alt fa-lg me-2 text-muted"></i> No recent vital records found.
+                      </div>
+                  </ng-template>
+              </div>
+          </div>
+      </div>
+  
+    </div> <!-- End main data container -->
+  
+  </div>
+  
+  <style>
+    .quick-actions .action-card {
+       transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+       border: 1px solid var(--border-color);
+     }
+    .quick-actions .action-card:hover {
+       transform: translateY(-5px);
+       box-shadow: var(--box-shadow-hover);
+     }
+     /* Ensure link covers card but text is clickable */
+    .quick-actions .action-card .card-body { z-index: 2; position: relative; }
+    .quick-actions .action-card .stretched-link::after {
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      z-index: 1;
+      content: "";
+    }
+    .upcoming-appointments h4, .recent-vitals h4 {
+      margin-bottom: 1rem;
+      border-bottom: 2px solid var(--border-color);
+      padding-bottom: 0.5rem;
+      color: var(--primary-color);
+    }
+    .list-group-item strong { color: var(--text-color); }
+    .list-group-item span[title] { /* Tooltip simulation or just grouping */
+       display: inline-block;
+    }
+  
+     @media (max-width: 767px) {
+        .recent-vitals .d-flex { flex-wrap: wrap; }
+        .recent-vitals .text-info { width: 100%; text-align: right; margin-top: 0.25rem; }
+     }
+  </style>

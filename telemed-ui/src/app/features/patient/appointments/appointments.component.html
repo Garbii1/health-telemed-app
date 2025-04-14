@@ -1,0 +1,88 @@
+<!-- features/patient/appointments/appointments.component.html -->
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap">
+        <h2>My Appointments</h2>
+         <!-- Filter Dropdown -->
+         <div class="filter-options">
+            <label for="statusFilter" class="form-label me-2">Filter by Status:</label>
+            <select id="statusFilter" class="form-select form-select-sm" (change)="onFilterChange($event)">
+               <option value="ALL" [selected]="filterStatus.value === 'ALL'">All</option>
+               <option value="SCHEDULED">Scheduled</option>
+               <option value="COMPLETED">Completed</option>
+               <option value="CANCELLED">Cancelled</option>
+            </select>
+         </div>
+    </div>
+     <p>View your past and upcoming virtual consultations.</p>
+      <hr>
+      <a routerLink="../book-appointment" class="btn btn-primary mb-3">
+         <i class="fas fa-plus me-1"></i> Book New Appointment
+      </a>
+  
+  
+    <div *ngIf="isLoading && !(appointments$ | async)" class="text-center mt-4">
+      <app-loading-spinner [isLoading]="true" message="Loading appointments..."></app-loading-spinner>
+    </div>
+  
+    <div *ngIf="errorMessage && !isLoading" class="alert alert-danger mt-3">
+      {{ errorMessage }}
+    </div>
+     <div *ngIf="cancelError" class="alert alert-danger mt-3">
+       {{ cancelError }}
+     </div>
+  
+  
+    <div *ngIf="!isLoading && (appointments$ | async) as appointments">
+      <div *ngIf="appointments.length === 0 && !errorMessage" class="alert alert-info mt-3 text-center">
+         <i class="fas fa-calendar-times fa-lg me-2 text-muted"></i> No appointments found matching the selected filter.
+      </div>
+  
+      <div class="list-group mt-3" *ngIf="appointments.length > 0">
+        <div *ngFor="let appt of appointments" class="list-group-item mb-3 shadow-sm appointment-card-patient">
+          <div class="row align-items-center">
+             <div class="col-md-8">
+                 <h5 class="mb-1">Dr. {{ appt.doctor_name || 'N/A' }}</h5>
+                 <p class="mb-1">
+                     <i class="fas fa-clock me-1 text-muted"></i> <strong>Time:</strong> {{ formatDate(appt.appointment_time) }}
+                     <span class="badge ms-2" [ngClass]="{
+                        'bg-primary': appt.status === 'SCHEDULED',
+                        'bg-success': appt.status === 'COMPLETED',
+                        'bg-secondary': appt.status === 'CANCELLED'
+                      }">{{ appt.status }}</span>
+                 </p>
+                 <p class="mb-1 reason"><i class="fas fa-comment-medical me-1 text-muted"></i> <strong>Reason:</strong> {{ appt.reason || 'Not specified' }}</p>
+                 <div *ngIf="appt.status === 'COMPLETED' && appt.consultation_notes" class="notes-preview mt-2">
+                     <strong><i class="fas fa-notes-medical me-1 text-muted"></i>Doctor's Notes:</strong> <em class="text-muted">{{ appt.consultation_notes }}</em>
+                 </div>
+              </div>
+             <div class="col-md-4 text-md-end mt-2 mt-md-0 action-buttons-patient">
+                  <!-- Show 'Cancel' button only for Scheduled appointments -->
+                 <button *ngIf="appt.status === 'SCHEDULED'"
+                         class="btn btn-outline-danger btn-sm"
+                         (click)="confirmCancelAppointment(appt.id)"
+                         [disabled]="cancellingAppointmentId === appt.id">
+                     <span *ngIf="cancellingAppointmentId !== appt.id"><i class="fas fa-times me-1"></i> Cancel</span>
+                     <span *ngIf="cancellingAppointmentId === appt.id">
+                        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                         Cancelling...
+                     </span>
+                  </button>
+                   <!-- Add button for video call if implemented -->
+                   <!-- <button *ngIf="appt.status === 'SCHEDULED' && appt.video_call_link" class="btn btn-success btn-sm ms-2">Join Call</button> -->
+              </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <style>
+  .appointment-card-patient { border-left: 5px solid var(--primary-color); }
+  .appointment-card-patient .badge { font-size: 0.85em; }
+  .appointment-card-patient .reason { color: var(--text-color-light); font-size: 0.95rem; }
+  .notes-preview { background-color: #f8f9fa; border-left: 3px solid var(--border-color); padding: 0.75rem 1rem; border-radius: 4px; font-size: 0.9rem; margin-top: 0.75rem; }
+  .notes-preview strong { display: block; margin-bottom: 0.25rem; color: var(--primary-color); }
+  .action-buttons-patient .btn { white-space: nowrap; } /* Prevent buttons wrapping text */
+  .text-md-end { text-align: right !important; }
+  @media (max-width: 767px) { .text-md-end { text-align: left !important; } }
+  </style>

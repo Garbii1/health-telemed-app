@@ -1,0 +1,172 @@
+<!-- features/doctor/appointments/appointments.component.html -->
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>My Schedule</h2>
+         <!-- Filter Dropdown -->
+         <div class="filter-options">
+            <label for="statusFilter" class="form-label me-2">Filter by Status:</label>
+            <select id="statusFilter" class="form-select form-select-sm" (change)="onFilterChange($event)">
+               <option value="SCHEDULED" [selected]="filterStatus.value === 'SCHEDULED'">Scheduled</option>
+               <option value="COMPLETED">Completed</option>
+               <option value="CANCELLED">Cancelled</option>
+               <option value="ALL">All</option>
+            </select>
+         </div>
+    </div>
+  
+  
+    <div *ngIf="isLoading && !(appointments$ | async)" class="text-center mt-4"> <!-- Show spinner only initially -->
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+      <p>Loading appointments...</p>
+    </div>
+  
+    <div *ngIf="errorMessage" class="alert alert-danger mt-3">
+      {{ errorMessage }}
+    </div>
+  
+    <div *ngIf="(appointments$ | async) as appointments">
+      <div *ngIf="!isLoading && appointments.length === 0 && !errorMessage" class="alert alert-info mt-3">
+        No appointments found matching the selected filter.
+      </div>
+  
+      <div class="list-group mt-3" *ngIf="appointments.length > 0">
+        <div *ngFor="let appt of appointments" class="list-group-item list-group-item-action mb-3 shadow-sm appointment-card">
+          <div class="row">
+             <div class="col-md-8">
+                <h5 class="mb-1">Patient: {{ appt.patient_name || 'N/A' }}</h5>
+                 <p class="mb-1">
+                    <strong>Time:</strong> {{ formatDate(appt.appointment_time) }}
+                    <span class="badge ms-2" [ngClass]="{
+                       'bg-primary': appt.status === 'SCHEDULED',
+                       'bg-success': appt.status === 'COMPLETED',
+                       'bg-secondary': appt.status === 'CANCELLED'
+                     }">{{ appt.status }}</span>
+                 </p>
+                 <p class="mb-1 reason"><strong>Reason:</strong> {{ appt.reason || 'Not specified' }}</p>
+                 <div *ngIf="appt.status === 'COMPLETED' && appt.consultation_notes" class="notes-preview mt-2">
+                     <strong>Notes:</strong> <em class="text-muted">{{ appt.consultation_notes | slice:0:100 }}{{ appt.consultation_notes.length > 100 ? '...' : '' }}</em>
+                 </div>
+              </div>
+             <div class="col-md-4 d-flex align-items-center justify-content-end action-buttons">
+                  <!-- Show 'Complete' button only for Scheduled appointments -->
+                 <button *ngIf="appt.status === 'SCHEDULED'" class="btn btn-success btn-sm" (click)="openNotesModal(appt)">
+                    Complete & Add Notes
+                  </button>
+                   <!-- Show 'Edit Notes' button for Completed appointments -->
+                   <button *ngIf="appt.status === 'COMPLETED'" class="btn btn-outline-secondary btn-sm" (click)="openNotesModal(appt)">
+                     View/Edit Notes
+                   </button>
+                   <!-- Maybe add a 'View Patient History' button here later -->
+              </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  
+    <!-- Simple Modal / Form for Notes (Replace with a proper modal component later) -->
+    <div class="modal-overlay" *ngIf="showNotesModalForAppointmentId">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <form [formGroup]="notesForm" (ngSubmit)="submitConsultationNotes()">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Consultation Notes for {{ selectedAppointment?.patient_name }}</h5>
+                        <button type="button" class="btn-close" aria-label="Close" (click)="closeNotesModal()"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p><strong>Appointment Time:</strong> {{ formatDate(selectedAppointment?.appointment_time) }}</p>
+                        <p><strong>Reason:</strong> {{ selectedAppointment?.reason || 'Not specified' }}</p>
+                        <hr>
+                        <div class="form-group">
+                            <label for="consultation_notes" class="form-label">Enter Consultation Notes:</label>
+                            <textarea id="consultation_notes" class="form-control" rows="6" formControlName="consultation_notes" placeholder="Enter details about the consultation, diagnosis, recommendations, etc." [class.is-invalid]="notesForm.get('consultation_notes')?.invalid && notesForm.get('consultation_notes')?.touched"></textarea>
+                            <div *ngIf="notesForm.get('consultation_notes')?.invalid && notesForm.get('consultation_notes')?.touched" class="invalid-feedback">
+                               Notes cannot be empty.
+                            </div>
+                            <!-- Display submission error -->
+                            <div *ngIf="notesForm.errors?.['submitError']" class="alert alert-danger mt-2">
+                               {{ notesForm.errors?.['submitError'] }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" (click)="closeNotesModal()">Cancel</button>
+                        <button type="submit" class="btn btn-success" [disabled]="isSubmittingNotes || notesForm.invalid">
+                            <span *ngIf="!isSubmittingNotes">Save Notes & Mark Complete</span>
+                            <span *ngIf="isSubmittingNotes">
+                                 <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                 Saving...
+                            </span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div> <!-- End Modal -->
+  
+  
+  </div>
+  
+  <!-- Add Styles for components if not global -->
+  <style>
+   /* Basic Modal Styling */
+   .modal-overlay {
+       position: fixed;
+       top: 0;
+       left: 0;
+       width: 100%;
+       height: 100%;
+       background-color: rgba(0, 0, 0, 0.5);
+       z-index: 1050; /* Higher than header */
+       display: flex;
+       align-items: center; /* Center vertically */
+       justify-content: center; /* Center horizontally */
+       overflow-y: auto; /* Allow scrolling if content is too tall */
+       padding: 1rem;
+     }
+     .modal-dialog {
+        position: relative;
+        width: auto;
+        margin: .5rem;
+        pointer-events: none;
+        max-width: 800px; /* Modal max width */
+        width: 100%;
+      }
+     .modal-content {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        pointer-events: auto;
+        background-color: #fff;
+        background-clip: padding-box;
+        border: 1px solid rgba(0,0,0,.2);
+        border-radius: .3rem;
+        outline: 0;
+      }
+     .modal-header { display: flex; flex-shrink: 0; align-items: center; justify-content: space-between; padding: 1rem 1rem; border-bottom: 1px solid #dee2e6; border-top-left-radius: calc(.3rem - 1px); border-top-right-radius: calc(.3rem - 1px); }
+     .modal-header .btn-close { padding: .5rem .5rem; margin: -.5rem -.5rem -.5rem auto; }
+     .modal-title { margin-bottom: 0; line-height: 1.5; }
+     .modal-body { position: relative; flex: 1 1 auto; padding: 1rem; }
+     .modal-footer { display: flex; flex-wrap: wrap; flex-shrink: 0; align-items: center; justify-content: flex-end; padding: .75rem; border-top: 1px solid #dee2e6; border-bottom-right-radius: calc(.3rem - 1px); border-bottom-left-radius: calc(.3rem - 1px); }
+     .modal-footer > * { margin: .25rem; }
+     .btn-close { box-sizing: content-box; width: 1em; height: 1em; padding: .25em .25em; color: #000; background: transparent; border: 0; border-radius: .25rem; opacity: .5; }
+     .btn-close:hover { color: #000; text-decoration: none; opacity: .75; }
+  
+   /* Other styles */
+   .appointment-card { border-left: 5px solid var(--primary-color); transition: box-shadow 0.2s ease-in-out; }
+   .appointment-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+   .appointment-card .badge { font-size: 0.85em; }
+   .appointment-card .reason { color: var(--text-color-light); font-size: 0.95rem; }
+   .notes-preview { background-color: #f8f9fa; border-left: 3px solid var(--border-color); padding: 0.5rem 0.75rem; border-radius: 4px; font-size: 0.9rem; }
+   .action-buttons .btn { margin-left: 0.5rem; }
+   .filter-options { display:flex; align-items: center; }
+   .form-select-sm { padding-top: .25rem; padding-bottom: .25rem; padding-left: .5rem; font-size: .875rem; border-radius: .2rem; }
+   .form-select { display: block; width: auto; padding: .375rem 2.25rem .375rem .75rem; font-size: 1rem; font-weight: 400; line-height: 1.5; color: #495057; background-color: #fff; background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right .75rem center; background-size: 16px 12px; border: 1px solid #ced4da; border-radius: .25rem; appearance: none; }
+  
+   @media (max-width: 767px) {
+      .action-buttons { justify-content: flex-start; margin-top: 1rem; }
+      .modal-dialog { max-width: 95%; margin: 1rem auto; }
+   }
+  </style>

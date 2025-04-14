@@ -1,0 +1,127 @@
+<!-- features/patient/profile/profile.component.html -->
+<div class="container mt-4">
+    <h2>My Profile</h2>
+    <p>View and update your profile information.</p>
+    <hr>
+  
+    <div *ngIf="isLoading" class="text-center mt-5">
+       <app-loading-spinner [isLoading]="true" message="Loading profile..."></app-loading-spinner>
+    </div>
+  
+    <div *ngIf="errorMessage && !isLoading" class="alert alert-danger">
+       {{ errorMessage }}
+     </div>
+  
+    <form *ngIf="!isLoading && initialProfileData" [formGroup]="profileForm" (ngSubmit)="onSubmit()">
+  
+        <!-- Success Message -->
+         <div *ngIf="successMessage" class="alert alert-success mb-3">
+            {{ successMessage }}
+          </div>
+  
+        <div class="card mb-4">
+           <div class="card-header">Account Information</div>
+           <div class="card-body">
+               <div class="row">
+                  <div class="col-md-6">
+                     <div class="form-group">
+                        <label for="username" class="form-label">Username</label>
+                        <input type="text" id="username" class="form-control" formControlName="username">
+                         <small class="form-text text-muted">Username cannot be changed.</small>
+                      </div>
+                  </div>
+                  <div class="col-md-6">
+                      <div class="form-group">
+                         <label for="email" class="form-label">Email Address <span class="text-danger">*</span></label>
+                         <input type="email" id="email" class="form-control" formControlName="email" [class.is-invalid]="email?.invalid && email?.touched">
+                          <div *ngIf="email?.invalid && email?.touched" class="invalid-feedback">
+                            <div *ngIf="email?.errors?.['required']">Email is required.</div>
+                            <div *ngIf="email?.errors?.['email']">Invalid email format.</div>
+                          </div>
+                       </div>
+                   </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                       <div class="form-group">
+                           <label for="first_name" class="form-label">First Name <span class="text-danger">*</span></label>
+                           <input type="text" id="first_name" class="form-control" formControlName="first_name" [class.is-invalid]="first_name?.invalid && first_name?.touched">
+                            <div *ngIf="first_name?.invalid && first_name?.touched" class="invalid-feedback">First name is required.</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="last_name" class="form-label">Last Name <span class="text-danger">*</span></label>
+                            <input type="text" id="last_name" class="form-control" formControlName="last_name" [class.is-invalid]="last_name?.invalid && last_name?.touched">
+                             <div *ngIf="last_name?.invalid && last_name?.touched" class="invalid-feedback">Last name is required.</div>
+                         </div>
+                     </div>
+                 </div>
+           </div>
+        </div>
+  
+       <div class="card mb-4">
+          <div class="card-header">Contact & Personal Information</div>
+          <div class="card-body">
+             <div class="row">
+               <div class="col-md-6">
+                  <div class="form-group">
+                     <label for="phone_number" class="form-label">Phone Number</label>
+                     <input type="tel" id="phone_number" class="form-control" formControlName="phone_number" placeholder="e.g., +1 555 123 4567">
+                   </div>
+               </div>
+               <div class="col-md-6">
+                   <div class="form-group">
+                      <label for="date_of_birth" class="form-label">Date of Birth</label>
+                      <input type="date" id="date_of_birth" class="form-control" formControlName="date_of_birth">
+                    </div>
+                </div>
+             </div>
+             <div class="form-group">
+                <label for="address" class="form-label">Address</label>
+                <textarea id="address" class="form-control" rows="3" formControlName="address" placeholder="Your street address, city, etc."></textarea>
+             </div>
+          </div>
+       </div>
+  
+        <div class="card mb-4" formGroupName="patient_details">
+            <div class="card-header">Emergency Contact (Optional)</div>
+            <div class="card-body">
+               <div class="row">
+                   <div class="col-md-6">
+                       <div class="form-group">
+                          <label for="emergency_contact_name" class="form-label">Contact Name</label>
+                           <input type="text" id="emergency_contact_name" class="form-control" formControlName="emergency_contact_name">
+                       </div>
+                   </div>
+                   <div class="col-md-6">
+                        <div class="form-group">
+                           <label for="emergency_contact_phone" class="form-label">Contact Phone</label>
+                           <input type="tel" id="emergency_contact_phone" class="form-control" formControlName="emergency_contact_phone">
+                        </div>
+                   </div>
+                </div>
+            </div>
+        </div>
+  
+  
+       <!-- Submit Button -->
+        <div class="mt-4 text-end">
+           <button type="submit" class="btn btn-primary" [disabled]="isSaving || profileForm.invalid || !profileForm.dirty">
+             <span *ngIf="!isSaving">Save Changes</span>
+             <span *ngIf="isSaving">
+               <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+               Saving...
+             </span>
+           </button>
+        </div>
+  
+    </form>
+  </div>
+  
+  <style>
+  /* Ensure consistent spacing within form groups */
+  .form-group { margin-bottom: 1.25rem; }
+  .text-end { text-align: right !important; }
+  .text-danger { color: var(--error-color); }
+  </style>

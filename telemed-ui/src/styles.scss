@@ -1,0 +1,349 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+// --- Variables ---
+:root {
+  --primary-color: #4a90e2; // A calm blue
+  --secondary-color: #50e3c2; // A gentle teal/green accent
+  --accent-color: #f5a623; // Optional accent (e.g., for warnings or highlights)
+  --text-color: #333;
+  --text-color-light: #666;
+  --bg-color: #f8f9fa; // Light grey background
+  --bg-color-alt: #ffffff; // White for cards/containers
+  --border-color: #e0e0e0;
+  --success-color: #28a745;
+  --error-color: #dc3545;
+  --link-color: var(--primary-color);
+
+  --font-family-base: 'Poppins', sans-serif;
+  --font-size-base: 16px;
+  --line-height-base: 1.6;
+
+  --border-radius: 8px;
+  --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --box-shadow-hover: 0 6px 16px rgba(0, 0, 0, 0.12);
+
+  --container-max-width: 1200px;
+  --container-padding: 0 20px;
+
+  --header-height: 70px;
+  --footer-height: 50px;
+}
+
+// --- Reset & Base Styles ---
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: var(--font-size-base);
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-family-base);
+  line-height: var(--line-height-base);
+  color: var(--text-color);
+  background-color: var(--bg-color);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+main {
+  flex-grow: 1; // Ensure main content takes up available space
+  padding-top: var(--header-height); // Prevent content from hiding under fixed header
+  padding-bottom: 2rem; // Add some space before the footer
+}
+
+h1, h2, h3, h4, h5, h6 {
+  margin-bottom: 0.75rem;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+h1 { font-size: 2.2rem; }
+h2 { font-size: 1.8rem; }
+h3 { font-size: 1.5rem; }
+h4 { font-size: 1.2rem; }
+
+p {
+  margin-bottom: 1rem;
+  color: var(--text-color-light);
+}
+
+a {
+  color: var(--link-color);
+  text-decoration: none;
+  transition: color 0.2s ease-in-out;
+
+  &:hover {
+    color: darken(var(--link-color), 10%);
+    text-decoration: underline;
+  }
+}
+
+ul, ol {
+  list-style-position: inside;
+  margin-bottom: 1rem;
+  padding-left: 1.5rem; // Indent list items
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  display: block; // Remove bottom space
+}
+
+button, input, select, textarea {
+  font-family: inherit;
+  font-size: 1rem;
+  line-height: var(--line-height-base);
+}
+
+// --- Layout Container ---
+.container {
+  max-width: var(--container-max-width);
+  margin-left: auto;
+  margin-right: auto;
+  padding: var(--container-padding);
+}
+
+// --- Utility Classes ---
+.text-center { text-align: center; }
+.mt-1 { margin-top: 0.5rem; }
+.mt-2 { margin-top: 1rem; }
+.mt-3 { margin-top: 1.5rem; }
+.mt-4 { margin-top: 2rem; }
+.mb-1 { margin-bottom: 0.5rem; }
+.mb-2 { margin-bottom: 1rem; }
+.mb-3 { margin-bottom: 1.5rem; }
+.mb-4 { margin-bottom: 2rem; }
+.p-1 { padding: 0.5rem; }
+.p-2 { padding: 1rem; }
+.p-3 { padding: 1.5rem; }
+.p-4 { padding: 2rem; }
+
+// --- Buttons ---
+.btn {
+  display: inline-block;
+  padding: 0.75rem 1.5rem;
+  font-weight: 500;
+  text-align: center;
+  vertical-align: middle;
+  cursor: pointer;
+  border: 1px solid transparent;
+  border-radius: var(--border-radius);
+  transition: all 0.2s ease-in-out;
+  user-select: none; // Prevent text selection on click
+
+  &:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+  }
+}
+
+.btn-primary {
+  color: #fff;
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+
+  &:hover:not(:disabled) {
+    background-color: darken(var(--primary-color), 10%);
+    border-color: darken(var(--primary-color), 10%);
+  }
+}
+
+.btn-secondary {
+   color: #fff;
+   background-color: var(--secondary-color);
+   border-color: var(--secondary-color);
+
+   &:hover:not(:disabled) {
+     background-color: darken(var(--secondary-color), 10%);
+     border-color: darken(var(--secondary-color), 10%);
+   }
+ }
+
+.btn-outline-primary {
+  color: var(--primary-color);
+  background-color: transparent;
+  border-color: var(--primary-color);
+
+  &:hover:not(:disabled) {
+    color: #fff;
+    background-color: var(--primary-color);
+  }
+}
+
+.btn-danger {
+   color: #fff;
+   background-color: var(--error-color);
+   border-color: var(--error-color);
+
+   &:hover:not(:disabled) {
+     background-color: darken(var(--error-color), 10%);
+     border-color: darken(var(--error-color), 10%);
+   }
+ }
+
+// --- Forms ---
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.form-control {
+  display: block;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: var(--text-color);
+  background-color: var(--bg-color-alt);
+  background-clip: padding-box;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+
+  &:focus {
+    border-color: var(--primary-color);
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem rgba(var(--primary-color), 0.25); // Use RGB for transparency if needed
+  }
+
+  &::placeholder {
+    color: #aaa;
+  }
+}
+
+textarea.form-control {
+  min-height: 120px;
+  resize: vertical;
+}
+
+.form-check {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.form-check-input {
+  margin-right: 0.5rem;
+  width: 1.2em;
+  height: 1.2em;
+}
+
+.form-check-label {
+  margin-bottom: 0; // Reset default margin
+}
+
+.invalid-feedback {
+  display: none; // Hide by default
+  width: 100%;
+  margin-top: 0.25rem;
+  font-size: 0.875em;
+  color: var(--error-color);
+}
+
+// Show feedback when input is invalid
+.form-control.ng-invalid.ng-touched {
+  border-color: var(--error-color);
+   &:focus {
+     box-shadow: 0 0 0 0.2rem rgba(var(--error-color), 0.25); // Use RGB if needed
+   }
+}
+
+.form-control.ng-invalid.ng-touched + .invalid-feedback,
+.ng-invalid.ng-touched .invalid-feedback // For custom controls or groups
+{
+  display: block;
+}
+
+// --- Cards ---
+.card {
+  background-color: var(--bg-color-alt);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+  margin-bottom: 1.5rem;
+  overflow: hidden; // Ensure content stays within rounded corners
+
+  .card-header {
+    padding: 1rem 1.5rem;
+    background-color: var(--bg-color); // Slightly different background for header
+    border-bottom: 1px solid var(--border-color);
+    font-size: 1.2rem;
+    font-weight: 600;
+  }
+
+  .card-body {
+    padding: 1.5rem;
+  }
+
+   .card-footer {
+    padding: 1rem 1.5rem;
+    background-color: var(--bg-color);
+    border-top: 1px solid var(--border-color);
+  }
+}
+
+// --- Alerts ---
+.alert {
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border: 1px solid transparent;
+  border-radius: var(--border-radius);
+  position: relative; // For potential close buttons
+
+  &.alert-success {
+    color: darken(var(--success-color), 15%);
+    background-color: lighten(var(--success-color), 45%);
+    border-color: lighten(var(--success-color), 35%);
+  }
+  &.alert-danger {
+    color: darken(var(--error-color), 15%);
+    background-color: lighten(var(--error-color), 45%);
+    border-color: lighten(var(--error-color), 35%);
+  }
+  &.alert-info {
+     color: darken(var(--primary-color), 15%);
+     background-color: lighten(var(--primary-color), 45%);
+     border-color: lighten(var(--primary-color), 35%);
+   }
+}
+
+// --- Responsive Design ---
+@media (max-width: 768px) {
+  html { font-size: 15px; } // Slightly smaller base font on smaller screens
+  h1 { font-size: 1.8rem; }
+  h2 { font-size: 1.6rem; }
+  h3 { font-size: 1.3rem; }
+
+  .container { --container-padding: 0 15px; }
+
+  .btn { padding: 0.6rem 1.2rem; }
+
+  main { padding-top: calc(var(--header-height) - 10px); } // Adjust if header shrinks
+}
+
+@media (max-width: 576px) {
+   html { font-size: 14px; }
+   h1 { font-size: 1.6rem; }
+   h2 { font-size: 1.4rem; }
+
+   .card-body, .card-header, .card-footer { padding: 1rem; }
+   .form-control { padding: 0.6rem 0.8rem;}
+}
+
+// --- Specific Component Styles (Add later in component SCSS files) ---

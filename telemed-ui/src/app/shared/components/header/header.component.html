@@ -1,0 +1,50 @@
+<header class="app-header">
+    <nav class="container header-nav">
+      <div class="logo">
+        <a routerLink="/">
+          <img src="assets/logo.png" alt="Telemed Platform Logo" class="logo-img">
+          <span class="logo-text">HealthConnect</span> <!-- Optional text beside logo -->
+        </a>
+      </div>
+  
+      <!-- Mobile Menu Button -->
+      <button class="menu-toggle" (click)="toggleMenu()" [attr.aria-expanded]="isMenuOpen">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+  
+      <!-- Navigation Links -->
+      <ul class="nav-links" [class.open]="isMenuOpen">
+        <!-- Always Visible Links -->
+        <li><a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="toggleMenu(false)">Home</a></li>
+  
+        <!-- Patient Links -->
+        <ng-container *ngIf="isLoggedIn && userRole === 'PATIENT'">
+          <li><a routerLink="/patient/dashboard" routerLinkActive="active" (click)="toggleMenu(false)">Dashboard</a></li>
+          <li><a routerLink="/patient/vitals" routerLinkActive="active" (click)="toggleMenu(false)">My Vitals</a></li>
+          <li><a routerLink="/patient/appointments" routerLinkActive="active" (click)="toggleMenu(false)">Appointments</a></li>
+           <li><a routerLink="/patient/profile" routerLinkActive="active" (click)="toggleMenu(false)">Profile</a></li>
+        </ng-container>
+  
+        <!-- Doctor Links -->
+        <ng-container *ngIf="isLoggedIn && userRole === 'DOCTOR'">
+          <li><a routerLink="/doctor/dashboard" routerLinkActive="active" (click)="toggleMenu(false)">Dashboard</a></li>
+          <li><a routerLink="/doctor/patients" routerLinkActive="active" (click)="toggleMenu(false)">My Patients</a></li>
+          <li><a routerLink="/doctor/appointments" routerLinkActive="active" (click)="toggleMenu(false)">Schedule</a></li>
+           <li><a routerLink="/doctor/profile" routerLinkActive="active" (click)="toggleMenu(false)">Profile</a></li>
+        </ng-container>
+  
+        <!-- Auth Links -->
+        <ng-container *ngIf="!isLoggedIn">
+          <li class="auth-link"><a routerLink="/login" routerLinkActive="active" class="btn btn-outline-primary btn-sm" (click)="toggleMenu(false)">Login</a></li>
+          <li class="auth-link"><a routerLink="/register" routerLinkActive="active" class="btn btn-primary btn-sm" (click)="toggleMenu(false)">Register</a></li>
+        </ng-container>
+  
+        <ng-container *ngIf="isLoggedIn">
+          <li class="user-info-nav" *ngIf="userInfo">Welcome, {{ userInfo.username || 'User' }}!</li>
+          <li class="auth-link"><button class="btn btn-danger btn-sm" (click)="logout()">Logout</button></li>
+        </ng-container>
+      </ul>
+    </nav>
+  </header>

@@ -1,0 +1,97 @@
+<!-- features/patient/book-appointment/book-appointment.component.html -->
+<div class="container mt-4">
+    <h2>Book a Virtual Consultation</h2>
+    <p>Select a doctor and choose a suitable time for your appointment.</p>
+    <hr>
+  
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <form [formGroup]="appointmentForm" (ngSubmit)="onSubmit()">
+  
+          <!-- Loading Doctors Spinner -->
+          <div *ngIf="isLoadingDoctors" class="text-center mb-3">
+             <app-loading-spinner [isLoading]="true" message="Loading doctors..."></app-loading-spinner>
+          </div>
+  
+           <!-- General Error Message -->
+           <div *ngIf="errorMessage && !isSubmitting" class="alert alert-danger">
+             {{ errorMessage }}
+           </div>
+            <!-- Success Message -->
+            <div *ngIf="successMessage" class="alert alert-success">
+               {{ successMessage }} Redirecting...
+             </div>
+  
+  
+          <!-- Doctor Selection -->
+          <div class="form-group mb-3" *ngIf="!isLoadingDoctors && (doctors$ | async) as doctors">
+            <label for="doctor_id" class="form-label">Select Doctor <span class="text-danger">*</span></label>
+            <select id="doctor_id" class="form-select" formControlName="doctor_id" [class.is-invalid]="doctor_id?.invalid && doctor_id?.touched">
+              <option value="" disabled>-- Choose a Doctor --</option>
+              <option *ngFor="let doctor of doctors" [value]="doctor.id">
+                Dr. {{ doctor.first_name }} {{ doctor.last_name }} ({{ doctor.profile?.doctor_details?.specialization || 'General' }}) <!-- Adjust based on DoctorSerializer output -->
+              </option>
+               <option *ngIf="doctors.length === 0" value="" disabled>No doctors available</option>
+            </select>
+             <div *ngIf="doctor_id?.invalid && doctor_id?.touched" class="invalid-feedback">
+               Please select a doctor.
+             </div>
+          </div>
+  
+          <!-- Date and Time Selection -->
+          <div class="form-group mb-3">
+            <label for="appointment_time" class="form-label">Select Date and Time <span class="text-danger">*</span></label>
+            <input type="datetime-local" id="appointment_time" class="form-control" formControlName="appointment_time" [min]="minDateTime" [class.is-invalid]="appointment_time?.invalid && appointment_time?.touched">
+            <div *ngIf="appointment_time?.invalid && appointment_time?.touched" class="invalid-feedback">
+               <div *ngIf="appointment_time?.errors?.['required']">Please select a date and time.</div>
+               <div *ngIf="appointment_time?.errors?.['pastDate']">Cannot book appointments in the past.</div>
+               <!-- Add more specific errors if needed (e.g., invalid format) -->
+            </div>
+             <small class="form-text text-muted">Select a date and time in the future.</small>
+          </div>
+  
+          <!-- Reason for Appointment -->
+          <div class="form-group mb-3">
+            <label for="reason" class="form-label">Reason for Appointment (Optional)</label>
+            <textarea id="reason" class="form-control" rows="4" formControlName="reason" placeholder="Briefly describe the reason for your visit (e.g., follow-up, new symptom, check-up)..." [class.is-invalid]="reason?.invalid && reason?.touched"></textarea>
+             <div *ngIf="reason?.invalid && reason?.touched" class="invalid-feedback">
+                 <div *ngIf="reason?.errors?.['maxlength']">Reason cannot exceed 500 characters.</div>
+             </div>
+          </div>
+  
+          <!-- Submit Button -->
+          <button type="submit" class="btn btn-primary" [disabled]="isSubmitting || appointmentForm.invalid || isLoadingDoctors">
+            <span *ngIf="!isSubmitting"><i class="fas fa-check me-1"></i> Book Appointment</span>
+            <span *ngIf="isSubmitting">
+              <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+              Booking...
+            </span>
+          </button>
+  
+        </form>
+      </div>
+    </div>
+  </div>
+  
+  <style>
+   .form-select {
+      /* Basic styling if not using Bootstrap's default */
+      display: block;
+      width: 100%;
+      padding: .375rem 2.25rem .375rem .75rem;
+      font-size: 1rem;
+      font-weight: 400;
+      line-height: 1.5;
+      color: #495057;
+      background-color: #fff;
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
+      background-repeat: no-repeat;
+      background-position: right .75rem center;
+      background-size: 16px 12px;
+      border: 1px solid #ced4da;
+      border-radius: .25rem;
+      appearance: none;
+    }
+    .form-select.is-invalid { border-color: var(--error-color); }
+    .text-danger { color: var(--error-color) !important; }
+  </style>

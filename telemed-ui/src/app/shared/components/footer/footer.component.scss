@@ -1,0 +1,48 @@
+.app-footer {
+    background-color: darken(var(--bg-color), 5%); // Slightly darker than main bg
+    color: var(--text-color-light);
+    padding: 1rem 0;
+    margin-top: auto; // Pushes footer to bottom if content is short
+    height: var(--footer-height);
+    border-top: 1px solid var(--border-color);
+    font-size: 0.9rem;
+  }
+  
+  .footer-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap; // Allow wrapping on small screens
+  }
+  
+  .footer-content p {
+    margin-bottom: 0; // Remove default paragraph margin
+  }
+  
+  .footer-nav {
+    a {
+      color: var(--text-color-light);
+      margin-left: 1.5rem;
+      text-decoration: none;
+  
+      &:hover {
+        color: var(--primary-color);
+        text-decoration: underline;
+      }
+    }
+  }
+  
+  @media (max-width: 576px) {
+    .footer-content {
+      flex-direction: column;
+      text-align: center;
+    }
+  
+    .footer-content p {
+      margin-bottom: 0.5rem;
+    }
+  
+    .footer-nav a {
+      margin: 0 0.5rem; // Adjust spacing for mobile
+    }
+  }

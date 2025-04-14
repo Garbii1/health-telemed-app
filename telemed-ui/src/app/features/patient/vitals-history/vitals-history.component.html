@@ -1,0 +1,151 @@
+<div class="vitals-history-container mt-4">
+    <h4>Vitals History & Trends</h4>
+  
+    <ng-container *ngIf="!vitalsData">
+      <p>Loading vital history...</p> <!-- Or a spinner component -->
+    </ng-container>
+  
+    <ng-container *ngIf="vitalsData && vitalsData.length === 0">
+      <div class="alert alert-info">No vital records found. Add a new record using the button above.</div>
+    </ng-container>
+  
+    <ng-container *ngIf="vitalsData && vitalsData.length > 0">
+      <!-- Charts Section -->
+      <div class="charts-section row">
+        <!-- Blood Pressure Chart -->
+        <div class="col-lg-6 mb-4" *ngIf="bpChartData.length > 0">
+          <div class="card">
+            <div class="card-header">Blood Pressure Trend (mmHg)</div>
+            <div class="card-body">
+              <ngx-charts-line-chart
+                [view]="view"
+                [scheme]="colorSchemeBP"
+                [legend]="legend"
+                [showXAxisLabel]="showXAxisLabel"
+                [showYAxisLabel]="showYAxisLabel"
+                [xAxis]="xAxis"
+                [yAxis]="yAxis"
+                [xAxisLabel]="xAxisLabel"
+                yAxisLabel="Pressure (mmHg)"
+                [timeline]="timeline"
+                [results]="bpChartData">
+              </ngx-charts-line-chart>
+            </div>
+          </div>
+        </div>
+  
+        <!-- Heart Rate Chart -->
+         <div class="col-lg-6 mb-4" *ngIf="hrChartData.length > 0">
+            <div class="card">
+              <div class="card-header">Heart Rate Trend (bpm)</div>
+              <div class="card-body">
+                 <ngx-charts-line-chart
+                   [view]="view"
+                   [scheme]="colorSchemeHR"
+                   [legend]="legend"
+                   [showXAxisLabel]="showXAxisLabel"
+                   [showYAxisLabel]="showYAxisLabel"
+                   [xAxis]="xAxis"
+                   [yAxis]="yAxis"
+                   [xAxisLabel]="xAxisLabel"
+                   yAxisLabel="Heart Rate (bpm)"
+                   [timeline]="timeline"
+                   [results]="hrChartData">
+                 </ngx-charts-line-chart>
+              </div>
+            </div>
+         </div>
+  
+        <!-- Glucose Chart -->
+         <div class="col-lg-6 mb-4" *ngIf="glucoseChartData.length > 0">
+            <div class="card">
+               <div class="card-header">Glucose Trend (mg/dL)</div>
+               <div class="card-body">
+                 <ngx-charts-line-chart
+                   [view]="view"
+                   [scheme]="colorSchemeGlucose"
+                   [legend]="legend"
+                   [showXAxisLabel]="showXAxisLabel"
+                   [showYAxisLabel]="showYAxisLabel"
+                   [xAxis]="xAxis"
+                   [yAxis]="yAxis"
+                   [xAxisLabel]="xAxisLabel"
+                   yAxisLabel="Glucose (mg/dL)"
+                   [timeline]="timeline"
+                   [results]="glucoseChartData">
+                 </ngx-charts-line-chart>
+               </div>
+            </div>
+         </div>
+  
+         <!-- Temperature Chart -->
+          <div class="col-lg-6 mb-4" *ngIf="tempChartData.length > 0">
+             <div class="card">
+                <div class="card-header">Temperature Trend (°C)</div>
+                <div class="card-body">
+                  <ngx-charts-line-chart
+                    [view]="view"
+                    [scheme]="colorSchemeTemp"
+                    [legend]="legend"
+                    [showXAxisLabel]="showXAxisLabel"
+                    [showYAxisLabel]="showYAxisLabel"
+                    [xAxis]="xAxis"
+                    [yAxis]="yAxis"
+                    [xAxisLabel]="xAxisLabel"
+                    yAxisLabel="Temperature (°C)"
+                    [timeline]="timeline"
+                    [results]="tempChartData">
+                  </ngx-charts-line-chart>
+                </div>
+             </div>
+          </div>
+  
+      </div> <!-- End Charts Section -->
+  
+      <!-- History Table Section -->
+      <div class="history-table-section mt-4">
+        <h5>Detailed History</h5>
+        <div class="table-responsive"> <!-- Make table scrollable on small screens -->
+          <table class="table table-striped table-hover">
+            <thead>
+              <tr>
+                <th>Date & Time</th>
+                <th>BP (Sys/Dia)</th>
+                <th>Heart Rate (bpm)</th>
+                <th>Glucose (mg/dL)</th>
+                <th>Temp (°C)</th>
+                <th>Notes</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Iterate over original data for table display (newest first) -->
+              <tr *ngFor="let record of vitalsData">
+                <td>{{ formatDate(record.record_time) }}</td>
+                <td>{{ record.blood_pressure_systolic ?? 'N/A' }} / {{ record.blood_pressure_diastolic ?? 'N/A' }}</td>
+                <td>{{ record.heart_rate ?? 'N/A' }}</td>
+                <td>{{ record.glucose_level ?? 'N/A' }}</td>
+                <td>{{ record.temperature ?? 'N/A' }}</td>
+                <td>{{ record.notes || '-' }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </ng-container>
+  </div>
+  
+  
+  <!-- Add Bootstrap table/grid styles if not global -->
+  <style>
+  .table { width: 100%; margin-bottom: 1rem; color: #212529; vertical-align: top; border-color: #dee2e6; }
+  .table th, .table td { padding: .75rem; vertical-align: top; border-top: 1px solid #dee2e6; }
+  .table thead th { vertical-align: bottom; border-bottom: 2px solid #dee2e6; }
+  .table-striped tbody tr:nth-of-type(odd) { background-color: rgba(0,0,0,.05); }
+  .table-hover tbody tr:hover { color: #212529; background-color: rgba(0,0,0,.075); }
+  .table-responsive { display: block; width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .row { display: flex; flex-wrap: wrap; margin-right: -15px; margin-left: -15px; }
+  .col-lg-6 { position: relative; width: 100%; padding-right: 15px; padding-left: 15px; }
+  @media (min-width: 992px) { .col-lg-6 { flex: 0 0 50%; max-width: 50%; } }
+  .mt-4 { margin-top: 1.5rem !important; }
+  .mb-4 { margin-bottom: 1.5rem !important; }
+  </style>
