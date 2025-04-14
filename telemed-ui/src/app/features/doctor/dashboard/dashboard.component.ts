@@ -1,19 +1,30 @@
-// features/doctor/dashboard/dashboard.component.ts
+// src/app/features/doctor/dashboard/dashboard.component.ts
 import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common'; // For *ngIf, *ngFor, async pipe, date pipe
+import { RouterLink } from '@angular/router'; // For routerLink
 import { AuthService, UserInfo } from '../../../core/services/auth.service';
 import { ApiService } from '../../../core/services/api.service';
-import { Observable, forkJoin } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { Observable, forkJoin, of } from 'rxjs'; // Import of
+import { map, catchError } from 'rxjs/operators';
+import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
 
 @Component({
   selector: 'app-doctor-dashboard',
+  standalone: true, // Add standalone
+  imports: [
+      CommonModule, // Provides *ngIf, *ngFor, async pipe, date pipe
+      RouterLink, // Provides routerLink
+      LoadingSpinnerComponent // Import child component
+  ],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss']
 })
 export class DoctorDashboardComponent implements OnInit {
   currentUser: UserInfo | null = null;
-  dashboardStats$: Observable<any> | undefined;
+  // Allow null for initial state or error
+  dashboardStats$: Observable<{ upcomingAppointments: any[], totalPatients: number } | null> | undefined;
   isLoading = true;
+  errorMessage: string | null = null; // Add error message property
 
   constructor(private authService: AuthService, private apiService: ApiService) { }
 
@@ -24,35 +35,42 @@ export class DoctorDashboardComponent implements OnInit {
 
   loadDashboardData(): void {
      this.isLoading = true;
-     // Fetch multiple pieces of data concurrently
+     this.errorMessage = null; // Reset error on load
+
      this.dashboardStats$ = forkJoin({
-       // Fetch upcoming appointments (e.g., scheduled for today or future)
-       appointments: this.apiService.getAppointments({ status: 'SCHEDULED', limit: 5, ordering: 'appointment_time' }), // Add params as needed
-       // Fetch total number of assigned patients
-       patients: this.apiService.getDoctorPatients()
+       appointments: this.apiService.getAppointments({ status: 'SCHEDULED', limit: 5, ordering: 'appointment_time' }).pipe(
+           catchError(err => {
+               console.error("Error fetching appointments:", err);
+               this.errorMessage = "Could not load upcoming appointments.";
+               return of([]); // Return empty on error
+           })
+        ),
+       patients: this.apiService.getDoctorPatients().pipe(
+            catchError(err => {
+                console.error("Error fetching patients:", err);
+                if (this.errorMessage) this.errorMessage += " Could not load patient list.";
+                else this.errorMessage = "Could not load patient list.";
+                return of([]); // Return empty on error
+            })
+        )
      }).pipe(
        map(results => {
          this.isLoading = false;
-         // Process results into a summary object
          return {
            upcomingAppointments: results.appointments,
            totalPatients: results.patients.length,
-           // Add more stats as needed
          };
+       }),
+       catchError(err => { // Catch errors from forkJoin itself
+            console.error("Error loading doctor dashboard data:", err);
+            this.isLoading = false;
+            this.errorMessage = "Failed to load dashboard data.";
+            return of(null); // Return null on overall error
        })
      );
-
-     // Handle errors
-      this.dashboardStats$.subscribe({
-        error: err => {
-           console.error("Error loading doctor dashboard data:", err);
-           this.isLoading = false;
-           // Show error message on template
-        }
-      });
    }
 
-    formatDate(dateString: string): string {
+    formatDate(dateString: string | null): string {
        if (!dateString) return 'N/A';
        return new Date(dateString).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' });
      }

@@ -1,14 +1,21 @@
+// src/app/features/patient/vitals-form/vitals-form.component.ts
 import { Component, Output, EventEmitter } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { CommonModule } from '@angular/common'; // For *ngIf
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms'; // For forms
 import { ApiService } from '../../../core/services/api.service';
 import { finalize } from 'rxjs/operators';
 
 @Component({
   selector: 'app-vitals-form',
+  standalone: true, // Add standalone
+  imports: [
+    CommonModule, // For *ngIf
+    ReactiveFormsModule // For [formGroup] etc.
+  ],
   templateUrl: './vitals-form.component.html',
   styleUrls: ['./vitals-form.component.scss']
 })
-export class VitalsFormComponent {
+export class VitalsFormComponent { // Logic remains the same
   @Output() vitalSubmitted = new EventEmitter<void>();
   vitalForm: FormGroup;
   isLoading = false;
@@ -17,14 +24,12 @@ export class VitalsFormComponent {
 
   constructor(private fb: FormBuilder, private apiService: ApiService) {
     this.vitalForm = this.fb.group({
-      // Use null default for optional number fields to avoid sending 0 if empty
       blood_pressure_systolic: [null, [Validators.min(50), Validators.max(300)]],
       blood_pressure_diastolic: [null, [Validators.min(30), Validators.max(200)]],
       heart_rate: [null, [Validators.min(30), Validators.max(250)]],
-      glucose_level: [null, [Validators.min(0), Validators.max(1000)]], // Adjust range as needed
-      temperature: [null, [Validators.min(30), Validators.max(45)]], // Celsius example range
+      glucose_level: [null, [Validators.min(0), Validators.max(1000)]],
+      temperature: [null, [Validators.min(30), Validators.max(45)]],
       notes: ['']
-      // record_time is set by the backend automatically
     });
   }
 
@@ -33,27 +38,14 @@ export class VitalsFormComponent {
      this.successMessage = null;
      if (this.vitalForm.invalid) {
        this.vitalForm.markAllAsTouched();
-       console.log("Form invalid:", this.vitalForm.errors);
        return;
      }
-
-    // Filter out null or empty values before sending? Or let backend handle nullable fields.
-    // Let's send all fields, backend models allow null.
      const formData = this.vitalForm.value;
-
-     // Basic check: Ensure at least one vital sign is entered
-     const vitalValues = [
-         formData.blood_pressure_systolic,
-         formData.blood_pressure_diastolic,
-         formData.heart_rate,
-         formData.glucose_level,
-         formData.temperature
-        ];
-     if (vitalValues.every(value => value === null || value === '')) {
+     const vitalValues = [ formData.blood_pressure_systolic, formData.blood_pressure_diastolic, formData.heart_rate, formData.glucose_level, formData.temperature ];
+     if (vitalValues.every(value => value === null || value === '' || value === undefined)) {
         this.errorMessage = "Please enter at least one vital sign measurement.";
         return;
       }
-
 
      this.isLoading = true;
      this.apiService.addVitalRecord(formData)
@@ -61,9 +53,8 @@ export class VitalsFormComponent {
        .subscribe({
          next: () => {
            this.successMessage = 'Vital record submitted successfully!';
-           this.vitalForm.reset(); // Clear the form
-           this.vitalSubmitted.emit(); // Notify parent component
-           // Optionally hide success message after a delay
+           this.vitalForm.reset();
+           this.vitalSubmitted.emit();
            setTimeout(() => this.successMessage = null, 3000);
          },
          error: (err) => {
@@ -73,7 +64,6 @@ export class VitalsFormComponent {
        });
    }
 
-    // Getters for cleaner template validation
     get systolic() { return this.vitalForm.get('blood_pressure_systolic'); }
     get diastolic() { return this.vitalForm.get('blood_pressure_diastolic'); }
     get heartRate() { return this.vitalForm.get('heart_rate'); }

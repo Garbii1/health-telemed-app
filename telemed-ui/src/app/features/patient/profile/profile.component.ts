@@ -1,17 +1,25 @@
-// features/patient/profile/profile.component.ts
+// src/app/features/patient/profile/profile.component.ts
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { CommonModule } from '@angular/common'; // For *ngIf
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms'; // For forms
 import { ApiService } from '../../../core/services/api.service';
 import { finalize } from 'rxjs/operators';
+import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component'; // Import spinner
 
 @Component({
   selector: 'app-patient-profile',
+  standalone: true, // Add standalone
+  imports: [
+    CommonModule, // For *ngIf
+    ReactiveFormsModule, // For [formGroup], formControlName
+    LoadingSpinnerComponent // Import child component
+  ],
   templateUrl: './profile.component.html',
   styleUrls: ['./profile.component.scss']
 })
 export class PatientProfileComponent implements OnInit {
   profileForm: FormGroup;
-  isLoading = true;
+  isLoading = true; // Start loading true
   isSaving = false;
   errorMessage: string | null = null;
   successMessage: string | null = null;
@@ -22,16 +30,13 @@ export class PatientProfileComponent implements OnInit {
     private apiService: ApiService
   ) {
     this.profileForm = this.fb.group({
-      // User fields (consider making username/email read-only depending on backend)
       username: [{value: '', disabled: true}],
       email: ['', [Validators.required, Validators.email]],
       first_name: ['', Validators.required],
       last_name: ['', Validators.required],
-      // UserProfile fields
       phone_number: [''],
       address: [''],
       date_of_birth: [''],
-      // PatientProfile specific fields (nested group for clarity)
       patient_details: this.fb.group({
         emergency_contact_name: [''],
         emergency_contact_phone: ['']
@@ -50,7 +55,6 @@ export class PatientProfileComponent implements OnInit {
       .pipe(finalize(() => this.isLoading = false))
       .subscribe({
         next: (profile) => {
-          console.log("Patient Profile data received:", profile);
           this.initialProfileData = profile;
            this.profileForm.patchValue({
              username: profile.user.username,
@@ -60,11 +64,12 @@ export class PatientProfileComponent implements OnInit {
              phone_number: profile.phone_number,
              address: profile.address,
              date_of_birth: this.formatDateForInput(profile.date_of_birth),
-             patient_details: { // Patch nested group
+             patient_details: {
                 emergency_contact_name: profile.patient_details?.emergency_contact_name || '',
                 emergency_contact_phone: profile.patient_details?.emergency_contact_phone || ''
               }
            });
+           this.profileForm.markAsPristine(); // Mark form clean after patching
         },
         error: (err) => {
           console.error("Error loading profile:", err);
@@ -73,7 +78,6 @@ export class PatientProfileComponent implements OnInit {
       });
   }
 
-   // Helper to format date string (YYYY-MM-DD) for date input
    formatDateForInput(dateStr: string | null): string | null {
      if (!dateStr) return null;
      try {
@@ -93,8 +97,6 @@ export class PatientProfileComponent implements OnInit {
       this.profileForm.markAllAsTouched();
       return;
     }
-
-    // Only save if changes were made
     if (!this.profileForm.dirty) {
         this.successMessage = "No changes detected.";
         setTimeout(() => this.successMessage = null, 3000);
@@ -102,43 +104,27 @@ export class PatientProfileComponent implements OnInit {
       }
 
     this.isSaving = true;
-
-    // Prepare payload - adjust based on backend serializer expectations
-    // Assume backend handles nested patient_details update via the main profile endpoint
-     const profileData = {
-        // Editable UserProfile fields
-        phone_number: this.profileForm.value.phone_number,
-        address: this.profileForm.value.address,
-        date_of_birth: this.profileForm.value.date_of_birth,
-        // Editable User fields (if backend supports updating them via profile)
-        user: {
-             email: this.profileForm.value.email,
-             first_name: this.profileForm.value.first_name,
-             last_name: this.profileForm.value.last_name,
-        },
-        // Editable PatientProfile fields (nested)
-        patient_details: this.profileForm.get('patient_details')?.value
-     };
-
-     // **IMPORTANT**: If your backend doesn't handle nested updates for 'user' or 'patient_details'
-     // via the main '/api/profile/' endpoint, you'll need to adjust the payload and possibly
-     // make separate API calls to update user details or patient details.
-     // Let's simplify the payload assuming only UserProfile and PatientProfile fields are sent:
-      const simplifiedPayload = {
+     // Adjust payload based on backend requirements (assuming simplified for now)
+     const simplifiedPayload = {
           phone_number: this.profileForm.value.phone_number,
           address: this.profileForm.value.address,
           date_of_birth: this.profileForm.value.date_of_birth,
+          // Include user fields IF backend allows updating via profile PUT/PATCH
+          user: {
+               email: this.profileForm.get('email')?.value,
+               first_name: this.profileForm.value.first_name,
+               last_name: this.profileForm.value.last_name,
+          },
           patient_details: this.profileForm.get('patient_details')?.value
-          // We might need to send user fields separately if required by backend
-      };
+     };
 
-    this.apiService.updateProfile(simplifiedPayload) // Use appropriate payload
+    this.apiService.updateProfile(simplifiedPayload)
       .pipe(finalize(() => this.isSaving = false))
       .subscribe({
         next: (updatedProfile) => {
           this.successMessage = "Profile updated successfully!";
            this.initialProfileData = updatedProfile;
-           this.profileForm.markAsPristine(); // Reset dirty state
+           this.profileForm.markAsPristine();
            setTimeout(() => this.successMessage = null, 3000);
         },
         error: (err) => {
@@ -148,7 +134,6 @@ export class PatientProfileComponent implements OnInit {
       });
   }
 
-   // --- Getters for template validation ---
    get email() { return this.profileForm.get('email'); }
    get first_name() { return this.profileForm.get('first_name'); }
    get last_name() { return this.profileForm.get('last_name'); }

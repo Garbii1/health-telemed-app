@@ -1,19 +1,29 @@
-// features/patient/appointments/appointments.component.ts
+// src/app/features/patient/appointments/appointments.component.ts
 import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common'; // For *ngIf, *ngFor, async pipe, ngClass
+import { RouterLink } from '@angular/router'; // For routerLink
 import { ApiService } from '../../../core/services/api.service';
 import { Observable, BehaviorSubject, of } from 'rxjs';
 import { switchMap, map, startWith, catchError } from 'rxjs/operators';
+import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component'; // Import spinner
 
 @Component({
   selector: 'app-patient-appointments',
+  standalone: true, // Add standalone
+  imports: [
+      CommonModule, // For *ngIf, *ngFor, async pipe, ngClass
+      RouterLink, // For routerLink
+      LoadingSpinnerComponent // Import child component
+  ],
   templateUrl: './appointments.component.html',
   styleUrls: ['./appointments.component.scss']
 })
 export class PatientAppointmentsComponent implements OnInit {
-  appointments$: Observable<any[]> | undefined;
-  isLoading = false;
+  // Allow null type
+  appointments$: Observable<any[] | null> | undefined;
+  isLoading = true; // Start loading true
   errorMessage: string | null = null;
-  filterStatus = new BehaviorSubject<string>('ALL'); // Default filter to show all
+  filterStatus = new BehaviorSubject<string>('ALL');
   cancellingAppointmentId: number | null = null;
   cancelError: string | null = null;
 
@@ -28,29 +38,33 @@ export class PatientAppointmentsComponent implements OnInit {
     this.errorMessage = null;
     this.cancelError = null;
 
-    this.appointments$ = this.filterStatus.pipe(
-      startWith(this.filterStatus.value), // Trigger initial load
+    const obs$ = this.filterStatus.pipe(
+      startWith(this.filterStatus.value), // Trigger initial load correctly
       switchMap(status => {
-        this.isLoading = true;
-        let params: any = {};
+        this.isLoading = true; // Set loading when filter changes too
+        let params: ApiParams = {};
         if (status && status !== 'ALL') {
-          params.status = status;
+          params['status'] = status;
         }
-        // Fetch appointments, sort descending by time
         return this.apiService.getAppointments(params).pipe(
           map(data => {
-            this.isLoading = false;
+            this.isLoading = false; // Set loading false when data received
             return data.sort((a, b) => new Date(b.appointment_time).getTime() - new Date(a.appointment_time).getTime());
           }),
+          // Catch errors within the inner pipe if needed, or rely on outer catch
           catchError(err => {
-            console.error("Error loading patient appointments:", err);
+            console.error("Error loading patient appointments inner pipe:", err);
             this.errorMessage = "Failed to load appointments.";
             this.isLoading = false;
-            return of([]); // Return empty array on error
+            return of([]); // Return empty array on specific error
           })
         );
-      })
+      }),
+      // Removed outer catchError, letting inner one handle or relying on async pipe
     );
+
+    this.appointments$ = obs$;
+    // No manual subscribe needed if using async pipe primarily
   }
 
   onFilterChange(event: Event): void {
@@ -59,7 +73,6 @@ export class PatientAppointmentsComponent implements OnInit {
   }
 
   confirmCancelAppointment(appointmentId: number): void {
-    // Simple browser confirmation
     const confirmation = confirm("Are you sure you want to cancel this appointment?");
     if (confirmation) {
       this.cancelAppointment(appointmentId);
@@ -74,8 +87,7 @@ export class PatientAppointmentsComponent implements OnInit {
       next: () => {
         console.log(`Appointment ${appointmentId} cancelled successfully.`);
         this.cancellingAppointmentId = null;
-        this.loadAppointments(); // Refresh the list
-        // Alternatively, update the status of the specific item in the local list
+        this.loadAppointments(); // Refresh list
       },
       error: (err) => {
         console.error(`Error cancelling appointment ${appointmentId}:`, err);
@@ -85,9 +97,11 @@ export class PatientAppointmentsComponent implements OnInit {
     });
   }
 
-  // Format date for display
   formatDate(dateString: string | null): string {
     if (!dateString) return 'N/A';
     return new Date(dateString).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' });
   }
 }
+
+// Define ApiParams type if not globally available
+type ApiParams = { [param: string]: string | number | boolean };
