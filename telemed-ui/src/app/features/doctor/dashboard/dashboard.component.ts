@@ -4,27 +4,26 @@ import { CommonModule } from '@angular/common'; // For *ngIf, *ngFor, async pipe
 import { RouterLink } from '@angular/router'; // For routerLink
 import { AuthService, UserInfo } from '../../../core/services/auth.service';
 import { ApiService } from '../../../core/services/api.service';
-import { Observable, forkJoin, of } from 'rxjs'; // Import of
+import { Observable, forkJoin, of } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
-import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
+// Note: LoadingSpinnerComponent removed as unused
 
 @Component({
   selector: 'app-doctor-dashboard',
-  standalone: true, // Add standalone
+  standalone: true,
   imports: [
-      CommonModule, // Provides *ngIf, *ngFor, async pipe, date pipe
-      RouterLink, // Provides routerLink
-      LoadingSpinnerComponent // Import child component
+      CommonModule,
+      RouterLink,
+     // LoadingSpinnerComponent // Removed - unused
   ],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss']
 })
 export class DoctorDashboardComponent implements OnInit {
   currentUser: UserInfo | null = null;
-  // Allow null for initial state or error
   dashboardStats$: Observable<{ upcomingAppointments: any[], totalPatients: number } | null> | undefined;
   isLoading = true;
-  errorMessage: string | null = null; // Add error message property
+  errorMessage: string | null = null;
 
   constructor(private authService: AuthService, private apiService: ApiService) { }
 
@@ -35,14 +34,13 @@ export class DoctorDashboardComponent implements OnInit {
 
   loadDashboardData(): void {
      this.isLoading = true;
-     this.errorMessage = null; // Reset error on load
-
+     this.errorMessage = null;
      this.dashboardStats$ = forkJoin({
        appointments: this.apiService.getAppointments({ status: 'SCHEDULED', limit: 5, ordering: 'appointment_time' }).pipe(
            catchError(err => {
                console.error("Error fetching appointments:", err);
                this.errorMessage = "Could not load upcoming appointments.";
-               return of([]); // Return empty on error
+               return of([]);
            })
         ),
        patients: this.apiService.getDoctorPatients().pipe(
@@ -50,22 +48,25 @@ export class DoctorDashboardComponent implements OnInit {
                 console.error("Error fetching patients:", err);
                 if (this.errorMessage) this.errorMessage += " Could not load patient list.";
                 else this.errorMessage = "Could not load patient list.";
-                return of([]); // Return empty on error
+                return of([]);
             })
         )
      }).pipe(
        map(results => {
          this.isLoading = false;
+         // Check if appointments is actually an array before accessing length
+         const upcomingAppointments = Array.isArray(results.appointments) ? results.appointments : [];
+         const totalPatients = Array.isArray(results.patients) ? results.patients.length : 0;
          return {
-           upcomingAppointments: results.appointments,
-           totalPatients: results.patients.length,
+           upcomingAppointments: upcomingAppointments,
+           totalPatients: totalPatients,
          };
        }),
-       catchError(err => { // Catch errors from forkJoin itself
+       catchError(err => {
             console.error("Error loading doctor dashboard data:", err);
             this.isLoading = false;
             this.errorMessage = "Failed to load dashboard data.";
-            return of(null); // Return null on overall error
+            return of(null);
        })
      );
    }
@@ -75,3 +76,5 @@ export class DoctorDashboardComponent implements OnInit {
        return new Date(dateString).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' });
      }
 }
+
+type ApiParams = { [param: string]: string | number | boolean };

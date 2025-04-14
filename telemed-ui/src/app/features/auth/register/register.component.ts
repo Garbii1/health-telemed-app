@@ -1,12 +1,12 @@
 // src/app/features/auth/register/register.component.ts
-import { Component } from '@angular/core'; // Added missing import
-import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common'; // For *ngIf
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors } from '@angular/forms'; // For forms
+import { Router, RouterLink } from '@angular/router'; // For routerLink
 import { AuthService } from '../../../core/services/auth.service';
 import { finalize } from 'rxjs/operators';
 
-// Custom Validator (keep as is)
+// Custom Validator
 export function passwordMatchValidator(control: AbstractControl): ValidationErrors | null {
   const password = control.get('password');
   const password2 = control.get('password2');
@@ -18,16 +18,16 @@ export function passwordMatchValidator(control: AbstractControl): ValidationErro
 
 @Component({
   selector: 'app-register',
-  standalone: true, // Add standalone
+  standalone: true,
   imports: [
-    CommonModule,          // For *ngIf
-    ReactiveFormsModule,   // For [formGroup], formControlName
-    RouterLink             // For routerLink
+    CommonModule,
+    ReactiveFormsModule,
+    RouterLink
   ],
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.scss']
 })
-export class RegisterComponent { // Class definition remains the same
+export class RegisterComponent {
   registerForm: FormGroup;
   isLoading = false;
   errorMessage: string | null = null;
@@ -58,7 +58,7 @@ export class RegisterComponent { // Class definition remains the same
      this.registerForm.get('role')?.valueChanges.subscribe(role => {
           this.updateConditionalValidators(role);
      });
-     this.updateConditionalValidators(this.registerForm.get('role')?.value); // Initial check
+     this.updateConditionalValidators(this.registerForm.get('role')?.value);
   }
 
   updateConditionalValidators(role: string) {
@@ -109,7 +109,6 @@ export class RegisterComponent { // Class definition remains the same
       });
   }
 
-   // --- Getters remain the same ---
    get username() { return this.registerForm.get('username'); }
    get email() { return this.registerForm.get('email'); }
    get first_name() { return this.registerForm.get('first_name'); }

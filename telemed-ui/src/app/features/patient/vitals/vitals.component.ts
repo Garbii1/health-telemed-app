@@ -1,19 +1,22 @@
 // src/app/features/patient/vitals/vitals.component.ts
-import { Component, OnInit } from '@angular/core'; // Added Component, OnInit
+import { Component, OnInit } from '@angular/core'; // Import Component, OnInit
 import { CommonModule } from '@angular/common'; // For *ngIf, async pipe
 import { ApiService } from '../../../core/services/api.service';
-import { Observable } from 'rxjs';
+import { Observable } from 'rxjs'; // Import Observable
 // Import standalone child components
 import { VitalsFormComponent } from '../vitals-form/vitals-form.component';
 import { VitalsHistoryComponent } from '../vitals-history/vitals-history.component';
+import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component'; // Import spinner
 
-@Component({
+
+@Component({ // Add Decorator
   selector: 'app-patient-vitals',
-  standalone: true, // Add standalone
+  standalone: true,
   imports: [
-    CommonModule, // For *ngIf, async pipe
-    VitalsFormComponent, // Import child
-    VitalsHistoryComponent // Import child
+    CommonModule,
+    VitalsFormComponent,
+    VitalsHistoryComponent,
+    LoadingSpinnerComponent // Import spinner
   ],
   templateUrl: './vitals.component.html',
   styleUrls: ['./vitals.component.scss']
@@ -21,8 +24,8 @@ import { VitalsHistoryComponent } from '../vitals-history/vitals-history.compone
 export class PatientVitalsComponent implements OnInit { // Implement OnInit
   vitalsHistory$: Observable<any[]> | undefined;
   showForm: boolean = false;
-  isLoading = true; // Add loading state
-  errorMessage: string | null = null; // Add error state
+  isLoading = true;
+  errorMessage: string | null = null;
 
   constructor(private apiService: ApiService) { }
 
@@ -31,17 +34,19 @@ export class PatientVitalsComponent implements OnInit { // Implement OnInit
   }
 
   loadVitalsHistory(): void {
-    this.isLoading = true; // Set loading true
-    this.errorMessage = null; // Reset error
-    this.vitalsHistory$ = this.apiService.getVitals(); // Direct assignment is fine with async pipe
+    this.isLoading = true;
+    this.errorMessage = null;
+    this.vitalsHistory$ = this.apiService.getVitals();
 
-    // Optional: Add error handling if needed beyond async pipe
+    // Add loading false and error handling
     this.vitalsHistory$.subscribe({
-        next: () => this.isLoading = false, // Set loading false on data arrival
+        // Using finalize might be better if the async pipe is not always subscribed
+        // finalize: () => this.isLoading = false,
+        next: () => this.isLoading = false, // Set loading false on data
         error: (err) => {
             console.error("Error loading vitals history:", err);
             this.errorMessage = "Failed to load vitals history.";
-            this.isLoading = false; // Set loading false on error
+            this.isLoading = false;
         }
     });
   }
@@ -51,7 +56,7 @@ export class PatientVitalsComponent implements OnInit { // Implement OnInit
    }
 
   onVitalSubmitted(): void {
-    this.loadVitalsHistory(); // Refresh the history list
-    this.showForm = false; // Hide the form after successful submission
+    this.loadVitalsHistory();
+    this.showForm = false;
   }
 }

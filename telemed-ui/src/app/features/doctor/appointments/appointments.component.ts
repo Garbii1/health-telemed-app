@@ -1,29 +1,26 @@
 // src/app/features/doctor/appointments/appointments.component.ts
-import { Component, OnInit } from '@angular/core'; // Added OnInit
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common'; // For *ngIf, *ngFor, async pipe, slice pipe, ngClass
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms'; // For notes form
 import { ApiService } from '../../../core/services/api.service';
 import { Observable, BehaviorSubject, of } from 'rxjs';
-import { switchMap, map, startWith, catchError } from 'rxjs/operators';
-// Assuming LoadingSpinnerComponent is standalone and correctly exported
-import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
-
+import { switchMap, map, catchError } from 'rxjs/operators';
+// Note: LoadingSpinnerComponent removed as it was unused in the template (NG8113)
 
 @Component({
   selector: 'app-doctor-appointments',
-  standalone: true, // Add standalone
+  standalone: true,
   imports: [
-      CommonModule, // Provides *ngIf, *ngFor, async pipe, slice pipe, ngClass
-      ReactiveFormsModule, // Provides formGroup etc.
-      LoadingSpinnerComponent // Import child component
+      CommonModule,
+      ReactiveFormsModule,
+      // LoadingSpinnerComponent // Removed - unused
   ],
   templateUrl: './appointments.component.html',
   styleUrls: ['./appointments.component.scss']
 })
-export class DoctorAppointmentsComponent implements OnInit { // Implement OnInit
-  // Fix: Allow null type for observable due to startWith(null)
-  appointments$: Observable<any[] | null> | undefined;
-  isLoading = true; // Start loading true
+export class DoctorAppointmentsComponent implements OnInit {
+  appointments$: Observable<any[] | null> | undefined; // Allow null type
+  isLoading = true;
   errorMessage: string | null = null;
   selectedAppointment: any = null;
   notesForm: FormGroup;
@@ -42,53 +39,37 @@ export class DoctorAppointmentsComponent implements OnInit { // Implement OnInit
   }
 
   loadAppointments(): void {
-    // Set loading true at the start of the load process
     this.isLoading = true;
     this.errorMessage = null;
-    // Assign observable first
     const obs$ = this.filterStatus.pipe(
-      // startWith(this.filterStatus.value), // No need for startWith if isLoading handles initial state
       switchMap(status => {
-          this.isLoading = true; // Also set loading true when filter changes
-          let params: ApiParams = {}; // Use type alias if defined in api.service
+          this.isLoading = true;
+          let params: ApiParams = {};
           if (status && status !== 'ALL') {
-             params['status'] = status; // Use bracket notation for safety
+             params['status'] = status;
           }
           return this.apiService.getAppointments(params).pipe(
               map(data => {
-                  this.isLoading = false; // Set loading false only when data arrives
+                  this.isLoading = false;
                   return data.sort((a, b) => new Date(b.appointment_time).getTime() - new Date(a.appointment_time).getTime());
               }),
-              // Let the main subscription handle errors
-              // catchError(err => {
-              //     console.error("Error loading doctor appointments inner pipe:", err);
-              //     this.errorMessage = "Failed to load appointments.";
-              //     this.isLoading = false;
-              //     return of([]);
-              // })
-              // startWith(null) // Removed: Let isLoading handle the initial empty state
+              catchError(err => {
+                  console.error("Error loading doctor appointments inner pipe:", err);
+                  this.errorMessage = "Failed to load appointments.";
+                  this.isLoading = false;
+                  return of([]);
+              })
           );
         })
     );
-    // Assign to class property
     this.appointments$ = obs$;
-
-    // Subscribe separately for error handling (or rely on async pipe error handling)
-    // Add null check for safety before subscribing
-    this.appointments$?.subscribe({
-        // next: () => { /* Optional: Log success */ }, // Not needed if just displaying data
-        error: err => {
-             console.error("Error loading doctor appointments:", err);
-             this.errorMessage = "Failed to load appointments.";
-             this.isLoading = false;
-        }
-    });
+    // No manual subscribe needed if template uses async pipe and handles loading/error states
   }
 
   onFilterChange(event: Event): void {
       const selectElement = event.target as HTMLSelectElement;
       this.filterStatus.next(selectElement.value);
-    }
+  }
 
   openNotesModal(appointment: any): void {
     this.selectedAppointment = appointment;
@@ -103,27 +84,24 @@ export class DoctorAppointmentsComponent implements OnInit { // Implement OnInit
     this.notesForm.reset();
     this.showNotesModalForAppointmentId = null;
     this.isSubmittingNotes = false;
-    this.notesForm.setErrors(null); // Clear previous submit errors
+    this.notesForm.setErrors(null);
   }
 
   submitConsultationNotes(): void {
     if (this.notesForm.invalid || !this.selectedAppointment) {
-        this.notesForm.markAllAsTouched(); // Mark fields to show errors
+        this.notesForm.markAllAsTouched();
         return;
     }
-
     this.isSubmittingNotes = true;
     const notes = this.notesForm.value.consultation_notes;
-    this.notesForm.setErrors(null); // Clear previous errors
+    this.notesForm.setErrors(null);
 
     this.apiService.completeAppointment(this.selectedAppointment.id, notes)
       .subscribe({
         next: () => {
           console.log('Appointment completed successfully');
           this.closeNotesModal();
-          // Manually update the list item status for immediate feedback
-          // Or trigger a full refresh (simpler)
-          this.loadAppointments();
+          this.loadAppointments(); // Refresh list
         },
         error: (err) => {
           console.error('Error completing appointment:', err);
@@ -139,5 +117,4 @@ export class DoctorAppointmentsComponent implements OnInit { // Implement OnInit
    }
 }
 
-// Define ApiParams type if not globally available
 type ApiParams = { [param: string]: string | number | boolean };

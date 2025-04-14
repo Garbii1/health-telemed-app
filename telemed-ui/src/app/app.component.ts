@@ -1,18 +1,20 @@
-// app.component.ts
+// src/app/app.component.ts
+import { Component } from '@angular/core'; // Added import
+import { RouterOutlet } from '@angular/router';
 import { HeaderComponent } from './shared/components/header/header.component';
 import { FooterComponent } from './shared/components/footer/footer.component';
-import { RouterOutlet } from '@angular/router'; // Import RouterOutlet
-// ... other imports
 
-@Component({
+@Component({ // Decorator added
   selector: 'app-root',
   standalone: true,
   imports: [
-     HeaderComponent, // <--- ADD
-     FooterComponent, // <--- ADD
-     RouterOutlet     // <--- ADD
+    RouterOutlet,
+    HeaderComponent,
+    FooterComponent
   ],
   templateUrl: './app.component.html',
-  // ...
+  styleUrls: ['./app.component.scss']
 })
-export class AppComponent { /* ... */ }
+export class AppComponent {
+  title = 'telemed-ui';
+}
