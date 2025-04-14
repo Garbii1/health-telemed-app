@@ -29,15 +29,26 @@ export class PatientDashboardComponent implements OnInit {
     }
 
     loadDashboardData(): void { /* ... same logic ... */ }
-    formatDate(dateString: string | null): string { /* ... Ensure returns string ... */ }
-    formatBP(systolic: number | null, diastolic: number | null): string { /* ... Ensure returns string ... */ }
+
+    // Fix TS2355: Ensure all paths return a string
+    formatDate(dateString: string | null): string {
+        if (!dateString) {
+           return 'N/A'; // <<< Return string
+        }
+        try {
+           return new Date(dateString).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' }); // <<< Return string
+        } catch(e) {
+           return 'Invalid Date'; // <<< Return string
+        }
+    }
+
+    // Fix TS2355: Ensure all paths return a string
+    formatBP(systolic: number | null, diastolic: number | null): string {
+        if (systolic === null && diastolic === null) {
+           return 'N/A'; // <<< Return string
+        }
+        return `${systolic ?? '-'} / ${diastolic ?? '-'}`; // <<< Return string
+    }
 }
 
 type ApiParams = { [param: string]: string | number | boolean };
-
-// Fix in template:
-// src/app/features/patient/dashboard/dashboard.component.html
-// Change this:
-// <p *ngIf="currentUser">Welcome, {{ currentUser?.username }}!</p>
-// To this (remove redundant ?. inside *ngIf):
-// <p *ngIf="currentUser">Welcome, {{ currentUser.username }}!</p>

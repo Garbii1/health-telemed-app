@@ -1,7 +1,7 @@
 <!-- features/doctor/dashboard/dashboard.component.html -->
 <div class="container mt-4">
     <h2>Doctor Dashboard</h2>
-    <p *ngIf="currentUser">Welcome back, Dr. {{ currentUser.username }}!</p>
+    <p *ngIf="currentUser">Welcome back, Dr. {{ currentUser.username }}!</p> 
     <hr>
   
     <div *ngIf="isLoading" class="text-center mt-5">
@@ -27,7 +27,7 @@
           <div class="card text-center stat-card">
              <div class="card-body">
                 <h5 class="card-title">Upcoming Appointments</h5>
-                <p class="card-text display-4">{{ stats.upcomingAppointments?.length || 0 }}</p>
+                <p class="card-text display-4">{{ (stats.upcomingAppointments ?? []).length || 0 }}</p>
                 <a routerLink="../appointments" class="btn btn-sm btn-outline-primary">View Schedule</a>
               </div>
            </div>

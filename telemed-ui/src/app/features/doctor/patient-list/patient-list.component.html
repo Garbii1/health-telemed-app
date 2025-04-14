@@ -19,9 +19,7 @@
       </div>
  
      <div class="list-group mt-3" *ngIf="patients.length > 0">
-        <!-- Use a descriptive label for the list -->
         <div role="list" aria-label="Assigned Patients">
-           <!-- Corrected anchor tag syntax -->
            <a *ngFor="let patient of patients"
               href="#"
               (click)="viewPatientDetails(patient.id); $event.preventDefault()"
@@ -34,12 +32,11 @@
              <div class="patient-details mt-1">
                  <p class="mb-1"><i class="fas fa-envelope me-2 text-secondary" aria-hidden="true"></i>Email: {{ patient.email || 'N/A' }}</p>
                  <p class="mb-1"><i class="fas fa-phone me-2 text-secondary" aria-hidden="true"></i>Phone: {{ patient.phone_number || 'N/A' }}</p>
-                 <small class="text-muted"><i class="fas fa-calendar-alt me-2 text-secondary" aria-hidden="true"></i>D.O.B: {{ patient.date_of_birth | date:'longDate' || 'N/A' }}</small>
+                 <!-- Fix TS2872: Use parentheses or split *ngIf -->
+                 <small class="text-muted"><i class="fas fa-calendar-alt me-2 text-secondary" aria-hidden="true"></i>D.O.B: {{ (patient.date_of_birth | date:'longDate') || 'N/A' }}</small>
              </div>
-           </a> <!-- Correct closing tag placement -->
+           </a>
         </div>
       </div>
    </div>
  </div>
- 
- <!-- Styles moved to patient-list.component.scss or global styles -->
