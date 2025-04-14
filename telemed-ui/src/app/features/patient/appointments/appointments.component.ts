@@ -4,7 +4,7 @@ import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { ApiService } from '../../../core/services/api.service';
 import { Observable, BehaviorSubject, of } from 'rxjs';
-import { switchMap, map, catchError, startWith } from 'rxjs/operators'; // <<< Import startWith
+import { switchMap, map, catchError, startWith } from 'rxjs/operators';
 import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
 
 @Component({
@@ -25,28 +25,22 @@ export class PatientAppointmentsComponent implements OnInit {
   constructor(private apiService: ApiService) { }
 
   ngOnInit(): void { this.loadAppointments(); }
-
-  loadAppointments(): void {
-     this.isLoading = true; this.errorMessage = null; this.cancelError = null;
-     const obs$ = this.filterStatus.pipe(
-       startWith(this.filterStatus.value), // <<< Now recognized
-       switchMap(status => {
-         this.isLoading = true;
-         let params: ApiParams = {};
-         if (status && status !== 'ALL') { params['status'] = status; }
-         return this.apiService.getAppointments(params).pipe(
-            map(data => { /* ... */ this.isLoading = false; return data; }),
-            catchError(err => { /* ... */ this.isLoading = false; return of([]); })
-         );
-       })
-     );
-     this.appointments$ = obs$;
-  }
-
+  loadAppointments(): void { /* ... */ }
   onFilterChange(event: Event): void { /* ... */ }
   confirmCancelAppointment(appointmentId: number): void { /* ... */ }
   cancelAppointment(appointmentId: number): void { /* ... */ }
-  formatDate(dateString: string | null): string { /* ... */ }
+
+  // Fix: Ensure return value
+  formatDate(dateString: string | null): string {
+     if (!dateString) {
+        return 'N/A'; // Return string for null input
+     }
+     try {
+        return new Date(dateString).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' }); // Return formatted string
+     } catch(e) {
+        return 'Invalid Date'; // Return string on error
+     }
+  }
 }
 
 type ApiParams = { [param: string]: string | number | boolean };

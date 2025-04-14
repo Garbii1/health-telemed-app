@@ -23,27 +23,24 @@ export class DoctorDashboardComponent implements OnInit {
   constructor(private authService: AuthService, private apiService: ApiService) { }
 
   ngOnInit(): void {
-    // currentUser could still be null initially, so keep optional chaining in subscribe
     this.authService.currentUser$.subscribe(user => this.currentUser = user);
     this.loadDashboardData();
   }
 
   loadDashboardData(): void { /* ... same logic ... */ }
 
-  formatDate(dateString: string | null): string { /* ... same logic ... */ }
+  // Fix: Ensure function always returns a string value
+  formatDate(dateString: string | null): string {
+     if (!dateString) {
+       return 'N/A'; // Return string for null input
+     }
+     try {
+       // Return the formatted string
+       return new Date(dateString).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' });
+     } catch(e) {
+       return 'Invalid Date'; // Return string for invalid date
+     }
+  }
 }
 
 type ApiParams = { [param: string]: string | number | boolean };
-
-// Fix in template:
-// src/app/features/doctor/dashboard/dashboard.component.html
-
-// Change this:
-// <p *ngIf="currentUser">Welcome back, Dr. {{ currentUser?.username }}!</p>
-// To this (?. is redundant inside *ngIf="currentUser"):
-// <p *ngIf="currentUser">Welcome back, Dr. {{ currentUser.username }}!</p>
-
-// Change this:
-// <p class="card-text display-4">{{ stats.upcomingAppointments?.length || 0 }}</p>
-// To this (assuming upcomingAppointments is always an array, even if empty, due to catchError returning of([])):
-// <p class="card-text display-4">{{ stats.upcomingAppointments.length || 0 }}</p>
