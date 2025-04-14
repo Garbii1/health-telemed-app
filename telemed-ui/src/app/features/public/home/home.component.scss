@@ -1,5 +1,6 @@
 /* features/public/home/home.component.scss */
-/* Remove the deprecated @import if only using CSS variables from styles.scss */
+/* Remove invalid imports/syntax errors */
+/* Relies on global CSS variables defined in styles.scss */
 
 .home-page {
   width: 100%;
@@ -8,64 +9,40 @@
 // --- Hero Section ---
 .hero-section {
   position: relative;
-  height: 70vh; // Adjust height as needed
+  height: 70vh;
   min-height: 400px;
-  background-image: url('/assets/hero-background.jpg'); // Place your image in src/assets
+  background-image: url('/assets/hero-background.jpg');
   background-size: cover;
   background-position: center center;
-  background-attachment: fixed; // Parallax effect
+  background-attachment: fixed;
   display: flex;
   align-items: center;
   justify-content: center;
   text-align: center;
   color: #fff;
 
-  /* Overlay for better text contrast */
+  /* Overlay */
   .hero-overlay {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.5); // Dark overlay
+    background-color: rgba(0, 0, 0, 0.5);
     z-index: 1;
   }
 
   .hero-content {
-    position: relative; /* Position above overlay */
+    position: relative;
     z-index: 2;
     max-width: 800px;
 
-    h1 {
-      font-size: 3rem;
-      font-weight: 700;
-      margin-bottom: 1rem;
-      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); /* Add shadow to text */
-    }
-
-    p {
-      font-size: 1.3rem;
-      margin-bottom: 2rem;
-      color: rgba(255, 255, 255, 0.9);
-      text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
-    }
+    h1 { font-size: 3rem; font-weight: 700; margin-bottom: 1rem; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); }
+    p { font-size: 1.3rem; margin-bottom: 2rem; color: rgba(255, 255, 255, 0.9); text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5); }
 
     .hero-buttons {
-      .btn {
-        margin: 0 0.5rem;
-        padding: 0.8rem 2rem; // Larger buttons for hero
-        font-size: 1.1rem;
-        border-width: 2px; // Make outline more prominent
-      }
-
-      .btn-outline-light {
-          color: #fff;
-          border-color: #fff;
-          &:hover {
-            background-color: #fff;
-            color: var(--primary-color);
-          }
-       }
+      .btn { margin: 0 0.5rem; padding: 0.8rem 2rem; font-size: 1.1rem; border-width: 2px; }
+      .btn-outline-light { color: #fff; border-color: #fff; &:hover { background-color: #fff; color: var(--primary-color); } }
     }
   }
 }
@@ -73,106 +50,34 @@
 // --- Features Section ---
 .features-section {
   padding: 4rem 0;
-
-  h2 {
-    margin-bottom: 3rem;
-    color: var(--primary-color);
-  }
-
+  h2 { margin-bottom: 3rem; color: var(--primary-color); }
   .feature-item {
     margin-bottom: 2rem;
-
-    .feature-icon {
-      font-size: 3rem; /* Make icons larger */
-      color: var(--secondary-color); /* Use accent color */
-      margin-bottom: 1.5rem;
-      display: inline-block; /* Needed for margin */
-    }
-
-    h3 {
-      font-size: 1.4rem;
-      margin-bottom: 0.5rem;
-      font-weight: 600;
-    }
-
-    p {
-       color: var(--text-color-light);
-       max-width: 300px; /* Limit width for readability */
-       margin-left: auto;
-       margin-right: auto;
-    }
+    .feature-icon { font-size: 3rem; color: var(--secondary-color); margin-bottom: 1.5rem; display: inline-block; }
+    h3 { font-size: 1.4rem; margin-bottom: 0.5rem; font-weight: 600; }
+    p { color: var(--text-color-light); max-width: 300px; margin-left: auto; margin-right: auto; }
   }
 }
 
 // --- How it Works Section ---
 .how-it-works-section {
   padding: 3rem 0;
-  background-color: var(--bg-color-alt); /* Alternate background */
-
-  h2 {
-    margin-bottom: 3rem;
-  }
-
+  background-color: var(--bg-color-alt);
+  h2 { margin-bottom: 3rem; }
   .step {
     text-align: center;
     margin-bottom: 2rem;
-
-    .step-icon {
-      width: 50px;
-      height: 50px;
-      border-radius: 50%;
-      background-color: var(--primary-color);
-      color: #fff;
-      font-size: 1.5rem;
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 0 auto 1.5rem auto;
-      box-shadow: var(--box-shadow);
-    }
-
-    h4 {
-      font-size: 1.2rem;
-      font-weight: 600;
-      margin-bottom: 0.5rem;
-    }
-     p {
-         color: var(--text-color-light);
-         font-size: 0.95rem;
-     }
+    .step-icon { width: 50px; height: 50px; border-radius: 50%; background-color: var(--primary-color); color: #fff; font-size: 1.5rem; font-weight: 600; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem auto; box-shadow: var(--box-shadow); }
+    h4 { font-size: 1.2rem; font-weight: 600; margin-bottom: 0.5rem; }
+    p { color: var(--text-color-light); font-size: 0.95rem; }
   }
 }
 
-// --- Responsive adjustments for Home page ---
+// --- Responsive adjustments ---
 @media (max-width: 768px) {
-  .hero-section {
-    height: 60vh;
-    .hero-content {
-      h1 { font-size: 2.2rem; }
-      p { font-size: 1.1rem; }
-      .hero-buttons .btn { font-size: 1rem; padding: 0.6rem 1.5rem;}
-    }
-  }
-
-  .features-section, .how-it-works-section {
-     padding: 3rem 0;
-     h2 { margin-bottom: 2rem; }
-  }
+  .hero-section { height: 60vh; .hero-content { h1 { font-size: 2.2rem; } p { font-size: 1.1rem; } .hero-buttons .btn { font-size: 1rem; padding: 0.6rem 1.5rem;} } }
+  .features-section, .how-it-works-section { padding: 3rem 0; h2 { margin-bottom: 2rem; } }
 }
 
-/* Add Bootstrap grid styles if not global (using classes defined in styles.scss) */
-.row { display: flex; flex-wrap: wrap; margin-right: -15px; margin-left: -15px; }
-.col-md-4 { position: relative; width: 100%; padding-right: 15px; padding-left: 15px; }
-.col-lg-6 { position: relative; width: 100%; padding-right: 15px; padding-left: 15px; } /* Added for consistency */
-.col-md-6 { position: relative; width: 100%; padding-right: 15px; padding-left: 15px; } /* Added for consistency */
-.col-md-8 { position: relative; width: 100%; padding-right: 15px; padding-left: 15px; } /* Added for consistency */
-
-@media (min-width: 768px) {
-    .col-md-4 { flex: 0 0 33.33333%; max-width: 33.33333%; }
-    .col-md-6 { flex: 0 0 50%; max-width: 50%; }
-    .col-md-8 { flex: 0 0 66.66667%; max-width: 66.66667%; }
-}
-@media (min-width: 992px) {
-    .col-lg-6 { flex: 0 0 50%; max-width: 50%; }
-}
+// --- Grid Styles (Use utility classes from styles.scss) ---
+/* .row, .col-md-4, etc. are defined globally */

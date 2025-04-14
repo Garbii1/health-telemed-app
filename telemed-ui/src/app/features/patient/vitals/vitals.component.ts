@@ -1,34 +1,18 @@
-import { Component, OnInit } from '@angular/core';
-import { ApiService } from '../../../core/services/api.service';
-import { Observable } from 'rxjs';
+// vitals.component.ts
+import { CommonModule } from '@angular/common'; // For *ngIf
+import { VitalsFormComponent } from '../vitals-form/vitals-form.component';
+import { VitalsHistoryComponent } from '../vitals-history/vitals-history.component';
+// ... other imports
 
 @Component({
-  selector: 'app-patient-vitals',
-  templateUrl: './vitals.component.html',
-  styleUrls: ['./vitals.component.scss']
+   selector: 'app-patient-vitals',
+   standalone: true,
+   imports: [
+       CommonModule,           // <--- ADD for *ngIf
+       VitalsFormComponent,    // <--- ADD
+       VitalsHistoryComponent  // <--- ADD
+   ],
+   templateUrl: './vitals.component.html',
+   // ...
 })
-export class PatientVitalsComponent implements OnInit {
-  vitalsHistory$: Observable<any[]> | undefined; // Observable for history
-  showForm: boolean = false; // Toggle form visibility
-
-  constructor(private apiService: ApiService) { }
-
-  ngOnInit(): void {
-    this.loadVitalsHistory();
-  }
-
-  loadVitalsHistory(): void {
-    // Fetch vitals history for the logged-in patient
-    this.vitalsHistory$ = this.apiService.getVitals();
-  }
-
-  toggleVitalForm(): void {
-     this.showForm = !this.showForm;
-   }
-
-  // Handle event when new vital is submitted from the form component
-  onVitalSubmitted(): void {
-    this.loadVitalsHistory(); // Refresh the history list
-    this.showForm = false; // Hide the form after successful submission
-  }
-}
+export class PatientVitalsComponent implements OnInit { /* ... */ }

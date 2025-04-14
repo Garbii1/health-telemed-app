@@ -3,10 +3,9 @@ import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-// FormsModule/ReactiveFormsModule are imported by standalone components now
 
-// AppRoutingModule is removed, routing provided in main.ts
-// import { AppRoutingModule } from './app-routing.module';
+// AppRoutingModule is removed
+// Feature Modules (AuthModule, PatientModule, DoctorModule) are removed
 
 import { AppComponent } from './app.component'; // Import standalone AppComponent
 
@@ -17,33 +16,30 @@ import { JwtInterceptor } from './core/interceptors/jwt.interceptor';
 import { HeaderComponent } from './shared/components/header/header.component';
 import { FooterComponent } from './shared/components/footer/footer.component';
 
-// AuthModule likely removed if Login/Register are standalone
-// import { AuthModule } from './features/auth/auth.module';
-
 @NgModule({
   declarations: [
-    // NO declarations here if all components are standalone
+    // NO declarations here - all components are standalone
   ],
   imports: [
-    // Angular Core Modules needed across the app (often provided by bootstrapApplication)
-    BrowserModule, // Typically needed once
-    // AppRoutingModule, // REMOVED
-    HttpClientModule, // Needed if not provided elsewhere
-    BrowserAnimationsModule, // Needed if not provided elsewhere
+    // Core Angular Modules - BrowserModule only once
+    BrowserModule,
+    // HttpClientModule & BrowserAnimationsModule are often provided functionally in main.ts
+    // Keep them here if using older DI patterns or if AppProviders require them
+    HttpClientModule,
+    BrowserAnimationsModule,
 
-    // Standalone components used directly by AppComponent template
-    HeaderComponent,
-    FooterComponent,
-    AppComponent // Import the root component itself
+    // Standalone components used directly by AppComponent template *must* be imported by AppComponent itself
+    // AppComponent needs to be imported here because it's the root component, though bootstrapped separately
+    AppComponent,
+    // HeaderComponent, // These are imported directly by AppComponent now
+    // FooterComponent,
 
-    // AuthModule, // REMOVE if components are standalone & routing is functional
   ],
   providers: [
-    // Interceptors are often provided via provideHttpClient in main.ts now
-    // Keep here if using older provide methods or specific DI needs
-     { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true }
+    // Providing interceptors here is still valid if not using provideHttpClient(withInterceptorsFromDi()) in main.ts
+    // It's generally cleaner to provide them in main.ts
+    // { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true }
   ],
   // NO bootstrap array needed for standalone bootstrapApplication
-  // bootstrap: [AppComponent]
 })
-export class AppModule { } // Note: This AppModule might become unnecessary if AppComponent is fully standalone and providers are moved to main.ts
+export class AppModule { }

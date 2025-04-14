@@ -14,15 +14,13 @@ interface LoginResponse {
 interface UserPayload {
   user_id: number;
   exp: number;
-  // Add other payload fields if needed
 }
 
-// Interface for user data we might want to store/expose
 export interface UserInfo {
-  id: number; // id is required
+  id: number;
   username?: string;
   email?: string;
-  role?: string; // We'll fetch this separately from profile endpoint
+  role?: string;
 }
 
 @Injectable({
@@ -106,9 +104,8 @@ export class AuthService {
      if (token) {
        try {
          const decoded: UserPayload = jwtDecode(token);
-         // Ensure id is present before creating UserInfo
          if (decoded.user_id) {
-             const userInfo: UserInfo = { id: decoded.user_id }; // id is guaranteed here
+             const userInfo: UserInfo = { id: decoded.user_id };
              const expiry = decoded.exp * 1000;
              if (Date.now() >= expiry) {
                 console.warn('Token expired');
@@ -133,21 +130,18 @@ export class AuthService {
     this.http.get<any>(`${this.apiUrl}/profile/`).subscribe({
       next: (profile) => {
         const currentVal = this.currentUser.value;
-        // FIX: Check currentVal exists before spreading
         if (currentVal) {
             this.currentUser.next({
-                ...currentVal, // Now safe to spread
+                ...currentVal,
                 username: profile.user.username,
                 email: profile.user.email,
             });
         } else {
-            // Handle case where currentUser was null (e.g., token decoded but profile fetched before value set)
-            console.warn("Current user was null when profile fetched, setting basic info.");
-             this.currentUser.next({ // Set directly from profile data
-                 id: profile.user.id, // Assuming profile has user.id
+             console.warn("Current user was null when profile fetched, setting basic info.");
+             this.currentUser.next({
+                 id: profile.user.id,
                  username: profile.user.username,
                  email: profile.user.email,
-                 // role: profile.role // Role is set below anyway
              });
         }
         this.currentUserRole.next(profile.role);
@@ -160,5 +154,4 @@ export class AuthService {
       }
     });
   }
-
 }

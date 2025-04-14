@@ -18,7 +18,6 @@ export const appRoutes: Routes = [
   // Patient routes (Lazy loading feature routes array)
   {
     path: 'patient',
-    // Assuming you create patient.routes.ts exporting PATIENT_ROUTES
     loadChildren: () => import('./features/patient/patient.routes').then(m => m.PATIENT_ROUTES),
     canActivate: [AuthGuard, RoleGuard],
     data: { expectedRoles: ['PATIENT'] }
@@ -27,7 +26,6 @@ export const appRoutes: Routes = [
   // Doctor routes (Lazy loading feature routes array)
   {
     path: 'doctor',
-     // Assuming you create doctor.routes.ts exporting DOCTOR_ROUTES
     loadChildren: () => import('./features/doctor/doctor.routes').then(m => m.DOCTOR_ROUTES),
     canActivate: [AuthGuard, RoleGuard],
     data: { expectedRoles: ['DOCTOR'] }
@@ -35,5 +33,5 @@ export const appRoutes: Routes = [
 
   // Fallback route
   { path: 'not-found', component: NotFoundComponent },
-  { path: '**', redirectTo: '/not-found' } // Redirect any other path to not-found page
+  { path: '**', redirectTo: '/not-found' }
 ];

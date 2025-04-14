@@ -1,12 +1,16 @@
 /* src/app/shared/components/footer/footer.component.scss */
-@use 'sass:color'; // Import sass:color
+@use 'sass:color';
+
+// Import SCSS variable from styles.scss if needed, or recalculate
+// Assuming $bg-color-value is globally available or defined here
+$bg-color-value: #f8f9fa; // Define if not imported
+$footer-bg-color: color.adjust($bg-color-value, $lightness: -5%);
 
 .app-footer {
-  // Use color.adjust instead of deprecated darken
-  background-color: color.adjust(var(--bg-color), $lightness: -5%);
-  color: var(--text-color-light);
+  background-color: $footer-bg-color; // Use calculated SCSS color
+  color: var(--text-color-light); // Use CSS var for text color
   padding: 1rem 0;
-  margin-top: auto; // Pushes footer to bottom if content is short
+  margin-top: auto;
   height: var(--footer-height);
   border-top: 1px solid var(--border-color);
   font-size: 0.9rem;
@@ -16,14 +20,14 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  flex-wrap: wrap; // Allow wrapping on small screens
-  max-width: var(--container-max-width); /* Apply container width */
-  margin: 0 auto; /* Center content */
-  padding: 0 var(--container-padding); /* Apply container padding */
+  flex-wrap: wrap;
+  max-width: var(--container-max-width);
+  margin: 0 auto;
+  padding: 0 var(--container-padding);
 }
 
 .footer-content p {
-  margin-bottom: 0; // Remove default paragraph margin
+  margin-bottom: 0;
 }
 
 .footer-nav {
@@ -50,6 +54,6 @@
   }
 
   .footer-nav a {
-    margin: 0 0.5rem; // Adjust spacing for mobile
+    margin: 0 0.5rem;
   }
 }

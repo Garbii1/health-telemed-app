@@ -1,8 +1,8 @@
 // src/app/features/auth/login/login.component.ts
 import { Component, OnInit } from '@angular/core';
 // Import necessary modules directly for standalone components
-import { CommonModule } from '@angular/common'; // Or NgIf
-import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { CommonModule } from '@angular/common'; // Import CommonModule or NgIf
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms'; // Import ReactiveFormsModule here
 import { Router, ActivatedRoute, RouterLink } from '@angular/router'; // Import RouterLink
 import { AuthService } from '../../../core/services/auth.service';
 import { finalize } from 'rxjs/operators';
@@ -14,7 +14,6 @@ import { finalize } from 'rxjs/operators';
       CommonModule,          // Import CommonModule for *ngIf etc.
       ReactiveFormsModule,   // Import ReactiveFormsModule for form directives
       RouterLink             // Import RouterLink for routerLink directive
-      // No need to import other components unless used directly in THIS template
   ],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss']
@@ -23,7 +22,7 @@ export class LoginComponent implements OnInit {
   loginForm: FormGroup;
   isLoading = false;
   errorMessage: string | null = null;
-  private returnUrl: string = '/'; // Default redirect URL
+  private returnUrl: string = '/';
 
   constructor(
     private fb: FormBuilder,
@@ -38,28 +37,26 @@ export class LoginComponent implements OnInit {
   }
 
   ngOnInit(): void {
-     // Redirect if already logged in
      if (this.authService.isLoggedIn()) {
        this.navigateToDashboard();
      }
-     // Get the return URL from route parameters or default based on role
      this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || this.getDefaultDashboardRoute();
   }
 
   onSubmit(): void {
-    this.errorMessage = null; // Clear previous errors
+    this.errorMessage = null;
     if (this.loginForm.invalid) {
-      this.loginForm.markAllAsTouched(); // Mark fields as touched to show errors
+      this.loginForm.markAllAsTouched();
       return;
     }
 
     this.isLoading = true;
     this.authService.login(this.loginForm.value)
-      .pipe(finalize(() => this.isLoading = false)) // Ensure isLoading is set to false
+      .pipe(finalize(() => this.isLoading = false))
       .subscribe({
         next: () => {
           console.log('Login successful');
-          this.navigateToDashboard(); // Redirect after successful login
+          this.navigateToDashboard();
         },
         error: (err) => {
           console.error('Login failed:', err);
@@ -68,7 +65,6 @@ export class LoginComponent implements OnInit {
       });
   }
 
-   // Helper to navigate based on role after login
    private navigateToDashboard(): void {
         const destination = this.returnUrl && this.returnUrl !== '/' ? this.returnUrl : this.getDefaultDashboardRoute();
         console.log("Navigating to:", destination);
@@ -76,17 +72,16 @@ export class LoginComponent implements OnInit {
    }
 
    private getDefaultDashboardRoute(): string {
-      const role = this.authService.getUserRole(); // Get role synchronously if possible, or subscribe
+      const role = this.authService.getUserRole();
        if (role === 'PATIENT') {
            return '/patient/dashboard';
          } else if (role === 'DOCTOR') {
            return '/doctor/dashboard';
          } else {
-           return '/'; // Fallback to home
+           return '/';
          }
      }
 
-  // Helper for template validation access
   get username() { return this.loginForm.get('username'); }
   get password() { return this.loginForm.get('password'); }
 }

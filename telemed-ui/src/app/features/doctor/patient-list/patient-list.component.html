@@ -1,69 +1,45 @@
 <!-- features/doctor/patient-list/patient-list.component.html -->
 <div class="container mt-4">
-    <h2>My Patients</h2>
-    <p>List of patients with whom you have scheduled or completed appointments.</p>
-    <hr>
-  
-    <div *ngIf="isLoading" class="text-center mt-4">
-       <div class="spinner-border text-primary" role="status">
-         <!-- Good practice for accessibility -->
-         <span class="visually-hidden">Loading...</span>
-       </div>
-       <p class="mt-2">Loading patient list...</p>
-     </div>
-  
-     <div *ngIf="errorMessage && !isLoading" class="alert alert-danger mt-3">
-       {{ errorMessage }}
-     </div>
-  
-  
-    <div *ngIf="!isLoading && !errorMessage && (patients$ | async) as patients">
-       <div *ngIf="patients.length === 0" class="alert alert-info mt-3">
-         You currently have no patients assigned based on scheduled or completed appointments.
-       </div>
-  
-      <div class="list-group mt-3" *ngIf="patients.length > 0">
-         <!-- Use a descriptive label for the list -->
-         <div role="list" aria-label="Assigned Patients">
-            <a *ngFor="let patient of patients"
-               href="#"  <!-- Consider routerLink="../patients/{{patient.id}}" if detail page exists -->
-               (click)="viewPatientDetails(patient.id); $event.preventDefault()"
-               class="list-group-item list-group-item-action flex-column align-items-start mb-2 shadow-sm patient-item"
-               role="listitem">
-              <div class="d-flex w-100 justify-content-between">
-                <h5 class="mb-1 patient-name">{{ patient.first_name }} {{ patient.last_name }} ({{ patient.username }})</h5>
-                <small class="text-muted">Patient ID: {{ patient.id }}</small>
-              </div>
-              <div class="patient-details mt-1">
-                  <p class="mb-1"><i class="fas fa-envelope me-2 text-secondary" aria-hidden="true"></i>Email: {{ patient.email || 'N/A' }}</p>
-                  <p class="mb-1"><i class="fas fa-phone me-2 text-secondary" aria-hidden="true"></i>Phone: {{ patient.phone_number || 'N/A' }}</p>
-                  <small class="text-muted"><i class="fas fa-calendar-alt me-2 text-secondary" aria-hidden="true"></i>D.O.B: {{ patient.date_of_birth | date:'longDate' || 'N/A' }}</small>
-              </div>
-              <!-- Add a View Details button/indicator if needed -->
-              <!-- <button class="btn btn-sm btn-outline-info mt-2">View Details</button> -->
-            </a>
-         </div>
-       </div>
+   <h2>My Patients</h2>
+   <p>List of patients with whom you have scheduled or completed appointments.</p>
+   <hr>
+ 
+   <div *ngIf="isLoading" class="text-center mt-4">
+      <app-loading-spinner [isLoading]="true" message="Loading patient list..."></app-loading-spinner>
     </div>
-  </div>
-  
-  <!-- Add Font Awesome to index.html if using icons -->
-  <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"> -->
-  
-  <!-- Add Bootstrap list group/spinner styles if not global -->
-  <style>
-   /* Add some subtle styling */
-   .patient-item:hover {
-      background-color: #f8f9fa;
-   }
-   .patient-name {
-      color: var(--primary-color);
-   }
-   .patient-details p, .patient-details small {
-      font-size: 0.9rem;
-   }
-   .patient-details .fas { /* Font awesome icon styling */
-      width: 1.2em; /* Ensure consistent icon spacing */
-   }
-   .visually-hidden { position: absolute !important; width: 1px !important; height: 1px !important; padding: 0 !important; margin: -1px !important; overflow: hidden !important; clip: rect(0,0,0,0) !important; white-space: nowrap !important; border: 0 !important; }
-  </style>
+ 
+    <div *ngIf="errorMessage && !isLoading" class="alert alert-danger mt-3">
+      {{ errorMessage }}
+    </div>
+ 
+ 
+   <div *ngIf="!isLoading && !errorMessage && (patients$ | async) as patients">
+      <div *ngIf="patients.length === 0" class="alert alert-info mt-3">
+        You currently have no patients assigned based on scheduled or completed appointments.
+      </div>
+ 
+     <div class="list-group mt-3" *ngIf="patients.length > 0">
+        <!-- Use a descriptive label for the list -->
+        <div role="list" aria-label="Assigned Patients">
+           <!-- Corrected anchor tag syntax -->
+           <a *ngFor="let patient of patients"
+              href="#"
+              (click)="viewPatientDetails(patient.id); $event.preventDefault()"
+              class="list-group-item list-group-item-action flex-column align-items-start mb-2 shadow-sm patient-item"
+              role="listitem">
+             <div class="d-flex w-100 justify-content-between">
+               <h5 class="mb-1 patient-name">{{ patient.first_name }} {{ patient.last_name }} ({{ patient.username }})</h5>
+               <small class="text-muted">Patient ID: {{ patient.id }}</small>
+             </div>
+             <div class="patient-details mt-1">
+                 <p class="mb-1"><i class="fas fa-envelope me-2 text-secondary" aria-hidden="true"></i>Email: {{ patient.email || 'N/A' }}</p>
+                 <p class="mb-1"><i class="fas fa-phone me-2 text-secondary" aria-hidden="true"></i>Phone: {{ patient.phone_number || 'N/A' }}</p>
+                 <small class="text-muted"><i class="fas fa-calendar-alt me-2 text-secondary" aria-hidden="true"></i>D.O.B: {{ patient.date_of_birth | date:'longDate' || 'N/A' }}</small>
+             </div>
+           </a> <!-- Correct closing tag placement -->
+        </div>
+      </div>
+   </div>
+ </div>
+ 
+ <!-- Styles moved to patient-list.component.scss or global styles -->
