@@ -1,0 +1,10 @@
+# telemed_platform/requirements.txt
+asgiref==3.8.1 # Django dependency
+Django==4.2.15 # Or your specific Django 4.x version
+django-cors-headers==4.4.0
+djangorestframework==3.15.2
+djangorestframework-simplejwt==5.3.1
+psycopg2-binary==2.9.9 # Even if using SQLite, kept for potential future use
+PyJWT==2.8.0 # simplejwt dependency
+sqlparse==0.5.1 # Django dependency
+tzdata==2024.1 # Django dependency

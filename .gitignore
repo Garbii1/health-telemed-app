@@ -1,0 +1,43 @@
+# Python
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+pip-log.txt
+pip-delete-this-directory.txt
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.log
+*.pot
+*.mo
+db.sqlite3  # Ignore local SQLite database
+staticfiles/ # Ignore collected static files locally if desired
+*.egg-info/
+.env
+
+# Django
+*.log
+local_settings.py
+
+# Frontend (Angular)
+telemed-ui/node_modules/
+telemed-ui/dist/
+telemed-ui/npm-debug.log*
+telemed-ui/coverage/
+telemed-ui/.angular/cache/
+telemed-ui/browserslist # If generated
+telemed-ui/.gitignore
+
+# IDE/Editor specific
+.idea/
+.vscode/
+*.swp
+*~
