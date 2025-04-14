@@ -1,17 +1,17 @@
 // src/app/features/doctor/patient-list/patient-list.component.ts
 import { Component, OnInit } from '@angular/core';
-import { CommonModule, DatePipe } from '@angular/common'; // Import DatePipe explicitly if needed, though usually provided by CommonModule
-// RouterLink removed as unused
+import { CommonModule } from '@angular/common'; // <<< ADDED: For *ngIf, *ngFor, async pipe, date pipe
+// RouterLink removed - unused warning
 import { ApiService } from '../../../core/services/api.service';
 import { Observable, of } from 'rxjs';
-import { catchError, map } from 'rxjs/operators'; // Import map
+import { catchError, map } from 'rxjs/operators'; // <<< Ensure map is imported
 import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
 
 @Component({
   selector: 'app-patient-list',
   standalone: true,
   imports: [
-      CommonModule, // Provides NgIf, NgFor, AsyncPipe, DatePipe etc.
+      CommonModule,
       // RouterLink, // Removed - unused
       LoadingSpinnerComponent
   ],
@@ -25,9 +25,7 @@ export class PatientListComponent implements OnInit {
 
   constructor(private apiService: ApiService) { }
 
-  ngOnInit(): void {
-    this.loadPatients();
-  }
+  ngOnInit(): void { this.loadPatients(); }
 
   loadPatients(): void {
     this.isLoading = true;
@@ -39,14 +37,12 @@ export class PatientListComponent implements OnInit {
          this.isLoading = false;
          return of([]);
        }),
-       map((data: any[]) => { // Added type annotation
+       map((data: any[]) => { // <<< Added type
            this.isLoading = false;
            return data;
        })
     );
   }
 
-   viewPatientDetails(patientId: number): void {
-     alert(`Navigate to details for patient ID: ${patientId} (Implement navigation)`);
-   }
+   viewPatientDetails(patientId: number): void { /* ... */ }
 }

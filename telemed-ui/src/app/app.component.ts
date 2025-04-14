@@ -1,10 +1,10 @@
 // src/app/app.component.ts
-import { Component } from '@angular/core'; // Added import
+import { Component } from '@angular/core'; // ENSURE THIS IMPORT IS PRESENT
 import { RouterOutlet } from '@angular/router';
 import { HeaderComponent } from './shared/components/header/header.component';
 import { FooterComponent } from './shared/components/footer/footer.component';
 
-@Component({ // Decorator added
+@Component({ // Decorator was missing import in previous log snippet
   selector: 'app-root',
   standalone: true,
   imports: [
