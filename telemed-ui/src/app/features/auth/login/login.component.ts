@@ -55,7 +55,7 @@ export class LoginComponent implements OnInit {
       .pipe(finalize(() => this.isLoading = false))
       .subscribe({
         next: () => {
-          console.log('Login successful');
+          console.log('Login successful, navigating...');
           this.navigateToDashboard();
         },
         error: (err) => {
@@ -67,17 +67,22 @@ export class LoginComponent implements OnInit {
 
    private navigateToDashboard(): void {
         const destination = this.returnUrl && this.returnUrl !== '/' ? this.returnUrl : this.getDefaultDashboardRoute();
-        console.log("Navigating to:", destination);
-        this.router.navigateByUrl(destination);
+        console.log("Attempting navigation to:", destination);
+        this.router.navigateByUrl(destination).catch(navErr => {
+          console.error("Navigation failed:", navErr);
+          this.router.navigate(['/']);
+        });
    }
 
    private getDefaultDashboardRoute(): string {
       const role = this.authService.getUserRole();
+      console.log("User role for redirect:", role);
        if (role === 'PATIENT') {
            return '/patient/dashboard';
          } else if (role === 'DOCTOR') {
            return '/doctor/dashboard';
          } else {
+           console.warn("Role not determined, falling back to home.");
            return '/';
          }
      }

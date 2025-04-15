@@ -132,11 +132,13 @@
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
       max-height: 0; // Hidden by default
       overflow: hidden;
-      transition: max-height 0.3s ease-out, padding 0.3s ease-out;
+      transition: max-height 0.3s ease-out, padding 0.3s ease-out, border-top 0.3s ease-out; // Smooth transition 
+      border-top: 1px solid transparent; // Add border for separation when open
   
       &.open {
-        max-height: 500px; // Adjust max height as needed
+        max-height: 70vh; // Sufficient height to show links, adjust as needed
         padding: 1rem 0; // Add padding back when open
+        border-top-color: var(--border-color); // Show border when open
       }
   
       li {

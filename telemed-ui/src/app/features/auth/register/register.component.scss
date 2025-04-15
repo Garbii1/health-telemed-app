@@ -1,63 +1,48 @@
 /* src/app/features/auth/register/register.component.scss */
 
-/* Use the same container as login for consistency */
+/* Inherit centering from login styles or define here */
 .auth-container {
     display: flex;
     justify-content: center;
-    align-items: flex-start; /* Align card to top */
-    /* Allow slightly less vertical padding if form is long */
+    align-items: flex-start; /* Align top */
     min-height: calc(100vh - var(--header-height, 70px) - var(--footer-height, 50px));
-    padding: 2rem var(--container-padding); /* Add vertical padding */
+    padding: 2rem var(--container-padding);
   }
   
-  /* Style the card */
   .auth-card {
     width: 100%;
-    /* Allow slightly wider card for register form */
-    max-width: 700px;
-    margin-top: 1rem; /* Add margin from top */
-    margin-bottom: 2rem; /* Add margin at bottom */
+    max-width: 750px; /* Wider card for register */
+    margin-top: 1rem;
+    margin-bottom: 2rem;
     border: none;
     border-radius: var(--border-radius);
   }
   
-  .card-header {
-    border-bottom: 1px solid var(--border-color);
-    h2 {
-      font-weight: 600;
-    }
-  }
+  .card-header h2 { font-weight: 600; }
   
-  /* Style section headings */
   .section-heading {
     font-size: 1.1rem;
     font-weight: 600;
     color: var(--primary-color);
     border-bottom: 1px solid var(--border-color);
     padding-bottom: 0.5rem;
-    margin-top: 1.5rem; // Add space above headings
+    margin-bottom: 1.5rem !important; // Ensure consistent spacing
+    margin-top: 1.5rem;
   }
   
-  /* Ensure consistent margins for form groups */
-  .form-group {
-     margin-bottom: 1rem; // Slightly less margin within register form
+  .form-group { margin-bottom: 1rem; }
+  
+  .form-label .text-danger { font-size: 0.9em; margin-left: 2px; }
+  
+  .form-select { /* If not defined globally */
+      /* ... styles ... */
   }
   
-  /* Responsive adjustments for columns if needed */
-  /* Uses global .row and .col-md-6 from styles.scss */
-  
-  /* Style radio buttons */
-  .form-check-input {
-      cursor: pointer;
-  }
-  .form-check-label {
-      cursor: pointer;
-  }
-  
-  /* Style required field indicator */
-  .form-label .text-danger {
-      font-size: 0.9em;
-      margin-left: 2px;
+  /* Ensure centered elements within the form have appropriate max-width if needed */
+  .form-group.text-center .form-select {
+      max-width: 300px; /* Example max-width */
+      margin-left: auto;
+      margin-right: auto;
   }
   
   /* Formatting for backend error messages */

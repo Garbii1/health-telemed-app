@@ -1,54 +1,41 @@
 /* src/app/features/auth/login/login.component.scss */
 
-/* Container to center the card vertically and horizontally */
 .auth-container {
   display: flex;
   justify-content: center;
   align-items: center;
-  /* Calculate min-height to fill viewport between header/footer */
-  /* Adjust subtraction values based on actual header/footer heights if needed */
-  min-height: calc(100vh - var(--header-height, 70px) - var(--footer-height, 50px) - 4rem); /* Add extra vertical padding */
-  padding: 2rem var(--container-padding); /* Use container padding horizontally */
+  min-height: calc(100vh - var(--header-height, 70px) - var(--footer-height, 50px) - 4rem);
+  padding: 2rem var(--container-padding);
 }
 
-/* Style the card holding the form */
 .auth-card {
   width: 100%;
-  max-width: 450px; /* Limit card width */
-  border: none; /* Optional: remove default card border for cleaner look */
-  border-radius: var(--border-radius); /* Use global radius */
+  max-width: 450px;
+  border: none;
+  border-radius: var(--border-radius);
 }
 
-.card-header {
-  border-bottom: 1px solid var(--border-color);
-  h2 {
-    font-weight: 600;
+.card-header h2 { font-weight: 600; }
+.card-body { /* Padding adjusted in HTML */ }
+
+/* Style for centered form groups */
+.form-group.text-center {
+  .form-label {
+    display: block; /* Ensure label is block for centering */
+    margin-bottom: 0.5rem;
   }
-}
-
-.card-body {
-  /* Padding adjusted in HTML (p-4) */
-}
-
-/* Make form controls slightly larger */
-.form-control-lg {
-  min-height: calc(1.5em + 1rem + 2px);
-  padding: .5rem 1rem;
-  font-size: 1.1rem; // Slightly larger text
-  border-radius: .3rem;
-}
-
-/* Make button larger */
-.btn-lg {
-  padding: 0.75rem 1.25rem;
-  font-size: 1.1rem;
-}
-
-/* Style the link at the bottom */
-.text-muted a {
-  color: var(--primary-color); // Make link stand out
-  text-decoration: none;
-  &:hover {
-    text-decoration: underline;
+  .form-control {
+    /* Limit width of centered inputs */
+    max-width: 320px;
+    /* mx-auto is added in HTML to center the block */
   }
+   .invalid-feedback {
+      max-width: 320px; // Match input width
+      margin-left: auto;
+      margin-right: auto;
+   }
 }
+
+.form-control-lg { /* Styles from previous version */ }
+.btn-lg { /* Styles from previous version */ }
+.text-muted a { /* Styles from previous version */ }
