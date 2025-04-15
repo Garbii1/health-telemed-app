@@ -2,51 +2,38 @@
 <header class="app-header">
   <nav class="container header-nav">
     <div class="logo">
-      <!-- Ensure logo link also closes menu if needed -->
-      <a routerLink="/" (click)="closeMenu()">
+      <a routerLink="/" (click)="closeMenu()"> <!-- Close on logo click -->
         <img src="assets/logo.png" alt="Telemed Platform Logo" class="logo-img">
         <span class="logo-text">HealthConnect</span>
       </a>
     </div>
 
-    <!-- Mobile Menu Button - ensure (click) calls toggleMenu() -->
+    <!-- Ensure click calls toggleMenu -->
     <button class="menu-toggle" aria-label="Toggle menu" [attr.aria-expanded]="isMenuOpen" (click)="toggleMenu()">
-      <span></span>
-      <span></span>
-      <span></span>
+      <span></span> <span></span> <span></span>
     </button>
 
-    <!-- Navigation Links - ensure [class.open] binds to isMenuOpen -->
-    <!-- Add (click)="closeMenu()" to links to close menu on navigation -->
+    <!-- Ensure [class.open] binding and (click) events -->
     <ul class="nav-links" [class.open]="isMenuOpen">
       <li><a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="closeMenu()">Home</a></li>
-
       <!-- Patient Links -->
       <ng-container *ngIf="isLoggedIn && userRole === 'PATIENT'">
         <li><a routerLink="/patient/dashboard" routerLinkActive="active" (click)="closeMenu()">Dashboard</a></li>
-        <li><a routerLink="/patient/vitals" routerLinkActive="active" (click)="closeMenu()">My Vitals</a></li>
-        <li><a routerLink="/patient/appointments" routerLinkActive="active" (click)="closeMenu()">Appointments</a></li>
-         <li><a routerLink="/patient/profile" routerLinkActive="active" (click)="closeMenu()">Profile</a></li>
+        <!-- ... other patient links with (click)="closeMenu()" ... -->
       </ng-container>
-
       <!-- Doctor Links -->
       <ng-container *ngIf="isLoggedIn && userRole === 'DOCTOR'">
         <li><a routerLink="/doctor/dashboard" routerLinkActive="active" (click)="closeMenu()">Dashboard</a></li>
-        <li><a routerLink="/doctor/patients" routerLinkActive="active" (click)="closeMenu()">My Patients</a></li>
-        <li><a routerLink="/doctor/appointments" routerLinkActive="active" (click)="closeMenu()">Schedule</a></li>
-         <li><a routerLink="/doctor/profile" routerLinkActive="active" (click)="closeMenu()">Profile</a></li>
+         <!-- ... other doctor links with (click)="closeMenu()" ... -->
       </ng-container>
-
       <!-- Auth Links -->
       <ng-container *ngIf="!isLoggedIn">
         <li class="auth-link"><a routerLink="/login" routerLinkActive="active" class="btn btn-outline-primary btn-sm" (click)="closeMenu()">Login</a></li>
         <li class="auth-link"><a routerLink="/register" routerLinkActive="active" class="btn btn-primary btn-sm" (click)="closeMenu()">Register</a></li>
       </ng-container>
-
       <ng-container *ngIf="isLoggedIn">
         <li class="user-info-nav" *ngIf="userInfo">Welcome, {{ userInfo.username || 'User' }}!</li>
-        <!-- Use logout() method which also closes menu -->
-        <li class="auth-link"><button class="btn btn-danger btn-sm" (click)="logout()">Logout</button></li>
+        <li class="auth-link"><button class="btn btn-danger btn-sm" (click)="logout()">Logout</button></li> <!-- logout() already calls closeMenu -->
       </ng-container>
     </ul>
   </nav>

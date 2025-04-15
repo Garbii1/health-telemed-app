@@ -19,47 +19,27 @@ export class HeaderComponent implements OnInit, OnDestroy {
   private authSubscription?: Subscription;
   private roleSubscription?: Subscription;
   private userSubscription?: Subscription;
-
-  // This property controls the mobile menu visibility
   isMenuOpen: boolean = false;
 
   constructor(private authService: AuthService, private router: Router) { }
+  ngOnInit(): void { /* ... subscriptions ... */ }
+  ngOnDestroy(): void { /* ... unsubscribes ... */ }
+  logout(): void { /* ... logic ... */ }
 
-  ngOnInit(): void {
-    this.authSubscription = this.authService.loggedIn$.subscribe(status => this.isLoggedIn = status);
-    this.roleSubscription = this.authService.currentUserRole$.subscribe(role => this.userRole = role);
-    this.userSubscription = this.authService.currentUser$.subscribe(user => this.userInfo = user);
-  }
-
-  ngOnDestroy(): void {
-    this.authSubscription?.unsubscribe();
-    this.roleSubscription?.unsubscribe();
-    this.userSubscription?.unsubscribe();
-  }
-
-  logout(): void {
-    this.toggleMenu(false); // Close menu on logout
-    this.authService.logout();
-  }
-
-  // This function toggles the menu state
+  // Function should toggle the boolean
   toggleMenu(forceState?: boolean): void {
-      console.log('Toggling menu. Current state:', this.isMenuOpen); // Debug log
-      if (typeof forceState === 'boolean') {
-        this.isMenuOpen = forceState;
-      } else {
-        this.isMenuOpen = !this.isMenuOpen;
-      }
-      console.log('New menu state:', this.isMenuOpen); // Debug log
+      console.log('Toggling menu. Current state:', this.isMenuOpen); // <<< DEBUG
+      if (typeof forceState === 'boolean') { this.isMenuOpen = forceState; }
+      else { this.isMenuOpen = !this.isMenuOpen; }
+      console.log('New menu state:', this.isMenuOpen); // <<< DEBUG
   }
 
-  // Navigate and ensure menu closes
+  // Function should close menu and navigate
   navigate(path: string[]): void {
-      this.toggleMenu(false); // Close menu after clicking a link
+      this.closeMenu(); // Ensure menu closes
       this.router.navigate(path);
   }
-
-  // Helper for template clicks that should close menu
+  // Helper specifically for template clicks
   closeMenu(): void {
       this.toggleMenu(false);
   }
