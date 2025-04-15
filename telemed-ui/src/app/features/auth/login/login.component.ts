@@ -55,7 +55,7 @@ export class LoginComponent implements OnInit {
       .pipe(finalize(() => this.isLoading = false))
       .subscribe({
         next: () => {
-          console.log('Login successful, navigating...');
+          console.log('Login successful');
           this.navigateToDashboard();
         },
         error: (err) => {
@@ -82,7 +82,6 @@ export class LoginComponent implements OnInit {
          } else if (role === 'DOCTOR') {
            return '/doctor/dashboard';
          } else {
-           console.warn("Role not determined, falling back to home.");
            return '/';
          }
      }
