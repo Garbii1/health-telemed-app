@@ -1,28 +1,73 @@
 /* src/app/features/auth/register/register.component.scss */
 
-.auth-container { /* ... same as login ... */ }
-.auth-card { /* ... same as login, maybe adjust max-width: 750px; ... */ }
-.card-header h2 { font-weight: 600; }
-.section-heading { /* ... styles from previous version ... */ }
-.form-group { margin-bottom: 1rem; }
-.form-label .text-danger { /* ... */ }
-.alert pre { /* ... */ }
-.btn-lg { /* ... */ }
-
-/* Example: If you need finer control over centering specific rows */
-.row.justify-content-center > .col-md-8 > .form-group.text-center .form-select {
-  /* Styles for the centered dropdown if needed */
-   max-width: 350px; /* Adjust width */
-   margin-left: auto;
-   margin-right: auto;
-}
-
-/* Ensure labels in grid rows align nicely by default */
-.row .form-label {
-    text-align: left; /* Default label alignment */
-}
-
-/* Center labels only in explicitly centered groups */
-.form-group.text-center .form-label {
-    text-align: center;
-}
+/* Inherit centering from login styles or define here */
+.auth-container {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start; /* Align top */
+    min-height: calc(100vh - var(--header-height, 70px) - var(--footer-height, 50px));
+    padding: 2rem var(--container-padding);
+  }
+  
+  .auth-card {
+    width: 100%;
+    max-width: 750px; /* Wider card for register */
+    margin-top: 1rem;
+    margin-bottom: 2rem;
+    border: none;
+    border-radius: var(--border-radius);
+  }
+  
+  .card-header h2 { font-weight: 600; }
+  
+  .section-heading {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--primary-color);
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 0.5rem;
+    margin-bottom: 1.5rem !important; // Ensure consistent spacing
+    margin-top: 1.5rem;
+  }
+  
+  .form-group { margin-bottom: 1rem; }
+  
+  .form-label .text-danger { font-size: 0.9em; margin-left: 2px; }
+  
+  .form-select { /* If not defined globally */
+      /* ... styles ... */
+  }
+  
+  /* Ensure centered elements within the form have appropriate max-width if needed */
+  .form-group.text-center .form-select {
+      max-width: 300px; /* Example max-width */
+      margin-left: auto;
+      margin-right: auto;
+  }
+  
+  /* Formatting for backend error messages */
+  .alert pre {
+      white-space: pre-wrap;       /* CSS3 */
+      white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
+      white-space: -pre-wrap;      /* Opera 4-6 */
+      white-space: -o-pre-wrap;    /* Opera 7 */
+      word-wrap: break-word;       /* Internet Explorer 5.5+ */
+      margin: 0;
+      font-size: 0.9em;
+  }
+  
+  .btn-lg {
+      padding: 0.75rem 1.25rem;
+      font-size: 1.1rem;
+  }
+  
+  /* Address the header clipping issue - Option 1: Add margin to the container */
+  /* This might be sufficient */
+  /* .auth-container { margin-top: 2rem; } */
+  
+  /* Address the header clipping issue - Option 2: More specific padding for this page */
+  /* If Option 1 doesn't work or affects other pages */
+  /* :host {
+    display: block;
+    padding-top: calc(var(--header-height, 70px) + 1rem); /* Add explicit padding if needed */
+  /* } */

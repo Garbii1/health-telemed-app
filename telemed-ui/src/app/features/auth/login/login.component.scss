@@ -10,68 +10,32 @@
 
 .auth-card {
   width: 100%;
-  max-width: 420px; // Slightly adjusted width
+  max-width: 450px;
   border: none;
   border-radius: var(--border-radius);
 }
 
 .card-header h2 { font-weight: 600; }
+.card-body { /* Padding adjusted in HTML */ }
 
-/* Center the form group contents */
-.auth-form-group {
-  display: flex;
-  flex-direction: column; /* Stack label above input */
-  align-items: center; /* Center items horizontally */
-
+/* Style for centered form groups */
+.form-group.text-center {
   .form-label {
+    display: block; /* Ensure label is block for centering */
     margin-bottom: 0.5rem;
-    font-weight: 500;
-    width: 100%; // Make label take full width for text alignment
-    text-align: center; // Center label text
   }
-
   .form-control {
-    width: 100%; // Input takes full width of its container
-    max-width: 300px; // Limit input width for aesthetics
-    text-align: left; // Keep input text left-aligned
+    /* Limit width of centered inputs */
+    max-width: 320px;
+    /* mx-auto is added in HTML to center the block */
   }
-
-  .invalid-feedback {
-    width: 100%;
-    max-width: 300px; // Match input width
-    text-align: left; // Keep error text left-aligned
-  }
+   .invalid-feedback {
+      max-width: 320px; // Match input width
+      margin-left: auto;
+      margin-right: auto;
+   }
 }
 
-.form-control-lg {
-  min-height: calc(1.5em + 1rem + 2px);
-  padding: .5rem 1rem;
-  font-size: 1.1rem;
-  border-radius: .3rem;
-}
-
-.btn-lg {
-  padding: 0.75rem 1.25rem;
-  font-size: 1.1rem;
-}
-
-.text-muted a {
-  color: var(--primary-color);
-  text-decoration: none;
-  &:hover { text-decoration: underline; }
-}
-
-/* Responsive: Make card full width on small screens */
-@media (max-width: 576px) {
-    .auth-card {
-        max-width: 100%;
-        box-shadow: none;
-        border-radius: 0;
-    }
-    .auth-form-group .form-control {
-        max-width: none; /* Allow full width */
-    }
-     .card-body {
-        padding: 1.5rem !important; /* Adjust padding */
-    }
-}
+.form-control-lg { /* Styles from previous version */ }
+.btn-lg { /* Styles from previous version */ }
+.text-muted a { /* Styles from previous version */ }

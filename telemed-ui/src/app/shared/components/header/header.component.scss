@@ -119,88 +119,57 @@
   }
   
   // Responsive adjustments
-  @media (max-width: 992px) {
+  @media (max-width: 992px) { // Adjust breakpoint as needed
     .nav-links {
       position: absolute;
-      top: var(--header-height);
+      top: var(--header-height); // Position below the header
       left: 0;
       width: 100%;
       background-color: var(--bg-color-alt);
       flex-direction: column;
       align-items: stretch; // Stretch items full width
-      padding: 0; // No padding when closed
-      max-height: 0;
-      overflow: hidden;
-      transition: max-height 0.3s ease-out, padding 0.3s ease-out, border-top 0.3s ease-out;
-      border-top: 1px solid transparent;
+      padding: 1rem 0;
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-      z-index: 999; // Ensure it's below header but above content
+      max-height: 0; // Hidden by default
+      overflow: hidden;
+      transition: max-height 0.3s ease-out, padding 0.3s ease-out, border-top 0.3s ease-out; // Smooth transition 
+      border-top: 1px solid transparent; // Add border for separation when open
   
       &.open {
-        max-height: 80vh; // Adjust height as needed
-        padding: 1rem 0;
-        border-top-color: var(--border-color);
+        max-height: 70vh; // Sufficient height to show links, adjust as needed
+        padding: 1rem 0; // Add padding back when open
+        border-top-color: var(--border-color); // Show border when open
       }
   
       li {
         margin: 0;
-        width: 100%; // Ensure full width
+        text-align: center;
   
-        a, button.btn { // Target both links and buttons within list items
-          display: block;
-          padding: 1rem 1.5rem; // Consistent padding
+        a, button {
+          display: block; // Make links take full width
+          padding: 1rem;
           border-bottom: 1px solid var(--border-color);
-          text-align: left; // Align text left for readability
           width: 100%;
-          color: var(--text-color); // Ensure readable text color
-          font-weight: 500;
-          background-color: transparent; // Ensure buttons don't have weird background
   
-          // Remove active styling underline for mobile view
-          &.active::after { display: none; }
-  
+          &.active::after {
+            display: none; // Hide underline indicator on mobile
+          }
           &:hover {
-             background-color: var(--bg-color); // Subtle hover
-             color: var(--primary-color);
-             text-decoration: none;
-          }
-  
-          // Reset button-specific styles that might interfere
-          &.btn {
-              border-radius: 0;
-              border: none; // Remove button borders within menu
-              border-bottom: 1px solid var(--border-color); // Re-add bottom border
-              text-align: left; // Override button text-align
-              color: var(--text-color); // Override button text color
-              font-size: 1rem; // Match link font size
-              font-weight: 500; // Match link font weight
-              padding: 1rem 1.5rem; // Match link padding
-  
-               &:hover {
-                  background-color: var(--bg-color);
-                  color: var(--primary-color);
-              }
-          }
-           &.btn-danger { // Specific style for logout button
-               color: var(--error-color); // Make logout red
-               &:hover {
-                   background-color: color.adjust(var(--error-color), $alpha: -0.9); // Faint red hover
-                   color: var(--error-color);
-               }
-           }
-          // Fix Register button highlight issue - ensure it doesn't stay primary blue
-          &.btn-primary.active, &.btn-primary {
-               background-color: transparent;
-               color: var(--text-color); // Standard text color
-               &:hover {
-                    background-color: var(--bg-color);
-                    color: var(--primary-color); // Hover color same as other links
-                }
+             background-color: var(--bg-color); // Highlight on hover
           }
         }
         // Remove border from last item
-        &:last-child a, &:last-child button.btn {
+        &:last-child a, &:last-child button {
             border-bottom: none;
+        }
+  
+        &.auth-link {
+            padding: 1rem;
+            a.btn, button.btn {
+                width: calc(100% - 2rem); // Make button slightly less wide
+                margin: 0.5rem auto;
+                display: block;
+            }
         }
       }
     }
