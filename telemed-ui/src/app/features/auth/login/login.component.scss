@@ -1,48 +1,54 @@
+/* src/app/features/auth/login/login.component.scss */
+
+/* Container to center the card vertically and horizontally */
 .auth-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: calc(100vh - var(--header-height) - var(--footer-height)); // Adjust based on layout
-    padding: 2rem 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* Calculate min-height to fill viewport between header/footer */
+  /* Adjust subtraction values based on actual header/footer heights if needed */
+  min-height: calc(100vh - var(--header-height, 70px) - var(--footer-height, 50px) - 4rem); /* Add extra vertical padding */
+  padding: 2rem var(--container-padding); /* Use container padding horizontally */
+}
+
+/* Style the card holding the form */
+.auth-card {
+  width: 100%;
+  max-width: 450px; /* Limit card width */
+  border: none; /* Optional: remove default card border for cleaner look */
+  border-radius: var(--border-radius); /* Use global radius */
+}
+
+.card-header {
+  border-bottom: 1px solid var(--border-color);
+  h2 {
+    font-weight: 600;
   }
-  
-  .auth-card {
-    width: 100%;
-    max-width: 450px; // Limit width of the auth card
-    margin: auto;
+}
+
+.card-body {
+  /* Padding adjusted in HTML (p-4) */
+}
+
+/* Make form controls slightly larger */
+.form-control-lg {
+  min-height: calc(1.5em + 1rem + 2px);
+  padding: .5rem 1rem;
+  font-size: 1.1rem; // Slightly larger text
+  border-radius: .3rem;
+}
+
+/* Make button larger */
+.btn-lg {
+  padding: 0.75rem 1.25rem;
+  font-size: 1.1rem;
+}
+
+/* Style the link at the bottom */
+.text-muted a {
+  color: var(--primary-color); // Make link stand out
+  text-decoration: none;
+  &:hover {
+    text-decoration: underline;
   }
-  
-  .card-header h2 {
-    margin-bottom: 0;
-    text-align: center;
-    color: var(--primary-color);
-  }
-  
-  .w-100 {
-    width: 100%;
-  }
-  
-  // Small spinner for loading state
-  .spinner-border-sm {
-    width: 1rem;
-    height: 1rem;
-    border-width: 0.2em;
-    vertical-align: -0.125em; // Align with text
-  }
-  
-  // From Bootstrap for spinner animation
-  .spinner-border {
-      display: inline-block;
-      width: 2rem;
-      height: 2rem;
-      vertical-align: text-bottom;
-      border: .25em solid currentColor;
-      border-right-color: transparent;
-      border-radius: 50%;
-      -webkit-animation: .75s linear infinite spinner-border;
-      animation: .75s linear infinite spinner-border;
-  }
-  
-  @keyframes spinner-border {
-      to { transform: rotate(360deg); }
-  }
+}

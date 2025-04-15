@@ -60,7 +60,29 @@ export class RegisterComponent {
   }
 
   updateConditionalValidators(role: string) { /* ... remains same ... */ }
-  onSubmit(): void { /* ... remains same ... */ }
+  onSubmit(): void {
+    this.errorMessage = null;
+    this.successMessage = null;
+    if (this.registerForm.invalid) {
+      this.registerForm.markAllAsTouched();
+      return;
+    }
+    this.isLoading = true;
+    this.authService.register(this.registerForm.value)
+      .pipe(finalize(() => this.isLoading = false))
+      .subscribe({
+        next: (response) => {
+          console.log('Registration successful:', response);
+          this.successMessage = 'Registration successful! Redirecting to login...';
+          // Redirect to login after successful registration
+          setTimeout(() => { // Delay allows user to see message
+            this.router.navigate(['/login']);
+          }, 2500); // 2.5 second delay
+          this.registerForm.reset({ role: 'PATIENT' });
+        },
+        error: (err) => { /* ... error handling ... */ }
+      });
+  }
 
    // Getters are fine
    get username() { return this.registerForm.get('username'); }

@@ -1,0 +1,88 @@
+/* src/app/features/auth/register/register.component.scss */
+
+/* Use the same container as login for consistency */
+.auth-container {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start; /* Align card to top */
+    /* Allow slightly less vertical padding if form is long */
+    min-height: calc(100vh - var(--header-height, 70px) - var(--footer-height, 50px));
+    padding: 2rem var(--container-padding); /* Add vertical padding */
+  }
+  
+  /* Style the card */
+  .auth-card {
+    width: 100%;
+    /* Allow slightly wider card for register form */
+    max-width: 700px;
+    margin-top: 1rem; /* Add margin from top */
+    margin-bottom: 2rem; /* Add margin at bottom */
+    border: none;
+    border-radius: var(--border-radius);
+  }
+  
+  .card-header {
+    border-bottom: 1px solid var(--border-color);
+    h2 {
+      font-weight: 600;
+    }
+  }
+  
+  /* Style section headings */
+  .section-heading {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--primary-color);
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 0.5rem;
+    margin-top: 1.5rem; // Add space above headings
+  }
+  
+  /* Ensure consistent margins for form groups */
+  .form-group {
+     margin-bottom: 1rem; // Slightly less margin within register form
+  }
+  
+  /* Responsive adjustments for columns if needed */
+  /* Uses global .row and .col-md-6 from styles.scss */
+  
+  /* Style radio buttons */
+  .form-check-input {
+      cursor: pointer;
+  }
+  .form-check-label {
+      cursor: pointer;
+  }
+  
+  /* Style required field indicator */
+  .form-label .text-danger {
+      font-size: 0.9em;
+      margin-left: 2px;
+  }
+  
+  /* Formatting for backend error messages */
+  .alert pre {
+      white-space: pre-wrap;       /* CSS3 */
+      white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
+      white-space: -pre-wrap;      /* Opera 4-6 */
+      white-space: -o-pre-wrap;    /* Opera 7 */
+      word-wrap: break-word;       /* Internet Explorer 5.5+ */
+      margin: 0;
+      font-size: 0.9em;
+  }
+  
+  .btn-lg {
+      padding: 0.75rem 1.25rem;
+      font-size: 1.1rem;
+  }
+  
+  /* Address the header clipping issue - Option 1: Add margin to the container */
+  /* This might be sufficient */
+  /* .auth-container { margin-top: 2rem; } */
+  
+  /* Address the header clipping issue - Option 2: More specific padding for this page */
+  /* If Option 1 doesn't work or affects other pages */
+  /* :host {
+    display: block;
+    padding-top: calc(var(--header-height, 70px) + 1rem); /* Add explicit padding if needed */
+  /* } */
