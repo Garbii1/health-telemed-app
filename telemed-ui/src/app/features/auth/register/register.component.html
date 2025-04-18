@@ -1,170 +1,78 @@
 <!-- src/app/features/auth/register/register.component.html -->
-<div class="auth-container">
-  <div class="auth-card card shadow-sm">
-     <div class="card-header bg-light">
-       <h2 class="text-center text-primary mb-0">Register</h2>
+<div class="auth-container register-container"> <!-- Add specific class -->
+  <div class="auth-card card border-0 shadow-sm">
+     <div class="card-header bg-light py-3">
+       <h2 class="text-center text-primary mb-0 fw-bold">Create Your Account</h2>
      </div>
-    <div class="card-body p-4">
+    <div class="card-body p-4 p-lg-5">
       <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
-        <div *ngIf="successMessage" class="alert alert-success">{{ successMessage }}</div>
-        <div *ngIf="errorMessage" class="alert alert-danger"><pre>{{ errorMessage }}</pre></div>
 
-        <!-- Basic Info Section -->
-        <h5 class="mt-2 mb-3 section-heading text-center">Account Information</h5>
+        <!-- Status Messages -->
+        <div *ngIf="successMessage" class="alert alert-success text-center small p-2 mb-3">{{ successMessage }}</div>
+        <div *ngIf="errorMessage" class="alert alert-danger small p-2 mb-3"><pre class="mb-0">{{ errorMessage }}</pre></div>
 
-        <!-- Role Selection - Changed to Dropdown -->
-        <div class="row justify-content-center mb-3">
-            <div class="col-md-8"> <!-- Adjust width as needed -->
-                 <div class="form-group text-center">
-                   <label for="role" class="form-label fw-bold">Register as: <span class="text-danger">*</span></label>
-                   <select id="role" class="form-select" formControlName="role" [class.is-invalid]="role?.invalid && role?.touched">
-                       <option value="PATIENT">Patient</option>
-                       <option value="DOCTOR">Doctor</option>
-                   </select>
-                   <div *ngIf="role?.invalid && role?.touched" class="invalid-feedback text-start">Required.</div>
-                 </div>
-            </div>
-        </div>
-
-
-        <div class="row mb-2">
-          <div class="col-md-6">
-            <div class="form-group">
-              <label for="first_name" class="form-label">First Name <span class="text-danger">*</span></label>
-              <input type="text" id="first_name" class="form-control" formControlName="first_name" [class.is-invalid]="first_name?.invalid && first_name?.touched">
-              <div *ngIf="first_name?.invalid && first_name?.touched" class="invalid-feedback">Required.</div>
-            </div>
-          </div>
-          <div class="col-md-6">
-            <div class="form-group">
-              <label for="last_name" class="form-label">Last Name <span class="text-danger">*</span></label>
-              <input type="text" id="last_name" class="form-control" formControlName="last_name" [class.is-invalid]="last_name?.invalid && last_name?.touched">
-               <div *ngIf="last_name?.invalid && last_name?.touched" class="invalid-feedback">Required.</div>
+        <!-- Section 1: Role & Basic Account -->
+        <h5 class="section-heading text-primary mb-3">Account Type</h5>
+        <div class="row justify-content-center mb-4">
+          <div class="col-md-7">
+            <div class="form-group mb-3">
+              <label for="role" class="form-label">Register as <span class="text-danger">*</span></label>
+              <select id="role" class="form-select form-select-lg" formControlName="role" [class.is-invalid]="role?.invalid && role?.touched">
+                  <option value="PATIENT">Patient</option>
+                  <option value="DOCTOR">Doctor</option>
+              </select>
+              <div *ngIf="role?.invalid && role?.touched" class="invalid-feedback text-start ps-1">Required.</div>
             </div>
           </div>
         </div>
 
-        <div class="form-group mb-3">
-          <label for="username" class="form-label">Username <span class="text-danger">*</span></label>
-          <input type="text" id="username" class="form-control" formControlName="username" [class.is-invalid]="username?.invalid && username?.touched">
-           <div *ngIf="username?.invalid && username?.touched" class="invalid-feedback">
-               <div *ngIf="username?.errors?.['required']">Required.</div>
-               <div *ngIf="username?.errors?.['minlength']">Must be at least 3 characters.</div>
-           </div>
-        </div>
-
-        <div class="form-group mb-3">
-          <label for="email" class="form-label">Email <span class="text-danger">*</span></label>
-          <input type="email" id="email" class="form-control" formControlName="email" [class.is-invalid]="email?.invalid && email?.touched">
-           <div *ngIf="email?.invalid && email?.touched" class="invalid-feedback">
-              <div *ngIf="email?.errors?.['required']">Required.</div>
-              <div *ngIf="email?.errors?.['email']">Invalid email format.</div>
-           </div>
-        </div>
-
         <div class="row mb-2">
-           <div class="col-md-6">
-              <div class="form-group">
-                 <label for="password" class="form-label">Password <span class="text-danger">*</span></label>
-                 <input type="password" id="password" class="form-control" formControlName="password" [class.is-invalid]="password?.invalid && password?.touched">
-                 <div *ngIf="password?.invalid && password?.touched" class="invalid-feedback">
-                   <div *ngIf="password?.errors?.['required']">Required.</div>
-                   <div *ngIf="password?.errors?.['minlength']">Must be at least 8 characters.</div>
-                 </div>
-               </div>
-           </div>
-           <div class="col-md-6">
-               <div class="form-group">
-                 <label for="password2" class="form-label">Confirm Password <span class="text-danger">*</span></label>
-                 <input type="password" id="password2" class="form-control" formControlName="password2" [class.is-invalid]="(password2?.invalid && password2?.touched) || (registerForm.errors?.['passwordMismatch'] && password2?.touched)">
-                  <div *ngIf="password2?.invalid && password2?.touched && password2?.errors?.['required']" class="invalid-feedback">Required.</div>
-                  <div *ngIf="registerForm.errors?.['passwordMismatch'] && password2?.touched" class="invalid-feedback">Passwords do not match.</div>
-               </div>
-           </div>
+          <div class="col-md-6"><div class="form-group"><label for="first_name" class="form-label">First Name <span class="text-danger">*</span></label><input type="text" id="first_name" class="form-control" formControlName="first_name" [class.is-invalid]="first_name?.invalid && first_name?.touched" required><div *ngIf="first_name?.invalid && first_name?.touched" class="invalid-feedback">Required.</div></div></div>
+          <div class="col-md-6"><div class="form-group"><label for="last_name" class="form-label">Last Name <span class="text-danger">*</span></label><input type="text" id="last_name" class="form-control" formControlName="last_name" [class.is-invalid]="last_name?.invalid && last_name?.touched" required><div *ngIf="last_name?.invalid && last_name?.touched" class="invalid-feedback">Required.</div></div></div>
+        </div>
+        <div class="form-group mb-3"><label for="username" class="form-label">Username <span class="text-danger">*</span></label><input type="text" id="username" class="form-control" formControlName="username" [class.is-invalid]="username?.invalid && username?.touched" required><div *ngIf="username?.invalid && username?.touched" class="invalid-feedback text-start ps-1"><div *ngIf="username?.errors?.['required']">Required.</div><div *ngIf="username?.errors?.['minlength']">Min 3 characters.</div></div></div>
+        <div class="form-group mb-3"><label for="email" class="form-label">Email <span class="text-danger">*</span></label><input type="email" id="email" class="form-control" formControlName="email" [class.is-invalid]="email?.invalid && email?.touched" required><div *ngIf="email?.invalid && email?.touched" class="invalid-feedback text-start ps-1"><div *ngIf="email?.errors?.['required']">Required.</div><div *ngIf="email?.errors?.['email']">Invalid email.</div></div></div>
+        <div class="row mb-3">
+           <div class="col-md-6"><div class="form-group mb-md-0"><label for="password" class="form-label">Password <span class="text-danger">*</span></label><input type="password" id="password" class="form-control" formControlName="password" [class.is-invalid]="password?.invalid && password?.touched" required><div *ngIf="password?.invalid && password?.touched" class="invalid-feedback text-start ps-1"><div *ngIf="password?.errors?.['required']">Required.</div><div *ngIf="password?.errors?.['minlength']">Min 8 characters.</div></div></div></div>
+           <div class="col-md-6"><div class="form-group mb-0"><label for="password2" class="form-label">Confirm Password <span class="text-danger">*</span></label><input type="password" id="password2" class="form-control" formControlName="password2" [class.is-invalid]="(password2?.invalid && password2?.touched) || (registerForm.errors?.['passwordMismatch'] && password2?.touched)" required><div *ngIf="password2?.invalid && password2?.touched && password2?.errors?.['required']" class="invalid-feedback text-start ps-1">Required.</div><div *ngIf="registerForm.errors?.['passwordMismatch'] && password2?.touched" class="invalid-feedback text-start ps-1">Passwords do not match.</div></div></div>
         </div>
 
-        <!-- Profile Information - Now Required -->
-         <h5 class="mt-4 mb-3 section-heading text-center">Profile Information</h5>
+        <!-- Section 2: Profile Information -->
+         <h5 class="mt-4 mb-3 section-heading text-primary">Profile Information</h5>
          <div class="row mb-2">
-           <div class="col-md-6">
-             <div class="form-group">
-               <label for="phone_number" class="form-label">Phone Number <span class="text-danger">*</span></label>
-               <input type="tel" id="phone_number" class="form-control" formControlName="phone_number" [class.is-invalid]="phone_number?.invalid && phone_number?.touched">
-               <div *ngIf="phone_number?.invalid && phone_number?.touched" class="invalid-feedback">Required.</div>
-             </div>
-           </div>
-           <div class="col-md-6">
-             <div class="form-group">
-               <label for="date_of_birth" class="form-label">Date of Birth <span class="text-danger">*</span></label>
-               <input type="date" id="date_of_birth" class="form-control" formControlName="date_of_birth" [class.is-invalid]="date_of_birth?.invalid && date_of_birth?.touched">
-               <div *ngIf="date_of_birth?.invalid && date_of_birth?.touched" class="invalid-feedback">Required.</div>
-             </div>
-           </div>
+           <div class="col-md-6"><div class="form-group"><label for="phone_number" class="form-label">Phone Number <span class="text-danger">*</span></label><input type="tel" id="phone_number" class="form-control" formControlName="phone_number" placeholder="e.g., 08012345678" [class.is-invalid]="phone_number?.invalid && phone_number?.touched" required><div *ngIf="phone_number?.invalid && phone_number?.touched" class="invalid-feedback">Required.</div></div></div>
+           <div class="col-md-6"><div class="form-group"><label for="date_of_birth" class="form-label">Date of Birth <span class="text-danger">*</span></label><input type="date" id="date_of_birth" class="form-control" formControlName="date_of_birth" [class.is-invalid]="date_of_birth?.invalid && date_of_birth?.touched" required><div *ngIf="date_of_birth?.invalid && date_of_birth?.touched" class="invalid-feedback">Required.</div></div></div>
          </div>
-          <div class="form-group mb-3">
-             <label for="address" class="form-label">Address <span class="text-danger">*</span></label>
-             <textarea id="address" class="form-control" formControlName="address" rows="2" [class.is-invalid]="address?.invalid && address?.touched"></textarea>
-              <div *ngIf="address?.invalid && address?.touched" class="invalid-feedback">Required.</div>
-          </div>
+          <div class="form-group mb-4"><label for="address" class="form-label">Address <span class="text-danger">*</span></label><textarea id="address" class="form-control" formControlName="address" rows="3" [class.is-invalid]="address?.invalid && address?.touched" required></textarea><div *ngIf="address?.invalid && address?.touched" class="invalid-feedback">Required.</div></div>
 
-
+        <!-- Section 3: Role Specific -->
         <!-- Doctor Specific Fields (Conditional) -->
         <div *ngIf="role?.value === 'DOCTOR'">
-          <h5 class="mt-4 mb-3 section-heading text-center">Doctor Information</h5>
+          <h5 class="mt-4 mb-3 section-heading text-primary">Doctor Information</h5>
           <div class="row mb-2">
-              <div class="col-md-6">
-                  <div class="form-group">
-                    <label for="specialization" class="form-label">Specialization <span class="text-danger">*</span></label>
-                    <input type="text" id="specialization" class="form-control" formControlName="specialization" [class.is-invalid]="specialization?.invalid && specialization?.touched">
-                     <div *ngIf="specialization?.invalid && specialization?.touched" class="invalid-feedback">Required for doctors.</div>
-                  </div>
-              </div>
-              <div class="col-md-6">
-                   <div class="form-group">
-                     <label for="license_number" class="form-label">License Number <span class="text-danger">*</span></label>
-                     <input type="text" id="license_number" class="form-control" formControlName="license_number" [class.is-invalid]="license_number?.invalid && license_number?.touched">
-                      <div *ngIf="license_number?.invalid && license_number?.touched" class="invalid-feedback">Required for doctors.</div>
-                   </div>
-              </div>
+              <div class="col-md-6"><div class="form-group"><label for="specialization" class="form-label">Specialization <span class="text-danger">*</span></label><input type="text" id="specialization" class="form-control" formControlName="specialization" [class.is-invalid]="specialization?.invalid && specialization?.touched"><div *ngIf="specialization?.invalid && specialization?.touched" class="invalid-feedback">Required.</div></div></div>
+              <div class="col-md-6"><div class="form-group"><label for="license_number" class="form-label">License Number <span class="text-danger">*</span></label><input type="text" id="license_number" class="form-control" formControlName="license_number" [class.is-invalid]="license_number?.invalid && license_number?.touched"><div *ngIf="license_number?.invalid && license_number?.touched" class="invalid-feedback">Required.</div></div></div>
           </div>
         </div>
 
-        <!-- Patient Specific Fields (Conditional & Optional Emergency Contact) -->
+         <!-- Patient Specific Fields (Conditional) -->
          <div *ngIf="role?.value === 'PATIENT'">
-            <h5 class="mt-4 mb-3 section-heading text-center">Patient Information</h5>
+            <h5 class="mt-4 mb-3 section-heading text-primary">Emergency Contact (Optional)</h5>
             <div class="row mb-2">
-               <div class="col-md-5"> <!-- Adjust col size -->
-                  <div class="form-group">
-                    <label for="emergency_contact_name" class="form-label">Emergency Contact Name</label>
-                    <input type="text" id="emergency_contact_name" class="form-control" formControlName="emergency_contact_name">
-                     <!-- Add validation if making required -->
-                  </div>
-               </div>
-                <div class="col-md-3"> <!-- Add column for relationship -->
-                     <div class="form-group">
-                       <label for="emergency_contact_relationship" class="form-label">Relationship</label>
-                       <input type="text" id="emergency_contact_relationship" class="form-control" formControlName="emergency_contact_relationship" placeholder="e.g., Spouse, Parent">
-                       <!-- Add validation if making required -->
-                     </div>
-                 </div>
-               <div class="col-md-4"> <!-- Adjust col size -->
-                   <div class="form-group">
-                     <label for="emergency_contact_phone" class="form-label">Emergency Contact Phone</label>
-                     <input type="tel" id="emergency_contact_phone" class="form-control" formControlName="emergency_contact_phone">
-                      <!-- Add validation if making required -->
-                   </div>
-               </div>
+               <div class="col-md-5"><div class="form-group"><label for="emergency_contact_name" class="form-label">Contact Name</label><input type="text" id="emergency_contact_name" class="form-control" formControlName="emergency_contact_name"></div></div>
+               <div class="col-md-3"><div class="form-group"><label for="emergency_contact_relationship" class="form-label">Relationship</label><input type="text" id="emergency_contact_relationship" class="form-control" formControlName="emergency_contact_relationship" placeholder="e.g., Spouse"></div></div>
+               <div class="col-md-4"><div class="form-group"><label for="emergency_contact_phone" class="form-label">Contact Phone</label><input type="tel" id="emergency_contact_phone" class="form-control" formControlName="emergency_contact_phone"></div></div>
             </div>
          </div>
 
         <!-- Submit Button -->
         <button type="submit" class="btn btn-primary w-100 btn-lg mt-4" [disabled]="isLoading || registerForm.invalid">
-          <span *ngIf="!isLoading">Register</span>
-          <span *ngIf="isLoading"><span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Registering...</span>
+          <span *ngIf="!isLoading">Create Account</span>
+          <span *ngIf="isLoading"><span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Creating Account...</span>
         </button>
       </form>
 
-      <p class="mt-4 text-center text-muted">
+      <p class="mt-4 text-center text-muted small">
         Already have an account? <a routerLink="/login" class="fw-bold">Login here</a>
       </p>
     </div>
