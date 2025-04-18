@@ -1,0 +1,144 @@
+/* src/app/features/patient/dashboard/dashboard.component.scss */
+@use 'sass:color';
+
+// Use :host for component-specific root styles
+:host {
+  display: block;
+  background-color: var(--bg-color); // Ensure component bg matches body
+}
+
+.patient-dashboard-container {
+    // Container padding applied in HTML (py-4)
+}
+
+.dashboard-title {
+    font-weight: 600;
+    color: var(--text-color);
+}
+
+.welcome-message {
+    font-size: 1rem;
+}
+
+.loading-section {
+    min-height: 300px; // Ensure spinner area has height
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+// --- Action Cards ---
+.action-card {
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  border-radius: var(--border-radius) !important;
+  background-color: var(--bg-color-alt); // White background
+
+  // Remove underline from the stretched link text
+  a.stretched-link {
+      color: inherit; // Inherit color from card body
+      text-decoration: none;
+      &:hover { text-decoration: none; }
+  }
+
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--box-shadow-hover) !important; // Use stronger hover shadow
+  }
+
+  .card-body {
+      display: flex;
+      flex-direction: column;
+      align-items: center; // Center content
+  }
+
+  .action-icon-wrapper {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1rem; // Space below icon
+      i { font-size: 1.5rem; } // Adjust icon size
+  }
+
+  .card-title {
+      font-weight: 600;
+      color: var(--text-color);
+      margin-bottom: 0.5rem !important;
+  }
+  .card-text {
+      font-size: 0.85rem;
+      min-height: 3em; // Prevent height changes based on text length
+  }
+}
+
+
+// --- Summary Cards ---
+.summary-card {
+    border: none; // Remove default border
+    border-radius: var(--border-radius) !important;
+    background-color: var(--bg-color-alt);
+    box-shadow: var(--box-shadow); // Subtle shadow
+}
+
+.summary-card .card-header {
+    background-color: #f8f9fa !important; // Use light background for header
+    border-bottom: 1px solid #eee !important; // Light border
+    padding: 0.75rem 1.25rem; // Adjust padding
+    h5 {
+        font-size: 1.1rem;
+        font-weight: 600;
+        i { font-size: 1em; } // Match icon size to text
+    }
+    .btn-link { // Style "View All" links
+        text-decoration: none;
+        font-size: 0.85rem;
+        padding: 0.1rem 0; // Minimal padding
+    }
+}
+
+.summary-card .card-body {
+    padding: 0.75rem 1.25rem; // Adjust padding
+}
+
+.summary-card .list-group-flush .list-group-item {
+    background-color: transparent; // Make items transparent
+    padding-left: 0; // Remove default list padding
+    padding-right: 0;
+    border-color: #f0f0f0; // Lighter border
+}
+
+.summary-card .no-data-placeholder {
+    color: var(--text-color-light) !important;
+    i { color: #d0d0d0 !important; } // Even lighter icon color
+}
+
+.vitals-summary {
+    color: var(--text-color-light);
+    strong { color: var(--text-color); }
+    span { display: inline-block; margin-bottom: 0.25rem; } // Ensure wrapping works okay
+}
+
+.fst-italic { font-style: italic !important; }
+
+
+// Responsive adjustments
+@media (max-width: 991px) { // Apply below large screens
+    .quick-actions .col-lg-4 {
+        flex: 0 0 50%; // Two cards per row on medium screens
+        max-width: 50%;
+    }
+    .data-summaries .col-lg-6 {
+        flex: 0 0 100%; // Stack summaries on medium screens
+        max-width: 100%;
+    }
+}
+@media (max-width: 576px) {
+     .quick-actions .col-lg-4 {
+        flex: 0 0 100%; // Stack action cards on small screens
+        max-width: 100%;
+    }
+    .welcome-message { display: none; } // Hide welcome message on small screens if needed
+    .dashboard-title { font-size: 1.5rem; } // Smaller title
+}
