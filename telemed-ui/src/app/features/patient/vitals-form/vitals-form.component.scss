@@ -1,0 +1,29 @@
+/* src/app/features/patient/vitals-form/vitals-form.component.scss */
+
+// <<< Ensure no border or outline is applied to the host element >>>
+:host {
+    display: block; // Good practice for components
+    border: none !important; // Explicitly remove any border
+    outline: none !important; // Explicitly remove any outline
+  }
+  
+  // Style the form itself if needed, but avoid adding a full left border
+  .vital-form {
+    // Add padding or other styles if needed for internal layout
+  }
+  
+  // Keep existing styles for input groups, form controls etc.
+  // Make sure none of these add a left border to the entire form container
+  
+  /* Example: Remove the border-left added previously to the card */
+  /* Remove this rule if it exists: */
+  /* .vital-form-card { border-left: 5px solid var(--success-color); } */
+  
+  // Ensure input groups look okay
+  .input-group { /* ... styles ... */ }
+  .input-group-text { /* ... styles ... */ }
+  
+  // Responsive styles if needed
+  @media (max-width: 576px) {
+      // Adjust form layout for mobile if necessary
+  }

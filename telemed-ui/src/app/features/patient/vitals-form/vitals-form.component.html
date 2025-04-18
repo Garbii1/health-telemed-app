@@ -1,89 +1,46 @@
-<div class="card vital-form-card mb-4">
-    <div class="card-body">
-      <h4 class="card-title mb-3">Enter New Vital Signs</h4>
-      <form [formGroup]="vitalForm" (ngSubmit)="onSubmit()">
-        <!-- Success Message -->
-        <div *ngIf="successMessage" class="alert alert-success">
-          {{ successMessage }}
+<!-- src/app/features/patient/vitals-form/vitals-form.component.html -->
+<!-- The card wrapper is now in the PARENT component (vitals.component.html) -->
+<!-- Add a class to the form itself for potential specific styling -->
+<form class="vital-form" [formGroup]="vitalForm" (ngSubmit)="onSubmit()">
+  <h4 class="mb-3">Enter New Vital Signs</h4> <!-- Moved heading inside form -->
+
+  <!-- Success Message -->
+  <div *ngIf="successMessage" class="alert alert-success">{{ successMessage }}</div>
+  <!-- Error Message -->
+  <div *ngIf="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
+
+  <div class="row">
+    <!-- Blood Pressure -->
+    <div class="col-md-6">
+      <div class="form-group">
+        <label class="form-label">Blood Pressure (Systolic / Diastolic)</label>
+        <div class="input-group">
+          <input type="number" class="form-control" placeholder="Systolic (e.g., 120)" formControlName="blood_pressure_systolic" [class.is-invalid]="systolic?.invalid && systolic?.touched">
+          <span class="input-group-text">/</span>
+          <input type="number" class="form-control" placeholder="Diastolic (e.g., 80)" formControlName="blood_pressure_diastolic" [class.is-invalid]="diastolic?.invalid && diastolic?.touched">
         </div>
-        <!-- Error Message -->
-        <div *ngIf="errorMessage" class="alert alert-danger">
-          {{ errorMessage }}
-        </div>
-  
-        <div class="row">
-          <!-- Blood Pressure -->
-          <div class="col-md-6">
-            <div class="form-group">
-              <label class="form-label">Blood Pressure (Systolic / Diastolic)</label>
-              <div class="input-group">
-                <input type="number" class="form-control" placeholder="Systolic (e.g., 120)" formControlName="blood_pressure_systolic" [class.is-invalid]="systolic?.invalid && systolic?.touched">
-                <span class="input-group-text">/</span>
-                <input type="number" class="form-control" placeholder="Diastolic (e.g., 80)" formControlName="blood_pressure_diastolic" [class.is-invalid]="diastolic?.invalid && diastolic?.touched">
-              </div>
-               <div *ngIf="(systolic?.invalid || diastolic?.invalid) && (systolic?.touched || diastolic?.touched)" class="invalid-feedback d-block">
-                 Invalid blood pressure value(s).
-               </div>
-            </div>
-          </div>
-  
-          <!-- Heart Rate -->
-          <div class="col-md-6">
-            <div class="form-group">
-              <label for="heart_rate" class="form-label">Heart Rate (bpm)</label>
-              <input type="number" id="heart_rate" class="form-control" placeholder="e.g., 70" formControlName="heart_rate" [class.is-invalid]="heartRate?.invalid && heartRate?.touched">
-              <div *ngIf="heartRate?.invalid && heartRate?.touched" class="invalid-feedback">Invalid heart rate value.</div>
-            </div>
-          </div>
-        </div>
-  
-         <div class="row">
-          <!-- Glucose Level -->
-          <div class="col-md-6">
-            <div class="form-group">
-              <label for="glucose_level" class="form-label">Glucose Level (mg/dL)</label> <!-- Specify unit -->
-              <input type="number" step="0.1" id="glucose_level" class="form-control" placeholder="e.g., 95.5" formControlName="glucose_level" [class.is-invalid]="glucose?.invalid && glucose?.touched">
-               <div *ngIf="glucose?.invalid && glucose?.touched" class="invalid-feedback">Invalid glucose level value.</div>
-            </div>
-          </div>
-  
-          <!-- Temperature -->
-           <div class="col-md-6">
-              <div class="form-group">
-                 <label for="temperature" class="form-label">Temperature (°C)</label> <!-- Specify unit -->
-                 <input type="number" step="0.1" id="temperature" class="form-control" placeholder="e.g., 36.6" formControlName="temperature" [class.is-invalid]="temperature?.invalid && temperature?.touched">
-                  <div *ngIf="temperature?.invalid && temperature?.touched" class="invalid-feedback">Invalid temperature value.</div>
-              </div>
-            </div>
-          </div>
-  
-        <!-- Notes -->
-        <div class="form-group">
-          <label for="notes" class="form-label">Notes (Optional)</label>
-          <textarea id="notes" class="form-control" rows="3" formControlName="notes" placeholder="Any additional information..."></textarea>
-        </div>
-  
-        <!-- Submit Button -->
-        <button type="submit" class="btn btn-success" [disabled]="isLoading">
-           <span *ngIf="!isLoading">Save Vital Record</span>
-           <span *ngIf="isLoading">
-             <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-             Saving...
-           </span>
-        </button>
-      </form>
+         <div *ngIf="(systolic?.invalid || diastolic?.invalid) && (systolic?.touched || diastolic?.touched)" class="invalid-feedback d-block"> Invalid blood pressure value(s). </div>
+      </div>
+    </div>
+    <!-- Heart Rate -->
+    <div class="col-md-6">
+       <div class="form-group"> <label for="heart_rate" class="form-label">Heart Rate (bpm)</label> <input type="number" id="heart_rate" class="form-control" placeholder="e.g., 70" formControlName="heart_rate" [class.is-invalid]="heartRate?.invalid && heartRate?.touched"> <div *ngIf="heartRate?.invalid && heartRate?.touched" class="invalid-feedback">Invalid heart rate value.</div> </div>
     </div>
   </div>
-  
-  <!-- Add Bootstrap grid/form styles if not global -->
-  <style>
-  .input-group { display: flex; flex-wrap: nowrap; align-items: stretch; width: 100%; }
-  .input-group .form-control { position: relative; flex: 1 1 auto; width: 1%; min-width: 0; }
-  .input-group .form-control:not(:first-child) { border-top-left-radius: 0; border-bottom-left-radius: 0; }
-  .input-group .form-control:not(:last-child) { border-top-right-radius: 0; border-bottom-right-radius: 0; }
-  .input-group-text { display: flex; align-items: center; padding: .375rem .75rem; margin-bottom: 0; font-size: 1rem; font-weight: 400; line-height: 1.5; color: #495057; text-align: center; white-space: nowrap; background-color: #e9ecef; border: 1px solid #ced4da; border-radius: .25rem; }
-  .input-group > .input-group-text { border-top-left-radius: 0; border-bottom-left-radius: 0; border-left: 0;}
-  .input-group > .form-control { border-right: 0;}
-  .invalid-feedback.d-block { display: block !important; }
-  .vital-form-card { border-left: 5px solid var(--success-color); } /* Add visual cue */
-  </style>
+
+   <div class="row">
+    <!-- Glucose Level -->
+    <div class="col-md-6"> <div class="form-group"> <label for="glucose_level" class="form-label">Glucose Level (mg/dL)</label> <input type="number" step="0.1" id="glucose_level" class="form-control" placeholder="e.g., 95.5" formControlName="glucose_level" [class.is-invalid]="glucose?.invalid && glucose?.touched"> <div *ngIf="glucose?.invalid && glucose?.touched" class="invalid-feedback">Invalid glucose level value.</div> </div> </div>
+    <!-- Temperature -->
+     <div class="col-md-6"> <div class="form-group"> <label for="temperature" class="form-label">Temperature (°C)</label> <input type="number" step="0.1" id="temperature" class="form-control" placeholder="e.g., 36.6" formControlName="temperature" [class.is-invalid]="temperature?.invalid && temperature?.touched"> <div *ngIf="temperature?.invalid && temperature?.touched" class="invalid-feedback">Invalid temperature value.</div> </div> </div>
+    </div>
+
+  <!-- Notes -->
+  <div class="form-group"> <label for="notes" class="form-label">Notes (Optional)</label> <textarea id="notes" class="form-control" rows="3" formControlName="notes" placeholder="Any additional information..."></textarea> </div>
+
+  <!-- Submit Button -->
+  <button type="submit" class="btn btn-success" [disabled]="isLoading">
+     <span *ngIf="!isLoading"><i class="fas fa-save me-1"></i>Save Vital Record</span>
+     <span *ngIf="isLoading"> <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Saving... </span>
+  </button>
+</form>
