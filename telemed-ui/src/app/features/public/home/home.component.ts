@@ -2,6 +2,8 @@
 import { Component, OnInit, OnDestroy } from '@angular/core'; // Import OnInit, OnDestroy
 import { CommonModule } from '@angular/common'; // Import CommonModule for *ngFor
 import { RouterLink } from '@angular/router';
+import { AuthService } from '../../../core/services/auth.service'; // <<< Import AuthService
+import { Observable } from 'rxjs'; // <<< Import Observable
 
 @Component({
   selector: 'app-home',
@@ -27,6 +29,14 @@ export class HomeComponent implements OnInit, OnDestroy { // Implement OnInit, O
 
   currentImageIndex = 0; // Index of the currently active image
   private intervalId: any = null; // To store the interval timer ID
+
+  // Observable for login status
+  isLoggedIn$: Observable<boolean>; // <<< Expose observable
+
+  // Inject AuthService
+  constructor(private authService: AuthService) { // <<< Inject AuthService
+    this.isLoggedIn$ = this.authService.loggedIn$; // <<< Assign observable
+  }
 
   ngOnInit(): void {
     // Preload images (optional but improves user experience)

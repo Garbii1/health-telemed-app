@@ -2,25 +2,24 @@
 <div class="home-page">
   <!-- Hero Section -->
   <section class="hero-section">
-    <!-- Container for background image slides -->
+    <!-- Backgrounds -->
     <div class="hero-backgrounds">
       <div *ngFor="let imageUrl of backgroundImages; let i = index"
            class="hero-bg-slide"
            [style.backgroundImage]="'url(' + imageUrl + ')'"
            [class.active]="i === currentImageIndex">
-           <!-- This div will hold one background image -->
       </div>
     </div>
+    <!-- Overlay -->
     <div class="hero-overlay"></div>
+    <!-- Content -->
     <div class="container hero-content">
       <h1 class="hero-title">Your Health, Connected</h1>
       <p>Access virtual consultations, monitor your vitals, and manage your health profile seamlessly.</p>
       <div class="hero-buttons">
-        <!-- Keep only the Get Started button -->
-        <a routerLink="/register" class="btn btn-primary btn-lg">Get Started</a>
-        <!-- REMOVED Login button:
-        <a routerLink="/login" class="btn btn-outline-light btn-lg">Login</a>
-        -->
+        <!-- Show Get Started button ONLY if NOT logged in -->
+        <!-- Use the async pipe to subscribe to isLoggedIn$ -->
+        <a *ngIf="!(isLoggedIn$ | async)" routerLink="/register" class="btn btn-primary btn-lg">Get Started</a>
       </div>
     </div>
   </section>
