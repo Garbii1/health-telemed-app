@@ -37,7 +37,7 @@
            <!-- No Login/Register here -->
            <ng-container *ngIf="isLoggedIn && userInfo">
               <span class="user-info-text me-3"> {{ userInfo.username || '' }}</span>
-              <button class="btn btn-outline-danger btn-sm" (click)="logout()">Logout</button>
+              <button class="btn btn-outline-danger btn-sm" (click)="logout()"></button>
            </ng-container>
        </div>
 
