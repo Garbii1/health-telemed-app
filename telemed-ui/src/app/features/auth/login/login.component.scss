@@ -4,38 +4,114 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: calc(100vh - var(--header-height, 70px) - var(--footer-height, 50px) - 4rem);
-  padding: 2rem var(--container-padding);
+  min-height: calc(100vh - var(--header-height, 70px) - var(--footer-height, 50px)); // Fill space
+  padding: 2rem 1rem; // Add padding
+  background-color: var(--bg-color); // Match global background
 }
 
 .auth-card {
   width: 100%;
-  max-width: 450px;
-  border: none;
-  border-radius: var(--border-radius);
+  max-width: 400px; // Control maximum width
+  border-radius: var(--border-radius, 8px) !important; // Ensure radius applies
+  background-color: var(--bg-color-alt); // White background for card
 }
 
-.card-header h2 { font-weight: 600; }
-.card-body { /* Padding adjusted in HTML */ }
+.card-body {
+  // Padding adjusted in HTML (p-4 p-lg-5)
+}
 
-/* Style for centered form groups */
-.form-group.text-center {
-  .form-label {
-    display: block; /* Ensure label is block for centering */
+.card-header { // Remove if not used, or style as needed
+    // Example: border-bottom: none; background-color: transparent;
+}
+
+// Center the icon/logo if used
+.auth-card .text-center i {
     margin-bottom: 0.5rem;
+}
+
+h2 {
+  font-weight: 600; // Make slightly bolder if needed
+}
+
+.form-group {
+  // Labels are now standard left-aligned above the input
+  label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    font-size: 0.9rem; // Slightly smaller label
+    color: var(--text-color-light);
+  }
+}
+
+// Input group styling for icons
+.input-group {
+  .input-group-text {
+    background-color: var(--bg-color); // Match background
+    border-color: var(--border-color);
+    border-right: none; // Remove border between icon and input
+    color: var(--text-color-light);
+    padding: 0 .75rem;
   }
   .form-control {
-    /* Limit width of centered inputs */
-    max-width: 320px;
-    /* mx-auto is added in HTML to center the block */
+      border-left: none; // Remove border between icon and input
+      padding-left: 0.5rem; // Adjust padding
+      &:focus {
+        // Ensure focus outline doesn't overlap icon weirdly
+        box-shadow: none; // Remove default focus glow if using input-group
+        border-color: var(--primary-color); // Simple border color change on focus
+        border-left: none; // Keep left border none on focus
+         & + .input-group-text { // Style icon box on input focus
+            border-color: var(--primary-color);
+            border-right: none;
+         }
+      }
+      // Add left border back if input is invalid
+       &.is-invalid {
+           border-left: 1px solid var(--error-color) !important;
+           &:focus {
+               border-color: var(--error-color);
+           }
+       }
   }
-   .invalid-feedback {
-      max-width: 320px; // Match input width
-      margin-left: auto;
-      margin-right: auto;
-   }
 }
 
-.form-control-lg { /* Styles from previous version */ }
-.btn-lg { /* Styles from previous version */ }
-.text-muted a { /* Styles from previous version */ }
+.form-control-lg {
+  min-height: calc(1.5em + 1rem + 2px);
+  padding-top: .5rem;
+  padding-bottom: .5rem;
+  font-size: 1rem; // Reset font size if lg is too big
+  border-radius: .3rem;
+}
+
+.btn-lg {
+  padding: 0.8rem 1.25rem;
+  font-size: 1.05rem; // Slightly smaller lg button
+  font-weight: 500;
+}
+
+.invalid-feedback {
+    font-size: 0.8rem; // Smaller error text
+    padding-left: 0.25rem;
+}
+
+.text-muted a {
+  color: var(--primary-color);
+  text-decoration: none;
+  &:hover { text-decoration: underline; }
+}
+
+// Ensure card doesn't have extra margin on mobile if container handles padding
+@media (max-width: 576px) {
+    .auth-card {
+        margin-top: 0;
+        margin-bottom: 0;
+        box-shadow: none;
+        border-radius: 0;
+        width: 100%;
+        max-width: none;
+    }
+    .card-body {
+        padding: 2rem 1.5rem !important; /* Adjust padding on mobile */
+    }
+}
