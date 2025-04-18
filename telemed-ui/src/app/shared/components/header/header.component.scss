@@ -1,194 +1,154 @@
+/* src/app/shared/components/header/header.component.scss */
+@use 'sass:color';
+
+// SCSS variables
+$primary-color-value: #4a90e2;
+$error-color-value: #dc3545;
+
+// --- Base Header Styling ---
 .app-header {
-    background-color: var(--bg-color-alt);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-    position: fixed; // Fixed header
-    top: 0;
-    left: 0;
-    width: 100%;
-    z-index: 1000; // Ensure it's above other content
-    height: var(--header-height);
-  }
-  
-  .header-nav {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    height: 100%;
-  }
-  
-  .logo {
-    display: flex;
-    align-items: center;
-    a {
-      display: flex;
-      align-items: center;
-      text-decoration: none;
-      color: var(--text-color);
-      &:hover {
-        text-decoration: none; // Remove underline for logo link
-      }
+  background-color: #ffffff;
+  position: fixed; top: 0; left: 0; width: 100%;
+  z-index: 1030;
+  height: var(--header-height, 70px);
+  border-bottom: 1px solid var(--border-color);
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+.header-nav {
+  display: flex; justify-content: space-between; align-items: center;
+  height: 100%; max-width: var(--container-max-width); margin: 0 auto;
+  padding: 0 var(--container-padding);
+}
+
+// --- Logo ---
+.logo-container { flex-shrink: 0; }
+.logo-link { display: flex; align-items: center; text-decoration: none; }
+.logo-img { height: 36px; width: auto; margin-right: 0.6rem; }
+.logo-text { font-size: 1.4rem; font-weight: 600; color: var(--primary-color); }
+
+// --- Desktop Navigation ---
+.desktop-nav { // Hidden below lg by class d-none d-lg-flex
+  flex-grow: 1; display: flex; justify-content: center; margin: 0 1rem;
+}
+.nav-links { // The UL itself for desktop
+  list-style: none; display: flex; margin: 0; padding: 0; height: 100%;
+  li {
+    margin: 0 1.25rem;
+    a { // Desktop link styling
+      display: flex; align-items: center; height: 100%; padding: 0 0.1rem;
+      text-decoration: none; color: var(--text-color-light); font-weight: 500;
+      font-size: 0.95rem; border-bottom: 2px solid transparent;
+      transition: color 0.2s ease, border-color 0.2s ease;
+      &:hover { color: var(--primary-color); }
+      &.active { color: var(--primary-color); border-bottom-color: var(--primary-color); }
     }
   }
-  
-  .logo-img {
-    height: 40px; // Adjust size as needed
-    width: auto;
-    margin-right: 10px;
+}
+
+// --- Desktop Auth/User Section ---
+.auth-actions { // Container holds desktop auth OR mobile toggle
+    display: flex; align-items: center; margin-left: 1rem; flex-shrink: 0;
+}
+.auth-user-section { // Desktop specific container (Hidden below lg)
+  .user-info-text { font-size: 0.9rem; color: var(--text-color-light); }
+  .btn { margin-left: 0.75rem; }
+}
+
+// --- Mobile Menu Button ---
+.menu-toggle { // Hidden above lg by d-lg-none
+  background: none; border: none; cursor: pointer;
+  padding: 0.5rem; margin: 0;
+  width: 40px; height: 40px;
+  display: flex; flex-direction: column; justify-content: center; align-items: center;
+  gap: 5px; z-index: 1035; // Above overlay
+
+  span { // Hamburger lines
+    display: block; width: 24px; height: 2px; background-color: var(--text-color);
+    border-radius: 1px; transition: transform 0.3s ease-in-out, opacity 0.2s ease-in-out;
   }
-  
-  .logo-text {
-    font-size: 1.4rem;
-    font-weight: 600;
-    color: var(--primary-color);
+  &[aria-expanded="true"] { // Animate to X
+    span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    span:nth-child(2) { opacity: 0; }
+    span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
   }
-  
-  .nav-links {
-    list-style: none;
-    display: flex;
-    align-items: center;
-    margin: 0;
-    padding: 0;
-  
-    li {
-      margin-left: 1.5rem; // Spacing between nav items
-  
-      a, button {
-        text-decoration: none;
-        color: var(--text-color-light);
-        font-weight: 500;
-        transition: color 0.2s ease;
-        padding: 0.5rem 0; // Vertical padding for larger clickable area
-        position: relative; // For active link indicator
-  
-        &:hover {
-          color: var(--primary-color);
-          text-decoration: none;
+}
+
+
+// --- Mobile Menu Overlay ---
+.mobile-menu-overlay { // Hidden above lg by d-lg-none
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background-color: rgba(0, 0, 0, 0.4);
+    opacity: 0; visibility: hidden;
+    transition: opacity 0.35s ease-in-out, visibility 0s linear 0.35s;
+    z-index: 1020; // Below header/panel
+    &.active { opacity: 1; visibility: visible; transition-delay: 0s; }
+}
+
+// --- Mobile Slide-out Menu Panel (From Right) ---
+.mobile-menu-panel { // Hidden above lg by d-lg-none
+    position: fixed; top: 0; right: 0; // Position on right
+    transform: translateX(105%); // Start off-screen right
+    left: auto;
+    width: 85%; max-width: 300px; height: 100%;
+    background-color: #ffffff;
+    transition: transform 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
+    border-left: 1px solid var(--border-color);
+    box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
+    z-index: 1031; // Above overlay
+    overflow-y: auto;
+    display: flex; flex-direction: column;
+
+    &.open { transform: translateX(0%); } // Slide in
+}
+
+// --- Mobile Menu Header ---
+.mobile-menu-header {
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+    display: flex; justify-content: space-between; align-items: center;
+    flex-shrink: 0;
+    .mobile-menu-title { font-size: 1.1rem; font-weight: 600; }
+    .mobile-close-btn { background: none; border: none; font-size: 1.8rem; color: var(--text-color-light); cursor: pointer; padding: 0; line-height: 1; }
+}
+
+// --- Mobile Navigation Links List ---
+.mobile-nav-links {
+  list-style: none; margin: 0; padding: 0.5rem 0;
+  flex-grow: 1; overflow-y: auto;
+
+  li {
+    margin: 0; width: 100%;
+
+    a, button.btn-logout-mobile {
+      display: block; padding: 0.9rem 1.5rem; text-align: left; width: 100%;
+      color: var(--text-color); font-weight: 500; background-color: transparent;
+      text-decoration: none; font-size: 1rem;
+      transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+      border: none; border-bottom: 1px solid #f0f0f0;
+
+      &.active {
+         color: var(--primary-color); font-weight: 500;
+         background-color: color.adjust($primary-color-value, $alpha: -0.94);
+      }
+      &:hover, &:focus {
+         background-color: #f8f9fa; color: var(--primary-color); outline: none;
+      }
+    }
+
+    button.btn-logout-mobile {
+        color: var(--error-color);
+        &:hover, &:focus {
+           background-color: color.adjust($error-color-value, $alpha: -0.9);
+           color: var(--error-color);
         }
-  
-        &.active {
-          color: var(--primary-color);
-          font-weight: 600;
-          // Optional: Add an underline indicator for active links
-          &::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 3px;
-            background-color: var(--primary-color);
-            border-radius: 2px;
-          }
-        }
-      }
-  
-      // Styling for auth buttons within the nav
-      &.auth-link {
-          margin-left: 1rem;
-          a.btn, button.btn {
-              padding: 0.4rem 1rem; // Smaller buttons in header
-              font-size: 0.9rem;
-              &.active::after { display: none; } // Don't show underline on buttons
-          }
-      }
-  
-      // Styling for Welcome message
-      &.user-info-nav {
-          color: var(--text-color-light);
-          font-size: 0.9rem;
-      }
     }
+
+    &:last-child { border-bottom: none; }
+    hr.mobile-menu-divider { /* ... */ }
   }
-  
-  // --- Mobile Menu ---
-  .menu-toggle {
-    display: none; // Hidden by default on larger screens
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 0.5rem;
-  
-    span {
-      display: block;
-      width: 25px;
-      height: 3px;
-      background-color: var(--text-color);
-      margin: 5px 0;
-      transition: all 0.3s ease;
-    }
-  }
-  
-  // Responsive adjustments
-  @media (max-width: 992px) { // Adjust breakpoint as needed
-    .nav-links {
-      position: absolute;
-      top: var(--header-height); // Position below the header
-      left: 0;
-      width: 100%;
-      background-color: var(--bg-color-alt);
-      flex-direction: column;
-      align-items: stretch; // Stretch items full width
-      padding: 1rem 0;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-      max-height: 0; // Hidden by default
-      overflow: hidden;
-      transition: max-height 0.3s ease-out, padding 0.3s ease-out, border-top 0.3s ease-out; // Smooth transition 
-      border-top: 1px solid transparent; // Add border for separation when open
-  
-      &.open {
-        max-height: 70vh; // Sufficient height to show links, adjust as needed
-        padding: 1rem 0; // Add padding back when open
-        border-top-color: var(--border-color); // Show border when open
-      }
-  
-      li {
-        margin: 0;
-        text-align: center;
-  
-        a, button {
-          display: block; // Make links take full width
-          padding: 1rem;
-          border-bottom: 1px solid var(--border-color);
-          width: 100%;
-  
-          &.active::after {
-            display: none; // Hide underline indicator on mobile
-          }
-          &:hover {
-             background-color: var(--bg-color); // Highlight on hover
-          }
-        }
-        // Remove border from last item
-        &:last-child a, &:last-child button {
-            border-bottom: none;
-        }
-  
-        &.auth-link {
-            padding: 1rem;
-            a.btn, button.btn {
-                width: calc(100% - 2rem); // Make button slightly less wide
-                margin: 0.5rem auto;
-                display: block;
-            }
-        }
-      }
-    }
-  
-    .menu-toggle {
-      display: block; // Show hamburger icon
-    }
-  
-    // Animation for hamburger icon (optional)
-    .menu-toggle[aria-expanded="true"] {
-      span:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
-      span:nth-child(2) { opacity: 0; }
-      span:nth-child(3) { transform: rotate(-45deg) translate(7px, -6px); }
-    }
-  }
-  
-  @media (max-width: 768px) {
-     .app-header { height: calc(var(--header-height) - 10px); } // Slightly smaller header
-     .logo-img { height: 35px; }
-     .logo-text { font-size: 1.2rem;}
-     .nav-links.open { top: calc(var(--header-height) - 10px); }
-  }
+}
+
+// --- Responsive Adjustments ---
+@media (max-width: 768px) { /* ... */ }
+@media (max-width: 576px) { /* ... */ }
