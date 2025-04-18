@@ -11,39 +11,69 @@
   position: relative;
   height: 70vh;
   min-height: 400px;
-  background-image: url('/assets/hero-background.jpg');
-  background-size: cover;
-  background-position: center center;
-  background-attachment: fixed;
+  background-color: #333; // Darker fallback color
   display: flex;
   align-items: center;
   justify-content: center;
   text-align: center;
   color: #fff;
+  overflow: hidden;
+}
 
-  /* Overlay */
-  .hero-overlay {
+// Container for background images
+.hero-backgrounds {
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
+    top: 0; left: 0; width: 100%; height: 100%;
+    z-index: 0;
+}
+
+// Individual background image slide
+.hero-bg-slide {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background-size: cover;
+    background-position: center center;
+    opacity: 0;
+    transition: opacity 1.5s ease-in-out;
     z-index: 1;
+    &.active { opacity: 1; z-index: 2; }
+}
+
+
+// Overlay for text contrast (ABOVE backgrounds)
+.hero-overlay {
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
+  // <<< INCREASE OPACITY (e.g., from 0.5 to 0.6 or 0.65) >>>
+  background-color: rgba(0, 0, 0, 0.6); // Darker overlay
+  z-index: 3;
+}
+
+// Content (ABOVE overlay)
+.hero-content {
+  position: relative;
+  z-index: 4;
+  max-width: 800px;
+
+  h1.hero-title { // Target specific class if needed
+    font-size: 3rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    // <<< ENSURE TEXT SHADOW IS APPLIED >>>
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.7); // Slightly stronger shadow
   }
 
-  .hero-content {
-    position: relative;
-    z-index: 2;
-    max-width: 800px;
+  p {
+    font-size: 1.3rem;
+    margin-bottom: 2rem;
+    color: rgba(255, 255, 255, 0.95); // Slightly more opaque text
+    // <<< ENSURE TEXT SHADOW IS APPLIED >>>
+    text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.6); // Slightly stronger shadow
+  }
 
-    h1 { font-size: 3rem; font-weight: 700; margin-bottom: 1rem; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); }
-    p { font-size: 1.3rem; margin-bottom: 2rem; color: rgba(255, 255, 255, 0.9); text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5); }
-
-    .hero-buttons {
-      .btn { margin: 0 0.5rem; padding: 0.8rem 2rem; font-size: 1.1rem; border-width: 2px; }
-      .btn-outline-light { color: #fff; border-color: #fff; &:hover { background-color: #fff; color: var(--primary-color); } }
-    }
+  .hero-buttons {
+    .btn { /* ... button styles ... */ }
+    .btn-outline-light { /* ... styles ... */ }
   }
 }
 

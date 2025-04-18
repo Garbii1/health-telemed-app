@@ -2,6 +2,15 @@
 <div class="home-page">
   <!-- Hero Section -->
   <section class="hero-section">
+    <!-- Container for background image slides -->
+    <div class="hero-backgrounds">
+      <div *ngFor="let imageUrl of backgroundImages; let i = index"
+           class="hero-bg-slide"
+           [style.backgroundImage]="'url(' + imageUrl + ')'"
+           [class.active]="i === currentImageIndex">
+           <!-- This div will hold one background image -->
+      </div>
+    </div>
     <div class="hero-overlay"></div>
     <div class="container hero-content">
       <h1 class="hero-title">Your Health, Connected</h1>
