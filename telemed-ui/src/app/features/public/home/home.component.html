@@ -1,63 +1,50 @@
+<!-- src/app/features/public/home/home.component.html -->
 <div class="home-page">
-    <!-- Hero Section -->
-    <section class="hero-section">
-      <div class="hero-overlay"></div> <!-- Overlay for text readability -->
-      <div class="container hero-content">
-        <h1>Your Health, Connected</h1>
-        <p>Access virtual consultations, monitor your vitals, and manage your health profile seamlessly.</p>
-        <div class="hero-buttons">
-          <a routerLink="/register" class="btn btn-primary btn-lg">Get Started</a>
-          <a routerLink="/login" class="btn btn-outline-light btn-lg">Login</a> <!-- Use btn-outline-light for contrast -->
-        </div>
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <!-- Container for background image slides -->
+    <div class="hero-backgrounds">
+      <div *ngFor="let imageUrl of backgroundImages; let i = index"
+           class="hero-bg-slide"
+           [style.backgroundImage]="'url(' + imageUrl + ')'"
+           [class.active]="i === currentImageIndex">
+           <!-- This div will hold one background image -->
       </div>
-    </section>
-  
-    <!-- Features Section -->
-    <section class="features-section container text-center">
+    </div>
+    <div class="hero-overlay"></div>
+    <div class="container hero-content">
+      <h1 class="hero-title">Your Health, Connected</h1>
+      <p>Access virtual consultations, monitor your vitals, and manage your health profile seamlessly.</p>
+      <div class="hero-buttons">
+        <!-- Keep only the Get Started button -->
+        <a routerLink="/register" class="btn btn-primary btn-lg">Get Started</a>
+        <!-- REMOVED Login button:
+        <a routerLink="/login" class="btn btn-outline-light btn-lg">Login</a>
+        -->
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section class="features-section container text-center">
+     <!-- ... (rest of the section remains the same) ... -->
       <h2>Platform Features</h2>
       <div class="row">
-        <div class="col-md-4 feature-item">
-          <i class="feature-icon fas fa-user-md"></i> <!-- Example using Font Awesome -->
-          <h3>Virtual Consultations</h3>
-          <p>Book and attend appointments with certified doctors from anywhere.</p>
-        </div>
-        <div class="col-md-4 feature-item">
-          <i class="feature-icon fas fa-heartbeat"></i>
-          <h3>Vital Monitoring</h3>
-          <p>Track your blood pressure, glucose, heart rate, and more.</p>
-        </div>
-        <div class="col-md-4 feature-item">
-          <i class="feature-icon fas fa-chart-line"></i>
-          <h3>Health Dashboard</h3>
-          <p>View your health history and analytics at a glance.</p>
-        </div>
+        <div class="col-md-4 feature-item"> <i class="feature-icon fas fa-user-md"></i> <h3>Virtual Consultations</h3> <p>Book and attend appointments with certified doctors from anywhere.</p> </div>
+        <div class="col-md-4 feature-item"> <i class="feature-icon fas fa-heartbeat"></i> <h3>Vital Monitoring</h3> <p>Track your blood pressure, glucose, heart rate, and more.</p> </div>
+        <div class="col-md-4 feature-item"> <i class="feature-icon fas fa-chart-line"></i> <h3>Health Dashboard</h3> <p>View your health history and analytics at a glance.</p> </div>
       </div>
+  </section>
+
+  <!-- How it Works Section -->
+  <section class="how-it-works-section container">
+      <!-- ... (rest of the section remains the same) ... -->
+       <h2 class="text-center">How It Works</h2>
+       <div class="row">
+           <div class="col-md-4 step"> <div class="step-icon">1</div> <h4>Register & Profile</h4> <p>Create your account and complete your health profile.</p> </div>
+            <div class="col-md-4 step"> <div class="step-icon">2</div> <h4>Book Appointment</h4> <p>Choose a doctor and schedule a virtual consultation time.</p> </div>
+             <div class="col-md-4 step"> <div class="step-icon">3</div> <h4>Monitor & Consult</h4> <p>Track your vitals and connect with your doctor online.</p> </div>
+       </div>
     </section>
-  
-    <!-- How it Works Section (Optional) -->
-    <section class="how-it-works-section container">
-        <h2 class="text-center">How It Works</h2>
-        <div class="row">
-            <div class="col-md-4 step">
-                <div class="step-icon">1</div>
-                <h4>Register & Profile</h4>
-                <p>Create your account and complete your health profile.</p>
-            </div>
-             <div class="col-md-4 step">
-                  <div class="step-icon">2</div>
-                  <h4>Book Appointment</h4>
-                  <p>Choose a doctor and schedule a virtual consultation time.</p>
-              </div>
-              <div class="col-md-4 step">
-                   <div class="step-icon">3</div>
-                   <h4>Monitor & Consult</h4>
-                   <p>Track your vitals and connect with your doctor online.</p>
-               </div>
-        </div>
-      </section>
-  
-  </div>
-  
-  <!-- Add Font Awesome (Optional for icons) -->
-  <!-- Add this to your main index.html <head> -->
-  <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-..." crossorigin="anonymous" referrerpolicy="no-referrer" /> -->
+
+</div>
