@@ -1,24 +1,46 @@
-<div class="container mt-4">
-    <div class="page-header d-flex justify-content-between align-items-center mb-4">
-       <h2>My Health Vitals</h2>
-       <button class="btn btn-primary" (click)="toggleVitalForm()">
-         {{ showForm ? 'Cancel Entry' : 'Add New Vital Record' }}
-       </button>
-     </div>
-  
-    <!-- Vitals Form (conditionally shown) -->
-    <app-vitals-form *ngIf="showForm" (vitalSubmitted)="onVitalSubmitted()"></app-vitals-form>
-  
-    <!-- Vitals History/Chart -->
-     <app-vitals-history [vitalsData]="vitalsHistory$ | async"></app-vitals-history>
-  
+<!-- src/app/features/patient/vitals/vitals.component.html -->
+<div class="container patient-vitals-container py-4">
+
+  <!-- Page Header -->
+  <div class="page-header d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
+    <h2 class="dashboard-title mb-0">My Health Vitals</h2>
+    <button class="btn btn-primary" (click)="toggleVitalForm()">
+      <i class="fas {{ showForm ? 'fa-times' : 'fa-plus' }} me-1"></i>
+      {{ showForm ? 'Cancel Entry' : 'Add New Record' }}
+    </button>
   </div>
-  
-  <!-- Utility class styles if not global -->
-  <style>
-  .d-flex { display: flex !important; }
-  .justify-content-between { justify-content: space-between !important; }
-  .align-items-center { align-items: center !important; }
-  .mt-4 { margin-top: 1.5rem !important; } /* Adjust spacing */
-  .mb-4 { margin-bottom: 1.5rem !important; }
-  </style>
+
+  <!-- Add New Vital Form Section (Conditional) -->
+  <!-- Wrap the form in a card for better separation -->
+  <div class="card shadow-sm mb-4 add-vital-form-section" *ngIf="showForm">
+      <div class="card-body p-4">
+         <!-- The standalone vitals form component goes here -->
+         <app-vitals-form (vitalSubmitted)="onVitalSubmitted()"></app-vitals-form>
+      </div>
+  </div>
+
+  <!-- Vitals History & Trends Section -->
+  <div class="card shadow-sm vitals-history-section">
+      <div class="card-header bg-light border-0 pt-3 pb-2">
+          <h4 class="mb-0 text-primary"><i class="fas fa-chart-line me-2"></i>Vitals History & Trends</h4>
+      </div>
+      <div class="card-body p-4">
+           <!-- Loading state for history -->
+           <div *ngIf="isLoading && !errorMessage" class="text-center loading-section py-5">
+               <app-loading-spinner [isLoading]="true" message="Loading vital history..."></app-loading-spinner>
+           </div>
+            <!-- Error state for history -->
+            <div *ngIf="errorMessage && !isLoading" class="alert alert-warning mt-3">
+                {{ errorMessage }}
+                <button class="btn btn-sm btn-outline-secondary ms-3" (click)="loadVitalsHistory()">Retry</button>
+            </div>
+             <!-- Data state for history: Use *ngIf with async pipe -->
+            <ng-container *ngIf="!isLoading && !errorMessage && (vitalsHistory$ | async) as historyData">
+                 <!-- Pass the resolved data array to the child -->
+                 <!-- Child component handles chart/table display and 'no data' message -->
+                <app-vitals-history [vitalsData]="historyData"></app-vitals-history>
+            </ng-container>
+      </div><!-- /card-body -->
+  </div><!-- /card -->
+
+</div> <!-- /container -->
