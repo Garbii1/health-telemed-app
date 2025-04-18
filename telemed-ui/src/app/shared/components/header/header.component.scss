@@ -1,154 +1,242 @@
 /* src/app/shared/components/header/header.component.scss */
-@use 'sass:color';
+@use 'sass:color'; // Import sass:color module for color functions
 
-// SCSS variables
-$primary-color-value: #4a90e2;
-$error-color-value: #dc3545;
+// --- Define SCSS variables matching CSS vars needed for SASS functions ---
+// These should ideally match the values in src/styles.scss :root
+$primary-color-value: #4a90e2; // Use the actual hex/color value
+$error-color-value: #dc3545;   // Use the actual hex/color value
 
 // --- Base Header Styling ---
 .app-header {
-  background-color: #ffffff;
-  position: fixed; top: 0; left: 0; width: 100%;
-  z-index: 1030;
-  height: var(--header-height, 70px);
-  border-bottom: 1px solid var(--border-color);
-  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+  background-color: #ffffff; // Use white background for cleanliness
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1030; // High z-index to stay on top
+  height: var(--header-height, 70px); // Use CSS variable for height
+  border-bottom: 1px solid var(--border-color); // Use CSS variable for border
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075); // Subtle shadow from Bootstrap's shadow-sm
 }
 
 .header-nav {
-  display: flex; justify-content: space-between; align-items: center;
-  height: 100%; max-width: var(--container-max-width); margin: 0 auto;
-  padding: 0 var(--container-padding);
+  display: flex;
+  justify-content: space-between; // Pushes logo left and actions right
+  align-items: center; // Vertically center items
+  height: 100%;
+  max-width: var(--container-max-width); // Use global container width
+  margin: 0 auto; // Center the nav content
+  padding: 0 var(--container-padding); // Use global container padding
 }
 
 // --- Logo ---
-.logo-container { flex-shrink: 0; }
-.logo-link { display: flex; align-items: center; text-decoration: none; }
-.logo-img { height: 36px; width: auto; margin-right: 0.6rem; }
-.logo-text { font-size: 1.4rem; font-weight: 600; color: var(--primary-color); }
-
-// --- Desktop Navigation ---
-.desktop-nav { // Hidden below lg by class d-none d-lg-flex
-  flex-grow: 1; display: flex; justify-content: center; margin: 0 1rem;
+.logo-container {
+  flex-shrink: 0; // Prevent logo from shrinking if space is tight
 }
-.nav-links { // The UL itself for desktop
-  list-style: none; display: flex; margin: 0; padding: 0; height: 100%;
-  li {
-    margin: 0 1.25rem;
-    a { // Desktop link styling
-      display: flex; align-items: center; height: 100%; padding: 0 0.1rem;
-      text-decoration: none; color: var(--text-color-light); font-weight: 500;
-      font-size: 0.95rem; border-bottom: 2px solid transparent;
-      transition: color 0.2s ease, border-color 0.2s ease;
-      &:hover { color: var(--primary-color); }
-      &.active { color: var(--primary-color); border-bottom-color: var(--primary-color); }
-    }
-  }
+.logo-link {
+  display: flex; // Align image and text
+  align-items: center;
+  text-decoration: none;
+  &:hover { text-decoration: none; } // No underline on hover
+}
+.logo-img {
+  height: 36px; // Adjust logo height as desired
+  width: auto;
+  margin-right: 0.6rem; // Space between logo and text
+}
+.logo-text {
+  font-size: 1.4rem; // Adjust font size
+  font-weight: 600; // Medium-bold weight
+  color: var(--primary-color); // Use primary color for brand
+  line-height: 1; // Adjust for vertical alignment if needed
 }
 
-// --- Desktop Auth/User Section ---
-.auth-actions { // Container holds desktop auth OR mobile toggle
-    display: flex; align-items: center; margin-left: 1rem; flex-shrink: 0;
-}
-.auth-user-section { // Desktop specific container (Hidden below lg)
-  .user-info-text { font-size: 0.9rem; color: var(--text-color-light); }
-  .btn { margin-left: 0.75rem; }
+// --- Spacer (Takes up space when desktop nav is hidden) ---
+.flex-grow-1 {
+  flex-grow: 1; // Pushes auth actions to the right
 }
 
-// --- Mobile Menu Button ---
-.menu-toggle { // Hidden above lg by d-lg-none
-  background: none; border: none; cursor: pointer;
-  padding: 0.5rem; margin: 0;
-  width: 40px; height: 40px;
-  display: flex; flex-direction: column; justify-content: center; align-items: center;
-  gap: 5px; z-index: 1035; // Above overlay
+// --- Auth Actions Container (Holds desktop logout OR mobile toggle) ---
+.auth-actions {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0; // Prevent shrinking
+}
+
+// --- Mobile Menu Button (Always present, hidden > lg by class) ---
+.menu-toggle {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem; // Clickable area
+  margin: 0; // Reset margin
+  width: 40px; // Fixed size
+  height: 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 5px; // Space between lines
+  z-index: 1035; // Above overlay/panel background
 
   span { // Hamburger lines
-    display: block; width: 24px; height: 2px; background-color: var(--text-color);
-    border-radius: 1px; transition: transform 0.3s ease-in-out, opacity 0.2s ease-in-out;
+    display: block;
+    width: 24px;
+    height: 2px;
+    background-color: var(--text-color); // Use standard text color
+    border-radius: 1px;
+    transition: transform 0.3s ease-in-out, opacity 0.2s ease-in-out;
   }
-  &[aria-expanded="true"] { // Animate to X
+
+  // Animation to "X" when menu is open
+  &[aria-expanded="true"] {
     span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
     span:nth-child(2) { opacity: 0; }
     span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
   }
 }
 
+// --- Mobile Menu Overlay (Covers page content when menu is open) ---
+.mobile-menu-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: rgba(0, 0, 0, 0.4); // Dark overlay
+  opacity: 0;
+  visibility: hidden; // Use visibility for accessibility
+  transition: opacity 0.35s ease-in-out, visibility 0s linear 0.35s; // Delay visibility change
+  z-index: 1020; // Below panel and header
 
-// --- Mobile Menu Overlay ---
-.mobile-menu-overlay { // Hidden above lg by d-lg-none
-    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-    background-color: rgba(0, 0, 0, 0.4);
-    opacity: 0; visibility: hidden;
-    transition: opacity 0.35s ease-in-out, visibility 0s linear 0.35s;
-    z-index: 1020; // Below header/panel
-    &.active { opacity: 1; visibility: visible; transition-delay: 0s; }
+  &.active { // When panel is open
+    opacity: 1;
+    visibility: visible;
+    transition-delay: 0s;
+  }
 }
 
-// --- Mobile Slide-out Menu Panel (From Right) ---
-.mobile-menu-panel { // Hidden above lg by d-lg-none
-    position: fixed; top: 0; right: 0; // Position on right
-    transform: translateX(105%); // Start off-screen right
-    left: auto;
-    width: 85%; max-width: 300px; height: 100%;
-    background-color: #ffffff;
-    transition: transform 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
-    border-left: 1px solid var(--border-color);
-    box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
-    z-index: 1031; // Above overlay
-    overflow-y: auto;
-    display: flex; flex-direction: column;
+// --- Mobile Slide-out Menu Panel (Slides from right) ---
+.mobile-menu-panel {
+  position: fixed;
+  top: 0;
+  right: 0; // Position on the right
+  transform: translateX(105%); // Start off-screen
+  left: auto; // Important: don't set left
+  width: 85%; // Panel width
+  max-width: 300px; // Max width
+  height: 100%; // Full viewport height
+  background-color: #ffffff; // Solid white background
+  transition: transform 0.35s cubic-bezier(0.25, 0.8, 0.25, 1); // Smooth slide
+  border-left: 1px solid var(--border-color); // Border on the visible edge
+  box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1); // Shadow on the visible edge
+  z-index: 1031; // Above overlay
+  overflow-y: auto; // Allow scrolling within the panel
+  display: flex;
+  flex-direction: column; // Stack header and list
 
-    &.open { transform: translateX(0%); } // Slide in
+  &.open {
+    transform: translateX(0%); // Slide into view
+  }
 }
 
 // --- Mobile Menu Header ---
 .mobile-menu-header {
-    padding: 1rem 1.5rem;
-    border-bottom: 1px solid var(--border-color);
-    display: flex; justify-content: space-between; align-items: center;
-    flex-shrink: 0;
-    .mobile-menu-title { font-size: 1.1rem; font-weight: 600; }
-    .mobile-close-btn { background: none; border: none; font-size: 1.8rem; color: var(--text-color-light); cursor: pointer; padding: 0; line-height: 1; }
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0; // Prevent header from shrinking
+
+  .mobile-menu-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-color);
+  }
+  .mobile-menu-title.user-info-text { // Style for welcome message
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: var(--text-color-light);
+  }
+  .mobile-close-btn {
+     background: none; border: none;
+     font-size: 1.8rem; color: var(--text-color-light);
+     cursor: pointer; padding: 0; line-height: 1;
+     &:hover { color: var(--text-color); }
+  }
 }
 
 // --- Mobile Navigation Links List ---
 .mobile-nav-links {
-  list-style: none; margin: 0; padding: 0.5rem 0;
-  flex-grow: 1; overflow-y: auto;
+  list-style: none;
+  margin: 0;
+  padding: 0.5rem 0; // Padding top/bottom of the list
+  flex-grow: 1; // Allow list to take remaining space
+  overflow-y: auto; // Allow only this list to scroll if needed
 
   li {
-    margin: 0; width: 100%;
+    margin: 0;
+    width: 100%;
 
     a, button.btn-logout-mobile {
-      display: block; padding: 0.9rem 1.5rem; text-align: left; width: 100%;
-      color: var(--text-color); font-weight: 500; background-color: transparent;
-      text-decoration: none; font-size: 1rem;
+      display: block; // Changed from flex to block for simplicity
+      padding: 0.9rem 1.5rem;
+      text-align: left;
+      width: 100%;
+      color: var(--text-color-light); // Slightly lighter text
+      font-weight: 500;
+      background-color: transparent;
+      text-decoration: none;
+      font-size: 1rem;
       transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
-      border: none; border-bottom: 1px solid #f0f0f0;
+      border: none; // Remove default button border
+      border-bottom: 1px solid #f0f0f0; // Light separator
 
-      &.active {
-         color: var(--primary-color); font-weight: 500;
-         background-color: color.adjust($primary-color-value, $alpha: -0.94);
+      &.active { // Style for the currently active route
+         color: var(--primary-color);
+         font-weight: 600;
+         // Use SCSS variable for background tint calculation
+         background-color: color.adjust($primary-color-value, $alpha: -0.94); // Very faint bg
       }
-      &:hover, &:focus {
-         background-color: #f8f9fa; color: var(--primary-color); outline: none;
+      &:hover, &:focus { // Hover/focus style
+         background-color: #f8f9fa; // Light grey background on hover
+         color: var(--primary-color); // Primary color text on hover
+         outline: none; // Remove focus outline
       }
     }
 
+    // Logout Button Specific Style
     button.btn-logout-mobile {
-        color: var(--error-color);
+        color: var(--error-color); // Red text
         &:hover, &:focus {
-           background-color: color.adjust($error-color-value, $alpha: -0.9);
-           color: var(--error-color);
+           // Use SCSS variable for background tint calculation
+           background-color: color.adjust($error-color-value, $alpha: -0.94); // Faint red bg
+           color: var(--error-color); // Keep text red
         }
     }
 
-    &:last-child { border-bottom: none; }
-    hr.mobile-menu-divider { /* ... */ }
+    &:last-child {
+      border-bottom: none; // No border on the very last item
+    }
+
+    // Divider style
+    hr.mobile-menu-divider {
+       height: 1px;
+       margin: .75rem 1.5rem;
+       background-color: var(--border-color);
+       border: 0;
+     }
   }
 }
 
-// --- Responsive Adjustments ---
-@media (max-width: 768px) { /* ... */ }
-@media (max-width: 576px) { /* ... */ }
+
+// --- Responsive Adjustments for Header Height/Logo ---
+@media (max-width: 768px) {
+   .app-header { height: calc(var(--header-height) - 10px); }
+   .mobile-menu-panel { top: calc(var(--header-height) - 10px); height: calc(100vh - var(--header-height, 70px) + 10px); }
+   .logo-img { height: 32px; }
+   .logo-text { font-size: 1.25rem; }
+}
+@media (max-width: 576px) {
+   .header-nav { padding: 0 1rem; }
+   .logo-img { height: 30px; }
+   .logo-text { font-size: 1.15rem; }
+}

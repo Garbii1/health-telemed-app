@@ -2,91 +2,64 @@
 <header class="app-header shadow-sm">
   <nav class="container header-nav">
 
-    <!-- Logo Section -->
+    <!-- Logo Section (Always Visible) -->
     <div class="logo-container">
-      <!-- Link closes menu if open -->
       <a routerLink="/" class="logo-link" (click)="isMenuOpen ? closeMenu() : null">
         <img src="assets/logo.png" alt="HealthConnect Logo" class="logo-img">
         <span class="logo-text">HealthConnect</span>
       </a>
     </div>
 
-    <!-- Desktop Navigation Links (Hidden below lg) -->
-    <div class="desktop-nav d-none d-lg-flex">
-      <ul class="nav-links mb-0">
-        <!-- No Home/Login/Register here -->
-        <ng-container *ngIf="isLoggedIn && userRole === 'PATIENT'">
-            <li><a routerLink="/patient/dashboard" routerLinkActive="active">Dashboard</a></li>
-            <li><a routerLink="/patient/vitals" routerLinkActive="active">My Vitals</a></li>
-            <li><a routerLink="/patient/appointments" routerLinkActive="active">Appointments</a></li>
-            <li><a routerLink="/patient/profile" routerLinkActive="active">Profile</a></li>
-        </ng-container>
-        <ng-container *ngIf="isLoggedIn && userRole === 'DOCTOR'">
-             <li><a routerLink="/doctor/dashboard" routerLinkActive="active">Dashboard</a></li>
-             <li><a routerLink="/doctor/patients" routerLinkActive="active">My Patients</a></li>
-             <li><a routerLink="/doctor/appointments" routerLinkActive="active">Schedule</a></li>
-             <li><a routerLink="/doctor/profile" routerLinkActive="active">Profile</a></li>
-        </ng-container>
-      </ul>
-    </div>
+    <!-- Spacer to push toggle right -->
+    <div class="flex-grow-1"></div>
 
-    <!-- Auth/User section & Mobile Toggle Button Container -->
-    <div class="auth-actions">
-        <!-- Desktop Auth/User (Hidden below lg) -->
-       <div class="d-none d-lg-flex align-items-center">
-           <!-- No Login/Register here -->
-           <ng-container *ngIf="isLoggedIn && userInfo">
-              <span class="user-info-text me-3"> {{ userInfo.username || '' }}</span>
-              <button class="btn btn-outline-danger btn-sm" (click)="logout()"></button>
-           </ng-container>
-       </div>
-
-       <!-- Mobile Menu Toggle Button (Visible below lg) -->
-       <button class="menu-toggle d-lg-none" aria-label="Toggle menu" [attr.aria-expanded]="isMenuOpen" (click)="toggleMenu()">
-         <span></span>
-         <span></span>
-         <span></span>
-       </button>
-    </div>
+    <!-- Mobile/Desktop Menu Toggle Button (ALWAYS Visible) -->
+    <!-- Remove d-lg-none -->
+    <button class="menu-toggle" aria-label="Toggle menu" [attr.aria-expanded]="isMenuOpen" (click)="toggleMenu()">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
 
   </nav> <!-- End header-nav -->
 
 </header> <!-- End app-header -->
 
-<!-- Mobile Menu Panel & Overlay (Outside the nav, direct children of component scope or after header) -->
-<!-- These elements are hidden on desktop using d-lg-none -->
-<div class="mobile-menu-overlay d-lg-none" [class.active]="isMenuOpen" (click)="closeMenu()"></div>
+<!-- Slide-out Menu Panel & Overlay (Always present in DOM, visibility controlled by class) -->
+<!-- Remove d-lg-none -->
+<div class="mobile-menu-overlay" [class.active]="isMenuOpen" (click)="closeMenu()"></div>
 
-<div class="mobile-menu-panel d-lg-none" [class.open]="isMenuOpen">
+<div class="mobile-menu-panel" [class.open]="isMenuOpen">
+    <!-- Header inside the panel -->
     <div class="mobile-menu-header">
-        <span class="mobile-menu-title">Menu</span>
-         <button class="mobile-close-btn" aria-label="Close menu" (click)="closeMenu()">×</button>
+        <!-- Title changes based on login state -->
+        <span class="mobile-menu-title">{{ isLoggedIn ? 'Navigation' : 'Menu' }}</span>
+        <button class="mobile-close-btn" aria-label="Close menu" (click)="closeMenu()">×</button>
     </div>
+
+    <!-- Links shown based on login state -->
     <ul class="mobile-nav-links">
-      <!-- Home only shown when logged out -->
       <li *ngIf="!isLoggedIn"><a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="closeMenu()">Home</a></li>
-      <!-- Patient Links -->
+
       <ng-container *ngIf="isLoggedIn && userRole === 'PATIENT'">
          <li><a routerLink="/patient/dashboard" routerLinkActive="active" (click)="closeMenu()">Dashboard</a></li>
          <li><a routerLink="/patient/vitals" routerLinkActive="active" (click)="closeMenu()">My Vitals</a></li>
          <li><a routerLink="/patient/appointments" routerLinkActive="active" (click)="closeMenu()">Appointments</a></li>
          <li><a routerLink="/patient/profile" routerLinkActive="active" (click)="closeMenu()">Profile</a></li>
       </ng-container>
-      <!-- Doctor Links -->
       <ng-container *ngIf="isLoggedIn && userRole === 'DOCTOR'">
          <li><a routerLink="/doctor/dashboard" routerLinkActive="active" (click)="closeMenu()">Dashboard</a></li>
          <li><a routerLink="/doctor/patients" routerLinkActive="active" (click)="closeMenu()">My Patients</a></li>
          <li><a routerLink="/doctor/appointments" routerLinkActive="active" (click)="closeMenu()">Schedule</a></li>
          <li><a routerLink="/doctor/profile" routerLinkActive="active" (click)="closeMenu()">Profile</a></li>
       </ng-container>
-      <!-- Separator -->
-      <li *ngIf="isLoggedIn"><hr class="mobile-menu-divider"></li>
-      <!-- Auth links only shown when logged out -->
+
+      <li *ngIf="isLoggedIn || !isLoggedIn"><hr class="mobile-menu-divider"></li>
+
       <ng-container *ngIf="!isLoggedIn">
           <li><a routerLink="/login" routerLinkActive="active" (click)="closeMenu()">Login</a></li>
           <li><a routerLink="/register" routerLinkActive="active" (click)="closeMenu()">Register</a></li>
       </ng-container>
-      <!-- Logout only shown when logged in -->
       <ng-container *ngIf="isLoggedIn">
          <li><button class="btn-logout-mobile" (click)="logout()">Logout</button></li>
       </ng-container>
