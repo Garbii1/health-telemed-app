@@ -1,0 +1,74 @@
+/* src/app/features/patient/profile/profile.component.scss */
+
+:host { display: block; background-color: var(--bg-color); }
+
+.profile-container { /* Container padding set in HTML */ }
+
+// Style page header
+.page-header {
+  .dashboard-title { font-weight: 600; color: var(--text-color); }
+  .text-muted { font-size: 0.95rem; }
+}
+
+// Style loading section
+.loading-section {
+    min-height: 400px; // Give it height while loading
+    display: flex; align-items: center; justify-content: center;
+    color: var(--text-color-light);
+}
+
+// Card styling
+.card {
+    border: none; // Remove default border
+    border-radius: var(--border-radius) !important;
+    margin-bottom: 1.75rem !important; // Increase space between cards
+    background-color: var(--bg-color-alt);
+}
+
+.card-header {
+    padding: 0.85rem 1.5rem; // Adjust header padding
+    background-color: #f8f9fa !important; // Use light background for headers
+    border-bottom: 1px solid #eee !important; // Light border
+    h5 { font-size: 1.1rem; font-weight: 500; color: var(--text-color); } // Section heading style
+}
+
+.card-body {
+   // Padding set in HTML (p-4)
+}
+
+// Form group and label styling
+.form-group {
+   margin-bottom: 1.25rem;
+   label {
+    display: block; margin-bottom: 0.4rem; font-weight: 500;
+    font-size: 0.9rem; color: var(--text-color-light);
+   }
+   .form-text { font-size: 0.8rem; margin-top: 0.25rem; }
+}
+
+// Input/Select styling (using standard size)
+.form-control {
+    padding-top: .5rem; padding-bottom: .5rem; font-size: 1rem;
+    border-radius: .3rem;
+}
+textarea.form-control { min-height: 80px; } // Adjust textarea height
+
+.invalid-feedback { font-size: 0.8rem; padding-left: 0.25rem; text-align: left; }
+
+// Required indicator
+.form-label .text-danger { font-size: 0.9em; margin-left: 2px; }
+
+// Submit button styling
+.btn-lg { padding: 0.8rem 1.5rem; font-size: 1.05rem; }
+
+// Responsive adjustments
+@media (max-width: 767px) {
+    // Stack columns inside cards if needed (Bootstrap row/col should handle this)
+    .card-body .row > [class*="col-"] {
+       margin-bottom: 1.25rem; // Add margin between stacked fields
+       &:last-child .form-group { margin-bottom: 0; } // Remove margin from last field in stacked col
+    }
+     .card-body { padding: 1.5rem !important; }
+     .text-end { text-align: center !important; } // Center button on small screens
+     .btn-lg { width: 100%; } // Make button full width
+}
