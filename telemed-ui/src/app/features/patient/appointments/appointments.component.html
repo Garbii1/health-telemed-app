@@ -3,25 +3,28 @@
 
   <!-- Page Header -->
   <div class="page-header d-flex justify-content-between align-items-center mb-3 flex-wrap border-bottom pb-3">
-    <div>
-      <h2 class="dashboard-title mb-1">My Appointments</h2>
-      <p class="text-muted mb-0">View your past and upcoming virtual consultations.</p>
-    </div>
-    <div class="filter-options mt-2 mt-md-0 d-flex align-items-center">
-      <label for="statusFilter" class="form-label me-2 mb-0 small text-muted">Filter by Status:</label>
-      <!-- Use ngModel for two-way binding OR keep (change) event -->
-      <select id="statusFilter" class="form-select form-select-sm" (change)="onFilterChange($event)" [value]="filterStatus.value" style="width: auto;">
-         <option value="ALL">All</option>
-         <option value="SCHEDULED">Scheduled</option>
-         <option value="COMPLETED">Completed</option>
-         <option value="CANCELLED">Cancelled</option>
-      </select>
-    </div>
+      <div> <!-- Group title and subtitle -->
+        <h2 class="dashboard-title mb-1">My Appointments</h2>
+        <p class="text-muted mb-0">View your past and upcoming virtual consultations.</p>
+      </div>
+       <!-- Filter Dropdown -->
+       <div class="filter-options mt-2 mt-md-0 d-flex align-items-center">
+          <label for="statusFilter" class="form-label me-2 mb-0 small text-muted">Filter by Status:</label>
+          <!-- Use (change) event binding -->
+          <select id="statusFilter" class="form-select form-select-sm" (change)="onFilterChange($event)" [value]="filterStatus.value" style="width: auto;">
+             <option value="ALL">All</option>
+             <option value="SCHEDULED">Scheduled</option>
+             <option value="COMPLETED">Completed</option>
+             <option value="CANCELLED">Cancelled</option>
+          </select>
+       </div>
   </div>
 
   <!-- Book New Button -->
    <div class="mb-4 text-end">
-    <a routerLink="../book-appointment" class="btn btn-primary"> <i class="fas fa-plus me-1"></i> Book New Appointment </a>
+    <a routerLink="../book-appointment" class="btn btn-primary">
+       <i class="fas fa-plus me-1"></i> Book New Appointment
+    </a>
    </div>
 
   <!-- Loading State -->
@@ -30,32 +33,95 @@
   </div>
 
   <!-- Error States -->
-  <div *ngIf="errorMessage && !isLoading" class="alert alert-danger mt-3"> {{ errorMessage }} <button class="btn btn-sm btn-outline-secondary ms-3" (click)="loadAppointments()">Retry</button> </div>
-  <div *ngIf="cancelError" class="alert alert-danger mt-3"> {{ cancelError }} </div>
+  <!-- Main loading error -->
+  <div *ngIf="errorMessage && !isLoading" class="alert alert-danger mt-3">
+    {{ errorMessage }}
+    <!-- Pass current filter value on retry -->
+    <button class="btn btn-sm btn-outline-secondary ms-3" (click)="loadAppointments(filterStatus.value)">Retry</button>
+  </div>
+  <!-- Cancellation error -->
+   <div *ngIf="cancelError" class="alert alert-danger mt-3">
+     {{ cancelError }}
+   </div>
 
   <!-- Appointments List/Cards -->
-  <!-- Bind directly to the 'appointments' property, check !isLoading -->
+  <!-- Bind directly to the 'appointments' property, check !isLoading and !errorMessage -->
   <div *ngIf="!isLoading && !errorMessage">
-    <!-- Check if the appointments array (not the observable) is empty -->
+    <!-- No Appointments Message -->
+    <!-- Check if the appointments array (not the observable) is empty or null -->
     <div *ngIf="!appointments || appointments.length === 0" class="alert alert-light text-center border-0 no-data-placeholder py-5 my-3">
        <i class="fas fa-calendar-times fa-2x mb-2 text-muted"></i>
        <p class="mb-0">No appointments found matching the selected filter.</p>
     </div>
 
+    <!-- Appointment Cards List -->
     <!-- Show list only if the appointments array has items -->
     <div class="appointment-list" *ngIf="appointments && appointments.length > 0">
       <!-- Loop over the component's appointments property -->
       <div *ngFor="let appt of appointments" class="card appointment-card shadow-sm mb-3">
-        <!-- ... Card structure remains the same as before ... -->
          <div class="card-body p-3">
            <div class="row align-items-center">
-               <div class="col-md-8 col-lg-9"> <!-- Details --> </div>
-               <div class="col-md-4 col-lg-3 text-md-end mt-2 mt-md-0 d-flex flex-column align-items-md-end"> <!-- Status/Actions --> </div>
+               <!-- Appointment Details -->
+               <div class="col-md-8 col-lg-9">
+                   <h5 class="mb-1 card-title">Dr. {{ appt.doctor_name || 'N/A' }}</h5>
+                   <p class="mb-1 text-muted small">
+                       <i class="fas fa-clock me-1"></i> {{ formatDate(appt.appointment_time) }}
+                   </p>
+                   <p class="mb-1 reason small">
+                       <i class="fas fa-comment-medical me-1"></i> {{ appt.reason || 'No reason specified' }}
+                   </p>
+               </div>
+               <!-- Status and Actions -->
+               <div class="col-md-4 col-lg-3 text-md-end mt-2 mt-md-0 d-flex flex-column align-items-md-end">
+                    <span class="badge mb-2 appointment-status" [ngClass]="{
+                      'status-scheduled': appt.status === 'SCHEDULED',
+                      'status-completed': appt.status === 'COMPLETED',
+                      'status-cancelled': appt.status === 'CANCELLED'
+                    }">{{ appt.status }}</span>
+
+                   <!-- Cancel Button (Conditional) -->
+                   <button *ngIf="appt.status === 'SCHEDULED'"
+                           class="btn btn-outline-danger btn-sm cancel-btn mt-1"
+                           (click)="confirmCancelAppointment(appt.id)"
+                           [disabled]="cancellingAppointmentId === appt.id">
+                       <span *ngIf="cancellingAppointmentId !== appt.id"><i class="fas fa-times me-1"></i> Cancel</span>
+                       <span *ngIf="cancellingAppointmentId === appt.id"> <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Cancelling... </span>
+                    </button>
+               </div>
+           </div><!-- /row -->
+           <!-- Doctor Notes (Conditional) -->
+           <div *ngIf="appt.status === 'COMPLETED' && appt.consultation_notes" class="notes-section mt-3 pt-3 border-top">
+               <h6 class="notes-title small text-muted"><i class="fas fa-notes-medical me-1"></i>Doctor's Notes:</h6>
+               <p class="notes-content small mb-0">{{ appt.consultation_notes }}</p>
            </div>
-           <div *ngIf="appt.status === 'COMPLETED' && appt.consultation_notes" class="notes-section mt-3 pt-3 border-top"> <!-- Notes --> </div>
-        </div>
-      </div>
-    </div>
-  </div>
+        </div><!-- /card-body -->
+      </div><!-- /card -->
+    </div><!-- /appointment-list -->
+  </div><!-- / *ngIf !isLoading && !errorMessage -->
 
 </div> <!-- /container -->
+
+<!-- Add component-specific styles if not already in SCSS file -->
+<style>
+  /* Ensure container has sufficient padding if needed */
+  .patient-appointments-container { min-height: calc(100vh - var(--header-height, 70px) - var(--footer-height, 50px) - 4rem); /* Example min height */}
+
+  /* Status badge styling */
+  .appointment-status { font-size: 0.75rem; padding: 0.3em 0.6em; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; border-radius: var(--border-radius); }
+  .status-scheduled { background-color: rgba(13, 110, 253, 0.15); color: #0d6efd; } /* primary */
+  .status-completed { background-color: rgba(25, 135, 84, 0.15); color: #198754; } /* success */
+  .status-cancelled { background-color: rgba(108, 117, 125, 0.15); color: #6c757d; } /* secondary */
+
+  .cancel-btn { width: 90px; text-align: center; padding-top: 0.25rem; padding-bottom: 0.25rem; }
+  @media (max-width: 767px) { .cancel-btn { width: auto; } }
+
+  /* Notes section styling */
+  .notes-section { background-color: #f8f9fa; padding: 0.75rem 1rem !important; margin: 1rem -1rem -0.75rem -1rem; border-radius: 0 0 var(--border-radius) var(--border-radius); }
+  .notes-title { font-weight: 500; margin-bottom: 0.25rem; }
+  .notes-content { color: var(--text-color-light); line-height: 1.5; }
+
+  /* No data styling */
+  .no-data-placeholder { background-color: transparent !important; border: 1px dashed var(--border-color) !important; color: var(--text-color-light); }
+  .no-data-placeholder i { font-size: 1.8rem; }
+  .no-data-placeholder p { margin-bottom: 0; }
+</style>
