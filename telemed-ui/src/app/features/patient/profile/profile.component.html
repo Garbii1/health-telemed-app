@@ -1,5 +1,5 @@
 <!-- src/app/features/patient/profile/profile.component.html -->
-<div class="container profile-container py-4"> <!-- Use specific container class -->
+<div class="container profile-container py-4">
 
    <!-- Page Header -->
    <div class="page-header mb-4 pb-2 border-bottom">
@@ -18,20 +18,18 @@
       <button class="btn btn-sm btn-outline-secondary ms-3" (click)="loadProfile()">Retry</button>
     </div>
  
-   <!-- Profile Form (Main content shown when not loading and no error) -->
+   <!-- Profile Form -->
+   <!-- Ensure initialProfileData check exists if template relies on it -->
    <form *ngIf="!isLoading && !errorMessage && initialProfileData" [formGroup]="profileForm" (ngSubmit)="onSubmit()">
  
-       <!-- Status Messages -->
+       <!-- Status Messages within the form -->
         <div *ngIf="successMessage" class="alert alert-success mb-3 small p-2">{{ successMessage }}</div>
-        <!-- Display general form errors if needed (e.g., backend validation not tied to specific field) -->
-         <div *ngIf="profileForm.errors && !errorMessage" class="alert alert-danger small p-2 mb-3">Please correct the form errors.</div>
+        <div *ngIf="profileForm.errors && !errorMessage" class="alert alert-danger small p-2 mb-3">Please correct the form errors.</div>
  
  
        <!-- Card 1: Account Information -->
        <div class="card shadow-sm mb-4">
-          <div class="card-header bg-light border-0">
-              <h5 class="mb-0 section-heading text-primary">Account Information</h5>
-          </div>
+          <div class="card-header bg-light border-0"> <h5 class="mb-0 section-heading text-primary">Account Information</h5> </div>
           <div class="card-body p-4">
               <div class="row">
                  <div class="col-md-6">
@@ -46,8 +44,8 @@
                         <label for="email" class="form-label">Email Address <span class="text-danger">*</span></label>
                         <input type="email" id="email" class="form-control" formControlName="email" [class.is-invalid]="email?.invalid && email?.touched" required>
                          <div *ngIf="email?.invalid && email?.touched" class="invalid-feedback">
-                           <div *ngIf="email?.errors?.['required']">Email is required.</div>
-                           <div *ngIf="email?.errors?.['email']">Invalid email format.</div>
+                           <div *ngIf="email?.errors?.['required']">Required.</div>
+                           <div *ngIf="email?.errors?.['email']">Invalid email.</div>
                          </div>
                       </div>
                   </div>
@@ -61,7 +59,7 @@
                        </div>
                    </div>
                    <div class="col-md-6">
-                       <div class="form-group mb-md-0"> <!-- Remove bottom margin on medium+ -->
+                       <div class="form-group mb-md-0">
                            <label for="last_name" class="form-label">Last Name <span class="text-danger">*</span></label>
                            <input type="text" id="last_name" class="form-control" formControlName="last_name" [class.is-invalid]="last_name?.invalid && last_name?.touched" required>
                             <div *ngIf="last_name?.invalid && last_name?.touched" class="invalid-feedback">Required.</div>
@@ -74,9 +72,7 @@
  
       <!-- Card 2: Contact & Personal Information -->
       <div class="card shadow-sm mb-4">
-         <div class="card-header bg-light border-0">
-            <h5 class="mb-0 section-heading text-primary">Contact & Personal Information</h5>
-         </div>
+         <div class="card-header bg-light border-0"> <h5 class="mb-0 section-heading text-primary">Contact & Personal Information</h5> </div>
          <div class="card-body p-4">
             <div class="row">
               <div class="col-md-6">
@@ -94,7 +90,7 @@
                    </div>
                </div>
             </div>
-            <div class="form-group mb-0"> <!-- Remove bottom margin -->
+            <div class="form-group mb-0">
                <label for="address" class="form-label">Address <span class="text-danger">*</span></label>
                <textarea id="address" class="form-control" rows="3" formControlName="address" placeholder="Your street address, city, state/province, country..." [class.is-invalid]="address?.invalid && address?.touched" required></textarea>
                 <div *ngIf="address?.invalid && address?.touched" class="invalid-feedback">Required.</div>
@@ -103,38 +99,24 @@
       </div><!-- /card -->
  
        <!-- Card 3: Emergency Contact -->
-       <!-- Use formGroupName to link to nested group -->
        <div class="card shadow-sm mb-4" formGroupName="patient_details">
-           <div class="card-header bg-light border-0">
-              <h5 class="mb-0 section-heading text-primary">Emergency Contact (Optional)</h5>
-           </div>
+           <div class="card-header bg-light border-0"> <h5 class="mb-0 section-heading text-primary">Emergency Contact (Optional)</h5> </div>
            <div class="card-body p-4">
               <div class="row">
-                  <div class="col-md-5">
-                      <div class="form-group">
-                         <label for="emergency_contact_name" class="form-label">Contact Name</label>
-                          <input type="text" id="emergency_contact_name" class="form-control" formControlName="emergency_contact_name">
-                      </div>
-                  </div>
-                  <div class="col-md-3">
-                       <div class="form-group">
-                          <label for="emergency_contact_relationship" class="form-label">Relationship</label>
-                          <input type="text" id="emergency_contact_relationship" class="form-control" formControlName="emergency_contact_relationship" placeholder="e.g., Spouse">
-                       </div>
-                  </div>
-                  <div class="col-md-4">
-                      <div class="form-group mb-md-0"> <!-- Remove bottom margin -->
-                         <label for="emergency_contact_phone" class="form-label">Contact Phone</label>
-                          <input type="tel" id="emergency_contact_phone" class="form-control" formControlName="emergency_contact_phone">
-                       </div>
-                  </div>
+                  <div class="col-md-5"> <div class="form-group"> <label for="emergency_contact_name" class="form-label">Contact Name</label> <input type="text" id="emergency_contact_name" class="form-control" formControlName="emergency_contact_name"> </div> </div>
+                  <div class="col-md-3"> <div class="form-group"> <label for="emergency_contact_relationship" class="form-label">Relationship</label> <input type="text" id="emergency_contact_relationship" class="form-control" formControlName="emergency_contact_relationship" placeholder="e.g., Spouse"> </div> </div>
+                  <div class="col-md-4"> <div class="form-group mb-md-0"> <label for="emergency_contact_phone" class="form-label">Contact Phone</label> <input type="tel" id="emergency_contact_phone" class="form-control" formControlName="emergency_contact_phone"> </div> </div>
                </div><!-- /row -->
            </div><!-- /card-body -->
        </div><!-- /card -->
  
       <!-- Submit Button Area -->
        <div class="mt-4 text-end">
-          <button type="submit" class="btn btn-primary btn-lg" [disabled]="isSaving || profileForm.invalid || !profileForm.dirty">
+          <!-- Add the (click) handler for debugging -->
+          <button type="submit"
+                  class="btn btn-primary btn-lg"
+                  [disabled]="isSaving || profileForm.invalid || !profileForm.dirty"
+                  (click)="onSaveButtonClick()"> <!-- Added click handler -->
             <span *ngIf="!isSaving"><i class="fas fa-save me-1"></i> Save Changes</span>
             <span *ngIf="isSaving"> <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Saving... </span>
           </button>
