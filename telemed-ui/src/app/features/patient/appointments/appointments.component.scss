@@ -1,0 +1,87 @@
+/* src/app/features/patient/appointments/appointments.component.scss */
+@use 'sass:color';
+
+// SCSS variables for status colors if needed
+$scheduled-color: #0d6efd; // Bootstrap primary blue
+$completed-color: #198754; // Bootstrap success green
+$cancelled-color: #6c757d; // Bootstrap secondary grey
+
+:host { display: block; background-color: var(--bg-color); }
+
+.patient-appointments-container {
+  // Container padding applied in HTML (py-4)
+}
+
+// Style the page header
+.page-header {
+  .dashboard-title { font-weight: 600; color: var(--text-color); }
+  .text-muted { font-size: 0.95rem; }
+}
+
+.filter-options {
+  label { font-size: 0.85rem; }
+}
+
+// Style Appointment Cards
+.appointment-card {
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  transition: box-shadow 0.2s ease-in-out;
+
+  &:hover { box-shadow: var(--box-shadow-hover); }
+
+  .card-title { font-weight: 500; font-size: 1.1rem; color: var(--text-color); }
+  .reason { color: var(--text-color-light); }
+
+  .appointment-status {
+    font-size: 0.75rem;
+    padding: 0.3em 0.6em;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+    border-radius: var(--border-radius); // Use global radius
+
+    // Status-specific colors
+    &.status-scheduled { background-color: rgba($scheduled-color, 0.15); color: $scheduled-color; }
+    &.status-completed { background-color: rgba($completed-color, 0.15); color: $completed-color; }
+    &.status-cancelled { background-color: rgba($cancelled-color, 0.15); color: $cancelled-color; }
+  }
+
+  .cancel-btn {
+     width: 90px; // Give cancel button a fixed width if desired
+     text-align: center;
+     padding-top: 0.25rem;
+     padding-bottom: 0.25rem;
+  }
+}
+
+// Styles for Doctor's Notes section
+.notes-section {
+    background-color: #f8f9fa; // Slightly different background
+    padding: 0.75rem 1rem !important; // Use !important if needed to override card-body padding
+    margin: 1rem -1rem -0.75rem -1rem; // Use negative margins to span card padding
+    border-radius: 0 0 var(--border-radius) var(--border-radius); // Round bottom corners
+}
+.notes-title { font-weight: 500; margin-bottom: 0.25rem; }
+.notes-content { color: var(--text-color-light); line-height: 1.5; }
+
+// No Data Placeholder styling
+.no-data-placeholder {
+    background-color: transparent !important;
+    border: 1px dashed var(--border-color) !important;
+    color: var(--text-color-light);
+    i { font-size: 1.8rem; }
+    p { margin-bottom: 0; }
+}
+
+
+// Responsive Adjustments
+@media (max-width: 767px) {
+    .text-md-end { text-align: left !important; } // Align actions left on mobile
+    .appointment-card .row > div { // Ensure columns stack nicely
+       margin-bottom: 0.5rem;
+       &:last-child { margin-bottom: 0;}
+    }
+    .appointment-card .cancel-btn { width: auto; } // Let button width be auto on mobile
+    .notes-section { margin: 1rem -0.75rem -0.75rem -0.75rem; } // Adjust negative margin for smaller padding
+}
