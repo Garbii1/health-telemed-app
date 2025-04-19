@@ -1,55 +1,72 @@
 <!-- src/app/features/patient/book-appointment/book-appointment.component.html -->
-<div class="container pt-4 mt-4"> <!-- Added padding -->
-  <h2 class="mb-1">Book a Virtual Consultation</h2>
-  <p class="text-muted mb-4 border-bottom pb-3">Select a doctor and choose a suitable time for your appointment.</p>
+<div class="container book-appointment-container py-4"> <!-- Use specific container -->
 
-  <div class="card shadow-sm">
-    <div class="card-body p-4 p-md-5">
+  <!-- Page Header -->
+  <div class="page-header mb-4 pb-2 border-bottom">
+    <h2 class="dashboard-title mb-1">Book a Virtual Consultation</h2>
+    <p class="text-muted mb-0">Select a doctor and choose a suitable time for your appointment.</p>
+  </div>
+
+  <!-- Loading State for Doctors -->
+  <div *ngIf="isLoadingDoctors" class="text-center loading-section py-5">
+    <app-loading-spinner [isLoading]="true" message="Loading available doctors..."></app-loading-spinner>
+  </div>
+
+  <!-- Main Form Card (Shown ONLY when NOT loading doctors) -->
+  <div class="card shadow-sm book-appointment-card" *ngIf="!isLoadingDoctors">
+    <div class="card-body p-4 p-lg-5">
       <form [formGroup]="appointmentForm" (ngSubmit)="onSubmit()">
 
-        <!-- Show spinner while loading doctors -->
-        <div *ngIf="isLoadingDoctors" class="text-center mb-3 py-5">
-           <app-loading-spinner [isLoading]="true" message="Loading doctors..."></app-loading-spinner>
+        <!-- General Error/Success Messages -->
+        <div *ngIf="errorMessage && !isSubmitting" class="alert alert-danger small p-2 mb-3"> {{ errorMessage }} <button type="button" class="btn btn-sm btn-link text-danger p-0 ms-2" (click)="loadDoctors()">Retry loading doctors?</button> </div>
+        <div *ngIf="successMessage" class="alert alert-success small p-2 mb-3"> {{ successMessage }} Redirecting... </div>
+
+        <!-- Doctor Selection -->
+        <div class="form-group mb-4">
+          <label for="doctor_id" class="form-label">Select Doctor <span class="text-danger">*</span></label>
+          <!-- Use doctors array from component -->
+          <select id="doctor_id" class="form-select form-select-lg" formControlName="doctor_id" [class.is-invalid]="doctor_id?.invalid && doctor_id?.touched" required>
+            <option value="" disabled selected>-- Choose an available Doctor --</option>
+            <option *ngFor="let doctor of doctors" [value]="doctor.id">
+               Dr. {{ doctor.first_name }} {{ doctor.last_name }}
+               <span *ngIf="doctor.profile?.doctor_details?.specialization"> ({{ doctor.profile.doctor_details.specialization }})</span>
+               <span *ngIf="!doctor.profile?.doctor_details?.specialization"> (General)</span>
+            </option>
+             <!-- Message shown inside select if needed, or rely on error message -->
+             <option *ngIf="!doctors || doctors.length === 0" value="" disabled>No doctors currently available</option>
+          </select>
+          <div *ngIf="doctor_id?.invalid && doctor_id?.touched" class="invalid-feedback text-start mt-1 ps-1"> Please select a doctor. </div>
+           <!-- Show error if doctors array is empty after loading -->
+           <div *ngIf="!isLoadingDoctors && (!doctors || doctors.length === 0) && !errorMessage" class="text-warning small mt-1"> No doctors are currently available to book. </div>
         </div>
 
-        <!-- Show form fields *only* when NOT loading doctors -->
-        <ng-container *ngIf="!isLoadingDoctors">
-             <div *ngIf="errorMessage && !isSubmitting" class="alert alert-danger"> {{ errorMessage }} <button type="button" class="btn btn-sm btn-outline-secondary ms-3" (click)="loadDoctors()">Retry</button> </div>
-             <div *ngIf="successMessage" class="alert alert-success"> {{ successMessage }} Redirecting... </div>
+        <!-- Date and Time Selection -->
+        <div class="form-group mb-4">
+          <label for="appointment_time" class="form-label">Select Date and Time <span class="text-danger">*</span></label>
+          <input type="datetime-local" id="appointment_time" class="form-control form-control-lg" formControlName="appointment_time" [min]="minDateTime" [class.is-invalid]="appointment_time?.invalid && appointment_time?.touched" required>
+          <div *ngIf="appointment_time?.invalid && appointment_time?.touched" class="invalid-feedback text-start mt-1 ps-1">
+             <div *ngIf="appointment_time?.errors?.['required']">Please select a date and time.</div>
+             <div *ngIf="appointment_time?.errors?.['pastDate']">Cannot book appointments in the past.</div>
+          </div>
+          <small class="form-text text-muted d-block mt-1">Select a date and time in the future.</small>
+        </div>
 
-            <!-- Doctor Selection (Now loops over 'doctors' property) -->
-            <div class="form-group mb-3">
-              <label for="doctor_id" class="form-label">Select Doctor <span class="text-danger">*</span></label>
-              <!-- Bind to the component's doctors array -->
-              <select id="doctor_id" class="form-select form-select-lg" formControlName="doctor_id" [class.is-invalid]="doctor_id?.invalid && doctor_id?.touched">
-                <option value="" disabled>-- Choose a Doctor --</option>
-                <!-- Loop over the component property 'doctors' -->
-                <option *ngFor="let doctor of doctors" [value]="doctor.id">
-                   Dr. {{ doctor.first_name }} {{ doctor.last_name }}
-                   <!-- Safely access nested specialization -->
-                   <span *ngIf="doctor.profile?.doctor_details?.specialization"> ({{ doctor.profile.doctor_details.specialization }})</span>
-                   <span *ngIf="!doctor.profile?.doctor_details?.specialization"> (General)</span>
-                </option>
-                 <!-- Show message if array is empty AFTER loading -->
-                 <option *ngIf="!doctors || doctors.length === 0" value="" disabled>No doctors available</option>
-              </select>
-               <div *ngIf="doctor_id?.invalid && doctor_id?.touched" class="invalid-feedback"> Please select a doctor. </div>
-            </div>
+        <!-- Reason for Appointment -->
+        <div class="form-group mb-4">
+          <label for="reason" class="form-label">Reason for Appointment</label>
+          <textarea id="reason" class="form-control" rows="4" formControlName="reason" placeholder="Briefly describe the reason for your visit..." [class.is-invalid]="reason?.invalid && reason?.touched" maxlength="500"></textarea>
+           <div *ngIf="reason?.invalid && reason?.touched" class="invalid-feedback text-start mt-1 ps-1">
+               <div *ngIf="reason?.errors?.['maxlength']">Reason cannot exceed 500 characters.</div>
+           </div>
+        </div>
 
-            <!-- Date and Time Selection -->
-            <div class="form-group mb-3"> <label for="appointment_time" class="form-label">Select Date and Time <span class="text-danger">*</span></label> <input type="datetime-local" id="appointment_time" class="form-control form-control-lg" formControlName="appointment_time" [min]="minDateTime" [class.is-invalid]="appointment_time?.invalid && appointment_time?.touched"> <div *ngIf="appointment_time?.invalid && appointment_time?.touched" class="invalid-feedback text-start mt-1 ps-1"> <div *ngIf="appointment_time?.errors?.['required']">Please select date/time.</div> <div *ngIf="appointment_time?.errors?.['pastDate']">Cannot book in past.</div> </div> <small class="form-text text-muted">Select a date and time in the future.</small> </div>
-
-            <!-- Reason for Appointment -->
-            <div class="form-group mb-3"> <label for="reason" class="form-label">Reason for Appointment (Optional)</label> <textarea id="reason" class="form-control" rows="4" formControlName="reason" placeholder="Briefly describe the reason..." [class.is-invalid]="reason?.invalid && reason?.touched"></textarea> <div *ngIf="reason?.invalid && reason?.touched" class="invalid-feedback text-start mt-1 ps-1"> <div *ngIf="reason?.errors?.['maxlength']">Reason too long (max 500 chars).</div> </div> </div>
-
-            <!-- Submit Button -->
-            <button type="submit" class="btn btn-primary btn-lg w-100 mt-3" [disabled]="isSubmitting || appointmentForm.invalid || isLoadingDoctors"> <!-- Disable while loading doctors too -->
-              <span *ngIf="!isSubmitting"><i class="fas fa-check me-1"></i> Book Appointment</span>
-              <span *ngIf="isSubmitting"> <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Booking... </span>
-            </button>
-        </ng-container> <!-- End *ngIf="!isLoadingDoctors" -->
+        <!-- Submit Button -->
+        <button type="submit" class="btn btn-primary btn-lg w-100 mt-3" [disabled]="isSubmitting || appointmentForm.invalid || isLoadingDoctors">
+          <span *ngIf="!isSubmitting"><i class="fas fa-check me-2"></i>Book Appointment</span>
+          <span *ngIf="isSubmitting"> <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Booking... </span>
+        </button>
 
       </form>
-    </div>
-  </div>
-</div>
+    </div><!-- /card-body -->
+  </div><!-- /card -->
+</div> <!-- /container -->

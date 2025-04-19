@@ -1,0 +1,84 @@
+/* src/app/features/patient/book-appointment/book-appointment.component.scss */
+
+:host { display: block; background-color: var(--bg-color); }
+
+.book-appointment-container {
+    // Container padding applied in HTML (py-4)
+}
+
+// Style the page header area
+.page-header {
+  .dashboard-title { font-weight: 600; color: var(--text-color); }
+  .text-muted { font-size: 0.95rem; }
+}
+
+// Style the loading section
+.loading-section {
+    min-height: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-color-light);
+}
+
+// Style the main card
+.book-appointment-card {
+    border: none; // Remove default border
+    border-radius: var(--border-radius) !important;
+    background-color: var(--bg-color-alt); // White background
+}
+
+// Form group spacing and labels
+.form-group {
+   margin-bottom: 1.5rem; // Consistent spacing
+   label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    font-size: 0.9rem;
+    color: var(--text-color); // Slightly darker labels
+   }
+   .form-text { font-size: 0.8rem; } // Smaller help text
+}
+
+// Input/Select styling
+.form-control, .form-select {
+    // Make inputs slightly larger for better touch target / modern feel
+    min-height: calc(1.5em + 1rem + 2px);
+    padding-top: .5rem;
+    padding-bottom: .5rem;
+    font-size: 1rem;
+    border-radius: .3rem; // Slightly larger radius
+}
+.form-select-lg { // Apply lg styles if using that class
+    min-height: calc(1.5em + 1rem + 2px);
+    padding-top: .5rem;
+    padding-bottom: .5rem;
+    font-size: 1rem; // Keep font size consistent maybe
+    border-radius: .3rem;
+}
+textarea.form-control {
+    min-height: 100px; // Adjust textarea height
+}
+
+// Error message styling
+.invalid-feedback {
+    font-size: 0.8rem;
+    padding-left: 0.25rem;
+}
+.alert pre { // For potential backend multi-line errors
+    white-space: pre-wrap; word-wrap: break-word; margin: 0; font-size: 0.9em;
+}
+
+// Button styling
+.btn-lg {
+  padding: 0.8rem 1.25rem;
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+
+// Responsive adjustments
+@media (max-width: 576px) {
+    .card-body { padding: 1.5rem !important; } // Adjust padding
+    .form-control-lg, .form-select-lg { font-size: 1rem; } // Normalize size
+}
