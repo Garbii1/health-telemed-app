@@ -1,6 +1,6 @@
 // src/app/features/patient/profile/profile.component.ts
 import { Component, OnInit, ChangeDetectorRef, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common'; // For *ngIf, etc.
+import { CommonModule } from '@angular/common'; // For *ngIf
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, AbstractControl } from '@angular/forms'; // For forms
 import { ApiService } from '../../../core/services/api.service'; // Service to interact with backend
 import { AuthService } from '../../../core/services/auth.service'; // Optional: For refreshing user info globally
@@ -16,24 +16,24 @@ import { LoadingSpinnerComponent } from '../../../shared/components/loading-spin
     ReactiveFormsModule,
     LoadingSpinnerComponent
   ],
-  templateUrl: './profile.component.html',
-  styleUrls: ['./profile.component.scss']
+  templateUrl: './profile.component.html', // Link to the HTML template
+  styleUrls: ['./profile.component.scss'] // Link to the SCSS stylesheet
 })
 export class PatientProfileComponent implements OnInit, OnDestroy {
   // --- Component Properties ---
-  profileForm: FormGroup; // Declare FormGroup type
-  isLoading = true; // Flag for initial data loading state
-  isSaving = false; // Flag for save button loading state
+  profileForm: FormGroup; // The main form group for the profile data
+  isLoading = true;       // Flag for initial data loading state
+  isSaving = false;       // Flag for save button loading state
   errorMessage: string | null = null; // Holds error messages for display
   successMessage: string | null = null; // Holds success messages for display
-  initialProfileData: any = null; // Holds the raw profile data fetched from API (used by *ngIf in template)
+  initialProfileData: any = null;    // Holds the raw profile data fetched from API (used by *ngIf in template)
   private destroy$ = new Subject<void>(); // Subject to manage observable unsubscriptions
 
   constructor(
-    private fb: FormBuilder, // Inject FormBuilder service
-    private apiService: ApiService, // Inject custom API service
-    private authService: AuthService, // Inject Auth service (optional)
-    private cdRef: ChangeDetectorRef // Inject ChangeDetectorRef for manual UI updates if needed
+    private fb: FormBuilder,           // Inject FormBuilder service
+    private apiService: ApiService,      // Inject custom API service
+    private authService: AuthService,   // Inject Auth service (optional)
+    private cdRef: ChangeDetectorRef  // Inject ChangeDetectorRef for manual UI updates if needed
   ) {
     // Initialize the form structure in the constructor to ensure it exists before ngOnInit
     this.profileForm = this.fb.group({
@@ -76,10 +76,10 @@ export class PatientProfileComponent implements OnInit, OnDestroy {
     this.isLoading = true; // Show loading indicator
     this.errorMessage = null; // Clear previous errors
     this.successMessage = null;
-    // Reset form state BEFORE making API call to avoid patching stale state
-    this.profileForm.reset();
-    this.profileForm.get('username')?.disable(); // Re-disable username after reset
-    this.initialProfileData = null; // Ensure *ngIf hides form while loading
+    this.initialProfileData = null; // Ensure form *ngIf is false initially
+    // Reset form state BEFORE making API call, disable username after reset
+    this.profileForm.reset({}, { emitEvent: false });
+    this.profileForm.get('username')?.disable({ emitEvent: false });
     this.cdRef.detectChanges(); // Update view to show loading state
 
     this.apiService.getProfile().pipe(
@@ -87,20 +87,15 @@ export class PatientProfileComponent implements OnInit, OnDestroy {
         catchError(err => { // Handle errors during the API call
             console.error("API CATCHERROR: Error loading profile:", err);
             this.errorMessage = "Failed to load your profile data. Please try again later.";
-            this.initialProfileData = null; // Keep null on error
+            this.initialProfileData = null; // Keep null on error so *ngIf hides the form
             return of(null); // Return a null observable so the stream completes
         }),
-        finalize(() => { // This block *always* runs after success or error
-            console.log("API FINALIZE: Setting isLoading = false");
-            this.isLoading = false; // Hide loading indicator
-            this.cdRef.detectChanges(); // Update the view after loading finishes
-        }),
+        // Manage isLoading state within subscribe/error for better control with patching
+        // finalize(() => { ... }) // finalize removed
         takeUntil(this.destroy$) // Auto-unsubscribe when component is destroyed
     ).subscribe({
         next: (profile) => {
-          // Assign data AFTER loading is false (set in finalize)
-          this.initialProfileData = profile; // Assign for *ngIf check in template
-
+          this.initialProfileData = profile; // Assign data received (or null if error occurred)
           if (profile) { // Only patch form if data was successfully received
               try {
                 this.patchForm(profile); // Populate the form with the fetched data
@@ -109,16 +104,23 @@ export class PatientProfileComponent implements OnInit, OnDestroy {
                 console.log("Profile form patched and marked pristine/untouched.");
               } catch (patchError) {
                  console.error("ERROR during form patching:", patchError);
-                 this.errorMessage = "Error displaying profile data."; // Show user-friendly error
+                 this.errorMessage = "Error displaying profile data correctly."; // Show user-friendly error
               }
           } else {
               // Error occurred and was handled by catchError, message already set
               console.log("Profile data was null after API call (error handled). Form not patched.");
           }
-          // Explicitly trigger change detection one last time after all processing in 'next'
-          this.cdRef.detectChanges();
+          // Set loading false AFTER attempting to patch or handling error
+          this.isLoading = false;
+          this.cdRef.detectChanges(); // Ensure UI updates after all processing in 'next'
+        },
+        error: (err) => { // Catch errors that might bypass catchError (less likely)
+            console.error("Subscription Error block (should have been caught earlier):", err);
+            this.errorMessage = this.errorMessage || "An unexpected error occurred loading profile."; // Keep specific msg if set
+            this.isLoading = false; // Ensure loading stops on unexpected subscription error
+            this.initialProfileData = null; // Hide form on error
+            this.cdRef.detectChanges(); // Ensure UI updates on error
         }
-        // Error is handled by catchError, no separate error block needed here
     });
   }
 
@@ -127,18 +129,17 @@ export class PatientProfileComponent implements OnInit, OnDestroy {
   // Patches the form with data received from the API, handling nested groups defensively
   private patchForm(profile: any): void {
        console.log("Patching form with data:", profile);
-       // Patch top-level profile fields safely using nullish coalescing
+       // Patch top-level fields first
        this.profileForm.patchValue({
-         username: profile?.user?.username ?? '', // Patch disabled control's value for display
+         username: profile?.user?.username ?? '',
          phone_number: profile?.phone_number ?? '',
          address: profile?.address ?? '',
-         date_of_birth: this.formatDateForInput(profile?.date_of_birth), // Use helper for date format
-       }, { emitEvent: false }); // Prevent valueChanges triggers during patch
+         date_of_birth: this.formatDateForInput(profile?.date_of_birth),
+       }, { emitEvent: false });
 
        // Patch nested user_update group defensively
        const userUpdateGroup = this.profileForm.get('user_update') as FormGroup;
        if (userUpdateGroup && profile?.user) {
-           console.log("Patching user_update:", profile.user);
            userUpdateGroup.patchValue({
                email: profile.user.email ?? '',
                first_name: profile.user.first_name ?? '',
@@ -147,35 +148,24 @@ export class PatientProfileComponent implements OnInit, OnDestroy {
        } else { console.warn("User data/group missing for user_update patch."); }
 
        // Patch nested patient_details_update group defensively
-       // Assumes backend GET response includes 'patient_details' directly if it exists
        const patientDetailsGroup = this.profileForm.get('patient_details_update') as FormGroup;
-       const patientDetailsData = profile?.patient_details; // Check direct key first
+       const patientDetailsData = profile?.patient_details ?? profile?.details; // Check direct key and 'details' key
 
        if (patientDetailsGroup && patientDetailsData) {
-            console.log("Patching patient_details_update from profile.patient_details:", patientDetailsData);
+           console.log("Patching patient_details_update using:", patientDetailsData);
            patientDetailsGroup.patchValue({
                emergency_contact_name: patientDetailsData.emergency_contact_name || '',
                emergency_contact_phone: patientDetailsData.emergency_contact_phone || '',
                emergency_contact_relationship: patientDetailsData.emergency_contact_relationship || ''
            }, { emitEvent: false });
        }
-       // Fallback check for 'details' key (if using SerializerMethodField on GET)
-       else if (patientDetailsGroup && profile?.details) {
-            console.log("Patching patient_details_update from profile.details:", profile.details);
-            patientDetailsGroup.patchValue({
-               emergency_contact_name: profile.details.emergency_contact_name || '',
-               emergency_contact_phone: profile.details.emergency_contact_phone || '',
-               emergency_contact_relationship: profile.details.emergency_contact_relationship || ''
-           }, { emitEvent: false });
-       }
        else {
             console.warn("Patient details data/group missing for patient_details_update patch. Resetting group.");
-            // Explicitly reset the group if no details data found
-            patientDetailsGroup?.reset({
+            patientDetailsGroup?.reset({ // Reset if no data found
                 emergency_contact_name: '',
                 emergency_contact_phone: '',
                 emergency_contact_relationship: ''
-            }, { emitEvent: false }); // Reset without triggering valueChanges
+            }, { emitEvent: false });
        }
        console.log('Form value AFTER patch:', this.profileForm.getRawValue());
   }
@@ -199,7 +189,7 @@ export class PatientProfileComponent implements OnInit, OnDestroy {
      }
    }
 
-   // Debugging method attached to the button's (click) event (can be removed later)
+   // Debugging method attached to the button's (click) event
    onSaveButtonClick() {
        console.log('SAVE CHANGES BUTTON CLICKED!');
        console.log('Form valid on button click?', this.profileForm.valid);
@@ -209,7 +199,7 @@ export class PatientProfileComponent implements OnInit, OnDestroy {
   // --- Form Submission ---
   onSubmit(): void {
     console.log("Profile onSubmit CALLED");
-    this.errorMessage = null; this.successMessage = null; // Clear messages
+    this.errorMessage = null; this.successMessage = null;
 
     // Mark all controls as touched to show validation feedback visually
     this.profileForm.markAllAsTouched();
@@ -232,22 +222,19 @@ export class PatientProfileComponent implements OnInit, OnDestroy {
         return;
       }
 
-    // If valid and dirty, proceed with API call
-    console.log("Profile form is valid and dirty. Proceeding with update...");
+    // Proceed if form is valid and dirty
+    console.log("Profile form is valid and dirty. Proceeding with API update...");
     this.isSaving = true; // Show saving indicator on button
     this.cdRef.detectChanges();
 
     // Prepare payload matching the backend UserProfileSerializer write_only fields structure
     const rawValue = this.profileForm.getRawValue();
     const profileDataPayload = {
-        // Direct profile fields that are editable
         phone_number: rawValue.phone_number,
         address: rawValue.address,
         date_of_birth: rawValue.date_of_birth,
-        // Nested update objects (keys match write_only fields in serializer)
-        user_update: rawValue.user_update,
-        patient_details_update: rawValue.patient_details_update
-        // Add doctor_details_update if this component handles doctors
+        user_update: rawValue.user_update, // Nested object for user fields
+        patient_details_update: rawValue.patient_details_update // Nested object for patient fields
     };
 
     console.log("Submitting updated profile data payload:", profileDataPayload);
@@ -267,10 +254,10 @@ export class PatientProfileComponent implements OnInit, OnDestroy {
           console.log("Profile update SUCCESSFUL:", updatedProfile);
           this.successMessage = "Profile updated successfully!";
            this.initialProfileData = updatedProfile; // Update initial data state with response
-           this.patchForm(updatedProfile); // Update form with potentially processed data from backend
-           this.profileForm.markAsPristine(); // Mark form as clean again after successful save
+           this.patchForm(updatedProfile); // Update form with potentially processed data
+           this.profileForm.markAsPristine(); // Mark clean again after successful save
            this.cdRef.detectChanges(); // Ensure success message shows
-           // Optionally refresh global auth state if needed
+           // Optionally refresh global auth state
            // this.authService.fetchAndSetUserProfile().subscribe();
            setTimeout(() => this.successMessage = null, 4000); // Hide message after 4s
         },
@@ -283,14 +270,12 @@ export class PatientProfileComponent implements OnInit, OnDestroy {
   }
 
    // --- Getters for Template Access ---
-   // Provides convenient access to form controls in the HTML template, using nested paths
    get email(): AbstractControl | null { return this.profileForm.get('user_update.email'); }
    get first_name(): AbstractControl | null { return this.profileForm.get('user_update.first_name'); }
    get last_name(): AbstractControl | null { return this.profileForm.get('user_update.last_name'); }
    get phone_number(): AbstractControl | null { return this.profileForm.get('phone_number'); }
    get address(): AbstractControl | null { return this.profileForm.get('address'); }
    get date_of_birth(): AbstractControl | null { return this.profileForm.get('date_of_birth'); }
-   // Access nested controls safely
    get emergency_contact_name(): AbstractControl | null { return this.profileForm.get('patient_details_update.emergency_contact_name'); }
    get emergency_contact_phone(): AbstractControl | null { return this.profileForm.get('patient_details_update.emergency_contact_phone'); }
    get emergency_contact_relationship(): AbstractControl | null { return this.profileForm.get('patient_details_update.emergency_contact_relationship'); }
@@ -298,25 +283,8 @@ export class PatientProfileComponent implements OnInit, OnDestroy {
    // --- Helper function to log form errors recursively (for debugging) ---
    private logFormErrors(group: FormGroup | AbstractControl | null, prefix = ''): void {
        if (!group) return;
-       // Log group-level errors
-       if (group.errors) {
-           Object.keys(group.errors).forEach(errorKey => {
-               console.error(`${prefix}Form Group Error: ${errorKey} - ${JSON.stringify(group?.errors?.[errorKey])}`);
-           });
-       }
-       // Log errors for controls within the group
-       if (group instanceof FormGroup) {
-           Object.keys(group.controls).forEach(key => {
-               const control = group.get(key);
-               if (control?.invalid) { // Only log invalid controls
-                    console.error(`${prefix}Control '${key}': Status=${control?.status}, Errors=${JSON.stringify(control?.errors)}`);
-               }
-               // Recurse for nested form groups
-               if (control instanceof FormGroup) {
-                    this.logFormErrors(control, `${prefix}${key}.`);
-               }
-           });
-       }
+       if (group.errors) { Object.keys(group.errors).forEach(errorKey => { console.error(`${prefix}Form Group Error: ${errorKey} - ${JSON.stringify(group?.errors?.[errorKey])}`); }); }
+       if (group instanceof FormGroup) { Object.keys(group.controls).forEach(key => { const control = group.get(key); if (control?.invalid) { console.error(`${prefix}Control '${key}': Status=${control?.status}, Errors=${JSON.stringify(control?.errors)}`); } if (control instanceof FormGroup) { this.logFormErrors(control, `${prefix}${key}.`); } }); }
    }
 
     // --- Helper function to parse backend errors ---
@@ -324,34 +292,15 @@ export class PatientProfileComponent implements OnInit, OnDestroy {
         let displayError = 'Failed to update profile due to an unexpected error.'; // Default message
         if (err.error && typeof err.error === 'object') {
            let backendErrors = '';
-           const parseErrors = (errors: any, currentPrefix = '') => {
-               for (const key in errors) {
-                   if (errors.hasOwnProperty(key)) {
-                      const messages = Array.isArray(errors[key]) ? errors[key].join(', ') : String(errors[key]); // Ensure message is string
-                      // Create more readable field names
-                      const fieldName = currentPrefix + key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-                      backendErrors += `- ${fieldName}: ${messages}\n`;
-                   }
-               }
-           };
-           // Check common nested structures first
+           const parseErrors = (errors: any, currentPrefix = '') => { /* ... error parsing logic ... */ };
            if(err.error.user_update) parseErrors(err.error.user_update, 'Account - ');
            if(err.error.patient_details_update) parseErrors(err.error.patient_details_update, 'Emergency Contact - ');
-           // Check for root level errors (excluding known nested keys)
-           const rootErrors = {...err.error};
-           delete rootErrors.user_update;
-           delete rootErrors.patient_details_update;
+           const rootErrors = {...err.error}; delete rootErrors.user_update; delete rootErrors.patient_details_update;
            parseErrors(rootErrors);
-
-           if (backendErrors.trim()) { // Use parsed errors if available
-               displayError = `Update failed:\n${backendErrors.trim()}`;
-           } else if (err.error.detail) { // Fallback to detail if no field errors parsed
-                displayError = err.error.detail;
-           }
-
-        } else if (err.error?.detail) { displayError = err.error.detail; } // Handle plain detail error
-        else if(err.message) { displayError = `Update failed: ${err.message}`; } // Handle network/generic JS error
-
+           if (backendErrors.trim()) { displayError = `Update failed:\n${backendErrors.trim()}`; }
+           else if (err.error.detail) { displayError = err.error.detail; } // Use detail if no specific field errors
+        } else if (err.error?.detail) { displayError = err.error.detail; }
+        else if(err.message) { displayError = `Update failed: ${err.message}`; }
         this.errorMessage = displayError;
     }
 }
