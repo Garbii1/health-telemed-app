@@ -14,17 +14,18 @@
  
    <!-- Error State -->
    <div *ngIf="errorMessage && !isLoading" class="alert alert-danger mt-3">
-      <pre class="mb-0">{{ errorMessage }}</pre> <!-- Use pre for formatted errors -->
+      <pre class="mb-0">{{ errorMessage }}</pre>
       <button class="btn btn-sm btn-outline-secondary ms-3 mt-2" (click)="loadProfile()">Retry</button>
     </div>
  
    <!-- Profile Form Container -->
-   <!-- Show form only when not loading, no error, and initial data is loaded -->
-   <div *ngIf="!isLoading && !errorMessage && initialProfileData">
+   <!-- Use isDataRendered flag to control rendering -->
+   <div *ngIf="isDataRendered && !isLoading && !errorMessage">
      <form [formGroup]="profileForm" (ngSubmit)="onSubmit()">
  
-         <!-- Success Message -->
+         <!-- Status Messages -->
           <div *ngIf="successMessage" class="alert alert-success mb-3 small p-2">{{ successMessage }}</div>
+          <div *ngIf="profileForm.invalid && profileForm.touched && !errorMessage" class="alert alert-warning small p-2 mb-3">Please correct the highlighted errors.</div>
  
          <!-- Card 1: Account Information -->
          <div class="card shadow-sm mb-4">
@@ -36,7 +37,6 @@
                        <div class="col-md-6">
                           <div class="form-group">
                              <label for="username" class="form-label">Username</label>
-                             <!-- Use username from top-level form control -->
                              <input type="text" id="username" class="form-control" formControlName="username">
                               <small class="form-text text-muted">Username cannot be changed.</small>
                            </div>
@@ -102,7 +102,6 @@
         </div><!-- /card -->
  
          <!-- Card 3: Emergency Contact -->
-         <!-- Use formGroupName to link to nested group -->
          <div class="card shadow-sm mb-4" formGroupName="patient_details_update">
              <div class="card-header bg-light border-0"> <h5 class="mb-0 section-heading text-primary">Emergency Contact (Optional)</h5> </div>
              <div class="card-body p-4">
@@ -116,11 +115,10 @@
  
         <!-- Submit Button Area -->
          <div class="mt-4 text-end">
-            <!-- Add the (click) handler for debugging -->
             <button type="submit"
                     class="btn btn-primary btn-lg"
                     [disabled]="isSaving || profileForm.invalid || !profileForm.dirty"
-                    (click)="onSaveButtonClick()"> <!-- Debug click handler -->
+                    (click)="onSaveButtonClick()"> <!-- Keep debug click handler if helpful -->
               <span *ngIf="!isSaving"><i class="fas fa-save me-1"></i> Save Changes</span>
               <span *ngIf="isSaving"> <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Saving... </span>
             </button>
@@ -128,4 +126,5 @@
  
      </form> <!-- /form -->
    </div> <!-- / *ngIf container -->
+ 
  </div> <!-- /container -->
