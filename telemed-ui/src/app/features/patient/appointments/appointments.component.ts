@@ -1,10 +1,10 @@
 // src/app/features/patient/appointments/appointments.component.ts
-import { Component, OnInit, ChangeDetectorRef, OnDestroy } from '@angular/core'; // Import ChangeDetectorRef, OnDestroy
+import { Component, OnInit, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { ApiService } from '../../../core/services/api.service';
-import { Observable, BehaviorSubject, of, Subject } from 'rxjs'; // Import Subject
-import { switchMap, map, catchError, startWith, finalize, takeUntil, tap } from 'rxjs/operators'; // Import finalize, takeUntil, tap
+import { Observable, BehaviorSubject, of, Subject, Subscription } from 'rxjs'; // Import Subscription
+import { switchMap, map, catchError, startWith, finalize, takeUntil, tap } from 'rxjs/operators';
 import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
 
 type ApiParams = { [param: string]: string | number | boolean };
@@ -16,70 +16,83 @@ type ApiParams = { [param: string]: string | number | boolean };
   templateUrl: './appointments.component.html',
   styleUrls: ['./appointments.component.scss']
 })
-export class PatientAppointmentsComponent implements OnInit, OnDestroy { // Implement OnDestroy
-  appointments$: Observable<any[] | null> | undefined;
-  isLoading = true; // <<< Start true
+export class PatientAppointmentsComponent implements OnInit, OnDestroy {
+  // Use direct property for data binding in template instead of async pipe on the main list
+  appointments: any[] | null = null;
+  isLoading = true; // Initialize as true
   errorMessage: string | null = null;
   filterStatus = new BehaviorSubject<string>('ALL');
   cancellingAppointmentId: number | null = null;
   cancelError: string | null = null;
-  private destroy$ = new Subject<void>(); // For unsubscribing
 
-  constructor(private apiService: ApiService, private cdRef: ChangeDetectorRef) { } // Inject cdRef
+  private destroy$ = new Subject<void>();
+  private appointmentsSubscription: Subscription | null = null; // To manage main data subscription
+
+  constructor(private apiService: ApiService, private cdRef: ChangeDetectorRef) { }
 
   ngOnInit(): void {
       console.log("PatientAppointments OnInit");
-      this.loadAppointments();
+      // Subscribe to filter changes to trigger reloads
+      this.filterStatus.pipe(
+          takeUntil(this.destroy$) // Unsubscribe when component destroyed
+      ).subscribe(status => {
+          console.log("Filter changed or initial load, triggering loadAppointments for status:", status);
+          this.loadAppointments(status); // Pass current status
+      });
   }
 
   ngOnDestroy(): void {
       console.log("PatientAppointments OnDestroy");
       this.destroy$.next();
       this.destroy$.complete();
+      // Unsubscribe manually if needed (though takeUntil should handle it)
+      // this.appointmentsSubscription?.unsubscribe();
   }
 
-  loadAppointments(): void {
-    console.log("loadAppointments called, filter:", this.filterStatus.value); // Debug
-    this.isLoading = true; // <<< Set loading true at the start
+  // Method now accepts the status directly
+  loadAppointments(status: string = 'ALL'): void {
+    console.log(`loadAppointments called with status: ${status}`);
+    this.isLoading = true; // <<< START Loading
     this.errorMessage = null;
     this.cancelError = null;
-    this.cdRef.detectChanges(); // Trigger initial loading state update
+    this.appointments = null; // Clear previous data
+    this.cdRef.detectChanges(); // Show loading state
 
-    this.appointments$ = this.filterStatus.pipe(
-      // startWith(this.filterStatus.value), // startWith might cause double loading if BehaviorSubject emits immediately
-      switchMap(status => {
-        console.log(`switchMap - Fetching appointments for status: ${status}`); // Debug
-        // isLoading should already be true here
-        let params: ApiParams = {};
-        if (status && status !== 'ALL') { params['status'] = status; }
-        return this.apiService.getAppointments(params).pipe(
-           tap(data => console.log("Appointments API success, data length:", data?.length)), // Debug success
-           map(data => data.sort((a, b) => new Date(b.appointment_time).getTime() - new Date(a.appointment_time).getTime())),
-           catchError(err => {
-               console.error("Error loading patient appointments inner pipe:", err);
-               this.errorMessage = "Failed to load appointments.";
-               // isLoading will be set by finalize
-               return of([]); // Return empty array on error
-           })
-        );
-      }),
-      // Use finalize to guarantee isLoading is set false
+    // Cancel previous subscription if one is running
+    this.appointmentsSubscription?.unsubscribe();
+
+    let params: ApiParams = {};
+    if (status && status !== 'ALL') { params['status'] = status; }
+
+    this.appointmentsSubscription = this.apiService.getAppointments(params).pipe(
+      map(data => data.sort((a, b) => new Date(b.appointment_time).getTime() - new Date(a.appointment_time).getTime())),
+      // finalize() runs on completion or error, good for setting loading false
       finalize(() => {
-           console.log("loadAppointments finalize. Setting isLoading = false"); // Debug
-           this.isLoading = false;
-           this.cdRef.detectChanges(); // <<< Trigger Change Detection AFTER loading done
+        console.log("API Call Finalized. Setting isLoading=false");
+        this.isLoading = false;
+        this.cdRef.detectChanges(); // <<< Ensure UI updates after loading is done
       }),
-      takeUntil(this.destroy$) // Ensure unsubscription
-    );
-    // Let async pipe handle the actual data subscription in the template
+      takeUntil(this.destroy$) // Unsubscribe automatically on component destroy
+    ).subscribe({
+      next: (data) => {
+        console.log("Appointments data received:", data);
+        this.appointments = data; // Assign data to the component property
+        this.errorMessage = null; // Clear error on success
+        // isLoading is set in finalize
+      },
+      error: (err) => {
+        console.error("Error loading patient appointments:", err);
+        this.errorMessage = "Failed to load appointments. Please try again.";
+        this.appointments = []; // Set empty array on error to clear previous data
+        // isLoading is set in finalize
+      }
+    });
   }
 
-  // Ensure these methods exist
   onFilterChange(event: Event): void {
     const selectElement = event.target as HTMLSelectElement;
-    console.log("Filter changed to:", selectElement.value); // Debug
+    // Push the new value to the BehaviorSubject, which triggers loadAppointments via the subscription in ngOnInit
     this.filterStatus.next(selectElement.value);
-    // loadAppointments is triggered automatically by the filterStatus BehaviorSubject change
   }
 
   confirmCancelAppointment(appointmentId: number): void {
@@ -90,24 +103,24 @@ export class PatientAppointmentsComponent implements OnInit, OnDestroy { // Impl
   }
 
   cancelAppointment(appointmentId: number): void {
-    console.log("Attempting to cancel appointment:", appointmentId); // Debug
+    console.log("Attempting cancel for ID:", appointmentId);
     this.cancellingAppointmentId = appointmentId;
     this.cancelError = null;
 
     this.apiService.cancelAppointment(appointmentId).pipe(
-        takeUntil(this.destroy$) // Unsubscribe if component destroyed during request
+        takeUntil(this.destroy$),
+        finalize(() => { // Ensure button state resets
+           this.cancellingAppointmentId = null;
+           this.cdRef.detectChanges();
+        })
     ).subscribe({
       next: () => {
         console.log(`Appointment ${appointmentId} cancelled successfully.`);
-        this.cancellingAppointmentId = null;
-        // Trigger a refresh by pushing the current filter value again (or fetching directly)
-        this.filterStatus.next(this.filterStatus.value); // Re-trigger loadAppointments
-        // Alternatively: this.loadAppointments(); // If not using BehaviorSubject trigger
+        this.filterStatus.next(this.filterStatus.value); // Re-trigger load with current filter
       },
       error: (err) => {
         console.error(`Error cancelling appointment ${appointmentId}:`, err);
-        this.cancelError = err.error?.detail || 'Failed to cancel the appointment. Please try again.';
-        this.cancellingAppointmentId = null;
+        this.cancelError = err.error?.detail || 'Failed to cancel the appointment.';
       }
     });
   }
