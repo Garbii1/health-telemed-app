@@ -14,113 +14,118 @@
  
    <!-- Error State -->
    <div *ngIf="errorMessage && !isLoading" class="alert alert-danger mt-3">
-      {{ errorMessage }}
-      <button class="btn btn-sm btn-outline-secondary ms-3" (click)="loadProfile()">Retry</button>
+      <pre class="mb-0">{{ errorMessage }}</pre> <!-- Use pre for formatted errors -->
+      <button class="btn btn-sm btn-outline-secondary ms-3 mt-2" (click)="loadProfile()">Retry</button>
     </div>
  
-   <!-- Profile Form -->
-   <!-- Ensure initialProfileData check exists if template relies on it -->
-   <form *ngIf="!isLoading && !errorMessage && initialProfileData" [formGroup]="profileForm" (ngSubmit)="onSubmit()">
+   <!-- Profile Form Container -->
+   <!-- Show form only when not loading, no error, and initial data is loaded -->
+   <div *ngIf="!isLoading && !errorMessage && initialProfileData">
+     <form [formGroup]="profileForm" (ngSubmit)="onSubmit()">
  
-       <!-- Status Messages within the form -->
-        <div *ngIf="successMessage" class="alert alert-success mb-3 small p-2">{{ successMessage }}</div>
-        <div *ngIf="profileForm.errors && !errorMessage" class="alert alert-danger small p-2 mb-3">Please correct the form errors.</div>
+         <!-- Success Message -->
+          <div *ngIf="successMessage" class="alert alert-success mb-3 small p-2">{{ successMessage }}</div>
  
- 
-       <!-- Card 1: Account Information -->
-       <div class="card shadow-sm mb-4">
-          <div class="card-header bg-light border-0"> <h5 class="mb-0 section-heading text-primary">Account Information</h5> </div>
-          <div class="card-body p-4">
-              <div class="row">
-                 <div class="col-md-6">
-                    <div class="form-group">
-                       <label for="username" class="form-label">Username</label>
-                       <input type="text" id="username" class="form-control" formControlName="username">
-                        <small class="form-text text-muted">Username cannot be changed.</small>
-                     </div>
-                 </div>
-                 <div class="col-md-6">
-                     <div class="form-group">
-                        <label for="email" class="form-label">Email Address <span class="text-danger">*</span></label>
-                        <input type="email" id="email" class="form-control" formControlName="email" [class.is-invalid]="email?.invalid && email?.touched" required>
-                         <div *ngIf="email?.invalid && email?.touched" class="invalid-feedback">
-                           <div *ngIf="email?.errors?.['required']">Required.</div>
-                           <div *ngIf="email?.errors?.['email']">Invalid email.</div>
-                         </div>
-                      </div>
-                  </div>
-               </div>
-               <div class="row">
-                   <div class="col-md-6">
-                      <div class="form-group">
-                          <label for="first_name" class="form-label">First Name <span class="text-danger">*</span></label>
-                          <input type="text" id="first_name" class="form-control" formControlName="first_name" [class.is-invalid]="first_name?.invalid && first_name?.touched" required>
-                           <div *ngIf="first_name?.invalid && first_name?.touched" class="invalid-feedback">Required.</div>
+         <!-- Card 1: Account Information -->
+         <div class="card shadow-sm mb-4">
+            <div class="card-header bg-light border-0"> <h5 class="mb-0 section-heading text-primary">Account Information</h5> </div>
+            <div class="card-body p-4">
+                <!-- Nested Group for User Fields -->
+                <div formGroupName="user_update">
+                    <div class="row">
+                       <div class="col-md-6">
+                          <div class="form-group">
+                             <label for="username" class="form-label">Username</label>
+                             <!-- Use username from top-level form control -->
+                             <input type="text" id="username" class="form-control" formControlName="username">
+                              <small class="form-text text-muted">Username cannot be changed.</small>
+                           </div>
                        </div>
-                   </div>
-                   <div class="col-md-6">
-                       <div class="form-group mb-md-0">
-                           <label for="last_name" class="form-label">Last Name <span class="text-danger">*</span></label>
-                           <input type="text" id="last_name" class="form-control" formControlName="last_name" [class.is-invalid]="last_name?.invalid && last_name?.touched" required>
-                            <div *ngIf="last_name?.invalid && last_name?.touched" class="invalid-feedback">Required.</div>
+                       <div class="col-md-6">
+                           <div class="form-group">
+                              <label for="email" class="form-label">Email Address <span class="text-danger">*</span></label>
+                              <input type="email" id="email" class="form-control" formControlName="email" [class.is-invalid]="email?.invalid && email?.touched" required>
+                               <div *ngIf="email?.invalid && email?.touched" class="invalid-feedback">
+                                 <div *ngIf="email?.errors?.['required']">Required.</div>
+                                 <div *ngIf="email?.errors?.['email']">Invalid email.</div>
+                               </div>
+                            </div>
                         </div>
-                    </div>
-                </div>
-          </div><!-- /card-body -->
-       </div><!-- /card -->
+                     </div>
+                     <div class="row">
+                         <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="first_name" class="form-label">First Name <span class="text-danger">*</span></label>
+                                <input type="text" id="first_name" class="form-control" formControlName="first_name" [class.is-invalid]="first_name?.invalid && first_name?.touched" required>
+                                 <div *ngIf="first_name?.invalid && first_name?.touched" class="invalid-feedback">Required.</div>
+                             </div>
+                         </div>
+                         <div class="col-md-6">
+                             <div class="form-group mb-md-0">
+                                 <label for="last_name" class="form-label">Last Name <span class="text-danger">*</span></label>
+                                 <input type="text" id="last_name" class="form-control" formControlName="last_name" [class.is-invalid]="last_name?.invalid && last_name?.touched" required>
+                                  <div *ngIf="last_name?.invalid && last_name?.touched" class="invalid-feedback">Required.</div>
+                              </div>
+                          </div>
+                      </div>
+                 </div> <!-- /end user_update formGroupName -->
+            </div><!-- /card-body -->
+         </div><!-- /card -->
  
  
-      <!-- Card 2: Contact & Personal Information -->
-      <div class="card shadow-sm mb-4">
-         <div class="card-header bg-light border-0"> <h5 class="mb-0 section-heading text-primary">Contact & Personal Information</h5> </div>
-         <div class="card-body p-4">
-            <div class="row">
-              <div class="col-md-6">
-                 <div class="form-group">
-                    <label for="phone_number" class="form-label">Phone Number <span class="text-danger">*</span></label>
-                    <input type="tel" id="phone_number" class="form-control" formControlName="phone_number" placeholder="e.g., 08012345678" [class.is-invalid]="phone_number?.invalid && phone_number?.touched" required>
-                     <div *ngIf="phone_number?.invalid && phone_number?.touched" class="invalid-feedback">Required.</div>
-                  </div>
-              </div>
-              <div class="col-md-6">
-                  <div class="form-group">
-                     <label for="date_of_birth" class="form-label">Date of Birth <span class="text-danger">*</span></label>
-                     <input type="date" id="date_of_birth" class="form-control" formControlName="date_of_birth" [class.is-invalid]="date_of_birth?.invalid && date_of_birth?.touched" required>
-                      <div *ngIf="date_of_birth?.invalid && date_of_birth?.touched" class="invalid-feedback">Required.</div>
-                   </div>
-               </div>
-            </div>
-            <div class="form-group mb-0">
-               <label for="address" class="form-label">Address <span class="text-danger">*</span></label>
-               <textarea id="address" class="form-control" rows="3" formControlName="address" placeholder="Your street address, city, state/province, country..." [class.is-invalid]="address?.invalid && address?.touched" required></textarea>
-                <div *ngIf="address?.invalid && address?.touched" class="invalid-feedback">Required.</div>
-            </div>
-         </div><!-- /card-body -->
-      </div><!-- /card -->
- 
-       <!-- Card 3: Emergency Contact -->
-       <div class="card shadow-sm mb-4" formGroupName="patient_details">
-           <div class="card-header bg-light border-0"> <h5 class="mb-0 section-heading text-primary">Emergency Contact (Optional)</h5> </div>
+        <!-- Card 2: Contact & Personal Information -->
+        <div class="card shadow-sm mb-4">
+           <div class="card-header bg-light border-0"> <h5 class="mb-0 section-heading text-primary">Contact & Personal Information</h5> </div>
            <div class="card-body p-4">
               <div class="row">
-                  <div class="col-md-5"> <div class="form-group"> <label for="emergency_contact_name" class="form-label">Contact Name</label> <input type="text" id="emergency_contact_name" class="form-control" formControlName="emergency_contact_name"> </div> </div>
-                  <div class="col-md-3"> <div class="form-group"> <label for="emergency_contact_relationship" class="form-label">Relationship</label> <input type="text" id="emergency_contact_relationship" class="form-control" formControlName="emergency_contact_relationship" placeholder="e.g., Spouse"> </div> </div>
-                  <div class="col-md-4"> <div class="form-group mb-md-0"> <label for="emergency_contact_phone" class="form-label">Contact Phone</label> <input type="tel" id="emergency_contact_phone" class="form-control" formControlName="emergency_contact_phone"> </div> </div>
-               </div><!-- /row -->
+                <div class="col-md-6">
+                   <div class="form-group">
+                      <label for="phone_number" class="form-label">Phone Number <span class="text-danger">*</span></label>
+                      <input type="tel" id="phone_number" class="form-control" formControlName="phone_number" placeholder="e.g., 08012345678" [class.is-invalid]="phone_number?.invalid && phone_number?.touched" required>
+                       <div *ngIf="phone_number?.invalid && phone_number?.touched" class="invalid-feedback">Required.</div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                       <label for="date_of_birth" class="form-label">Date of Birth <span class="text-danger">*</span></label>
+                       <input type="date" id="date_of_birth" class="form-control" formControlName="date_of_birth" [class.is-invalid]="date_of_birth?.invalid && date_of_birth?.touched" required>
+                        <div *ngIf="date_of_birth?.invalid && date_of_birth?.touched" class="invalid-feedback">Required.</div>
+                     </div>
+                 </div>
+              </div>
+              <div class="form-group mb-0">
+                 <label for="address" class="form-label">Address <span class="text-danger">*</span></label>
+                 <textarea id="address" class="form-control" rows="3" formControlName="address" placeholder="Your street address, city, state/province, country..." [class.is-invalid]="address?.invalid && address?.touched" required></textarea>
+                  <div *ngIf="address?.invalid && address?.touched" class="invalid-feedback">Required.</div>
+              </div>
            </div><!-- /card-body -->
-       </div><!-- /card -->
+        </div><!-- /card -->
  
-      <!-- Submit Button Area -->
-       <div class="mt-4 text-end">
-          <!-- Add the (click) handler for debugging -->
-          <button type="submit"
-                  class="btn btn-primary btn-lg"
-                  [disabled]="isSaving || profileForm.invalid || !profileForm.dirty"
-                  (click)="onSaveButtonClick()"> <!-- Added click handler -->
-            <span *ngIf="!isSaving"><i class="fas fa-save me-1"></i> Save Changes</span>
-            <span *ngIf="isSaving"> <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Saving... </span>
-          </button>
-       </div>
+         <!-- Card 3: Emergency Contact -->
+         <!-- Use formGroupName to link to nested group -->
+         <div class="card shadow-sm mb-4" formGroupName="patient_details_update">
+             <div class="card-header bg-light border-0"> <h5 class="mb-0 section-heading text-primary">Emergency Contact (Optional)</h5> </div>
+             <div class="card-body p-4">
+                <div class="row">
+                    <div class="col-md-5"> <div class="form-group"> <label for="emergency_contact_name" class="form-label">Contact Name</label> <input type="text" id="emergency_contact_name" class="form-control" formControlName="emergency_contact_name"> </div> </div>
+                    <div class="col-md-3"> <div class="form-group"> <label for="emergency_contact_relationship" class="form-label">Relationship</label> <input type="text" id="emergency_contact_relationship" class="form-control" formControlName="emergency_contact_relationship" placeholder="e.g., Spouse"> </div> </div>
+                    <div class="col-md-4"> <div class="form-group mb-md-0"> <label for="emergency_contact_phone" class="form-label">Contact Phone</label> <input type="tel" id="emergency_contact_phone" class="form-control" formControlName="emergency_contact_phone"> </div> </div>
+                 </div><!-- /row -->
+             </div><!-- /card-body -->
+         </div><!-- /card -->
  
-   </form> <!-- /form -->
+        <!-- Submit Button Area -->
+         <div class="mt-4 text-end">
+            <!-- Add the (click) handler for debugging -->
+            <button type="submit"
+                    class="btn btn-primary btn-lg"
+                    [disabled]="isSaving || profileForm.invalid || !profileForm.dirty"
+                    (click)="onSaveButtonClick()"> <!-- Debug click handler -->
+              <span *ngIf="!isSaving"><i class="fas fa-save me-1"></i> Save Changes</span>
+              <span *ngIf="isSaving"> <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Saving... </span>
+            </button>
+         </div>
+ 
+     </form> <!-- /form -->
+   </div> <!-- / *ngIf container -->
  </div> <!-- /container -->
