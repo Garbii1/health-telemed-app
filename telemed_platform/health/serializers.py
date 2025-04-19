@@ -134,7 +134,7 @@ class AppointmentSerializer(serializers.ModelSerializer):
         model = Appointment
         fields = ['id', 'patient', 'doctor', 'patient_id', 'doctor_id', 'appointment_time',
                   'reason', 'status', 'consultation_notes', 'created_at', 'updated_at']
-        read_only_fields = ['status', 'consultation_notes', 'created_at', 'updated_at'] # Status managed by specific actions
+        read_only_fields = ['status', 'consultation_notes', 'created_at', 'updated_at', 'patient', 'doctor'] # Status managed by specific actions
 
 # Simplified Appointment Serializer for Listing (optional, can improve performance)
 class AppointmentListSerializer(serializers.ModelSerializer):
