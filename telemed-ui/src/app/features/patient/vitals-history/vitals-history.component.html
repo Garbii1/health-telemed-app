@@ -2,15 +2,18 @@
 <div class="vitals-history-container mt-2">
 
   <!-- ===== No Data State ===== -->
+  <!-- Shown if vitalsData is null, undefined, or an empty array -->
   <div *ngIf="!vitalsData || vitalsData.length === 0" class="alert alert-light text-center border-0 no-data-placeholder py-4 my-3">
     <i class="fas fa-file-medical-alt fa-2x mb-2 text-muted"></i>
     <p class="mb-0">No vital records found.</p>
   </div>
 
   <!-- ===== Data Available State ===== -->
+  <!-- Render content only if vitalsData is an array with items -->
   <ng-container *ngIf="vitalsData && vitalsData.length > 0">
 
     <!-- --- Charts Section --- -->
+    <!-- Conditionally render chart section based on processed chart data -->
     <div class="charts-section row mb-4" *ngIf="bpChartData.length > 0 || hrChartData.length > 0 || glucoseChartData.length > 0 || tempChartData.length > 0">
       <h5 class="mb-3 chart-section-title">Vital Trends</h5>
 
@@ -116,9 +119,10 @@
     <div class="history-table-section mt-4">
       <h5 class="mb-3">Detailed History</h5>
 
-      <!-- Standard Table for Desktop (Hidden below md breakpoint) -->
-      <div class="table-responsive shadow-sm rounded d-none d-md-block">
-        <table class="table table-striped table-hover table-bordered mb-0 vitals-table-desktop">
+      <!-- Standard Table for Desktop -->
+      <!-- Visibility controlled by CSS media query -->
+      <div class="table-responsive shadow-sm rounded vitals-desktop-table-wrapper">
+        <table class="table table-striped table-hover table-bordered mb-0">
           <thead class="table-light">
             <tr>
               <th>Date & Time</th>
@@ -130,7 +134,6 @@
             </tr>
           </thead>
           <tbody>
-            <!-- Loop through data for desktop table rows -->
             <tr *ngFor="let record of vitalsData">
               <td class="text-nowrap">{{ formatDate(record.record_time) }}</td>
               <td class="text-nowrap">{{ record.blood_pressure_systolic ?? '-' }} / {{ record.blood_pressure_diastolic ?? '-' }}</td>
@@ -143,15 +146,14 @@
         </table>
       </div>
 
-      <!-- Mobile Card List View (Visible below md breakpoint) -->
-      <div class="mobile-vitals-list d-md-none">
-          <!-- Loop through data for mobile cards -->
+      <!-- Mobile Card List View -->
+      <!-- Visibility controlled by CSS media query -->
+      <div class="mobile-vitals-list">
           <div *ngFor="let record of vitalsData" class="card mobile-vital-card shadow-sm mb-3">
               <div class="card-header bg-light fw-bold">
                   {{ formatDate(record.record_time) }}
               </div>
               <div class="card-body">
-                  <!-- Display each vital as a label-value pair -->
                   <p class="mb-2"><strong class="vital-label">BP (Sys/Dia):</strong> {{ record.blood_pressure_systolic ?? '-' }} / {{ record.blood_pressure_diastolic ?? '-' }} mmHg</p>
                   <p class="mb-2"><strong class="vital-label">Heart Rate:</strong> {{ record.heart_rate ?? 'N/A' }} bpm</p>
                   <p class="mb-2"><strong class="vital-label">Glucose:</strong> {{ record.glucose_level ?? 'N/A' }} mg/dL</p>

@@ -1,7 +1,7 @@
 /* src/app/features/patient/vitals-history/vitals-history.component.scss */
 
 .vitals-history-container {
-    // Optional: Add padding if needed, though parent usually handles it
+    // Optional base styles for the container
   }
   
   // --- Chart Styles ---
@@ -13,111 +13,90 @@
   }
   .chart-card-wrapper .card {
     border: none;
-    border-radius: var(--border-radius); // Use global radius
+    border-radius: var(--border-radius);
   }
   .chart-card-wrapper .card-header {
     font-size: 0.9rem;
     font-weight: 500;
     color: var(--text-color-light);
-    background-color: #f8f9fa !important; // Use consistent light bg
+    background-color: #f8f9fa !important;
     border:0;
-    padding: 0.6rem 1rem; // Adjust padding
+    padding: 0.6rem 1rem;
   }
   .chart-card-wrapper .card-body {
     padding: 0.5rem;
-    overflow: hidden; // Prevent chart overflow issues
+    overflow: hidden;
   }
-  // Ensure charts scale within their container
   ngx-charts-line-chart {
-    display: block; // Make sure it behaves like a block element
-    width: 100% !important; // Force width
-    height: auto !important; // Allow height to adjust
-    * { // Target inner elements if needed
-        max-width: 100%; // Prevent internal SVG overflow
-    }
+    display: block;
+    width: 100% !important;
+    height: auto !important;
+    * { max-width: 100%; }
   }
   
-  // --- Desktop Table Styles ---
-  /* These styles apply only when table is visible (d-md-block) */
+  // --- Desktop Table Styles (Visible md and up) ---
   .history-table-section h5 { font-weight: 500; }
-  .table-responsive {
-      border: 1px solid var(--border-color); // Add border around responsive container
-      border-radius: var(--border-radius);
-  }
-  .vitals-table-desktop { // Target specific desktop table
-    th {
-        font-weight: 500;
-        font-size: 0.85rem;
-        white-space: nowrap;
-        background-color: #f8f9fa; // Consistent light header
-        color: var(--text-color-light);
-        text-transform: uppercase; // Optional: Uppercase headers
-        letter-spacing: 0.5px; // Optional: Adjust letter spacing
-        vertical-align: middle;
-    }
-    td {
-      font-size: 0.9rem;
-      vertical-align: middle;
-    }
-    .notes-cell {
-      white-space: pre-wrap;
-      word-break: break-word;
-      min-width: 150px; // Allow notes to take some width
-    }
-    .text-nowrap { white-space: nowrap; }
-    .table-bordered th, .table-bordered td { border-width: 0 0 1px 0; } // Only bottom borders
-    .table-bordered thead th { border-bottom-width: 2px; } // Heavier border below header
-    .table > :not(caption) > * > * { padding: 0.75rem 0.75rem; } // Consistent padding
-    .table-striped > tbody > tr:nth-of-type(odd) > * { background-color: rgba(0,0,0,.02); } // Very subtle stripe
-    .table-hover > tbody > tr:hover > * { background-color: rgba(0,0,0,.04); }
+  .vitals-desktop-table-wrapper {
+      // By default, the table wrapper is visible
+      display: block; // Or default display for div
+  
+      .table { // Styles specific to the table inside the desktop wrapper
+        th {
+          font-weight: 500; font-size: 0.8rem; white-space: nowrap;
+          background-color: #f8f9fa; color: var(--text-color-light);
+          text-transform: uppercase; letter-spacing: 0.5px; vertical-align: middle;
+          border-bottom-width: 2px; // Heavier border below header
+          border-top: 0; // Remove default top border
+        }
+        td {
+          font-size: 0.9rem; vertical-align: middle;
+          border-bottom-width: 1px; // Ensure bottom border exists for stripes
+          border-top: 0; // Remove default top border
+        }
+        .notes-cell { white-space: pre-wrap; word-break: break-word; min-width: 150px; }
+        .text-nowrap { white-space: nowrap; }
+        > :not(caption) > * > * { padding: 0.75rem 0.75rem; } // Cell padding
+        &.table-bordered { border: 1px solid var(--border-color); }
+        &.table-bordered th, &.table-bordered td { border: 1px solid var(--border-color); }
+        &.table-striped > tbody > tr:nth-of-type(odd) > * { background-color: rgba(0,0,0,.02); }
+        &.table-hover > tbody > tr:hover > * { background-color: rgba(0,0,0,.04); }
+      }
   }
   
   
-  // --- Mobile Card List Styles ---
-  /* These styles apply only when cards are visible (d-md-none) */
+  // --- Mobile Card List Styles (Visible below md) ---
   .mobile-vitals-list {
-    // No specific styles needed for the list container itself
+      display: none; // <<< Hide mobile list by default
   }
-  
   .mobile-vital-card {
     border-radius: var(--border-radius);
     border: 1px solid var(--border-color);
-    background-color: var(--bg-color-alt); // Ensure white background
+    background-color: var(--bg-color-alt);
   
     .card-header {
-      background-color: #f8f9fa !important; // Light grey header
-      font-size: 0.9rem; // Slightly smaller header text
-      padding: 0.6rem 1rem; // Adjust padding
+      background-color: #f8f9fa !important;
+      font-size: 0.9rem;
+      padding: 0.6rem 1rem;
       color: var(--text-color);
     }
-  
     .card-body {
-      padding: 0.75rem 1rem; // Adjust padding
-      font-size: 0.95rem; // Standard font size for body
-  
+      padding: 0.75rem 1rem;
+      font-size: 0.95rem;
       p {
-        margin-bottom: 0.65rem; // Spacing between rows
+        margin-bottom: 0.65rem;
         line-height: 1.4;
-        display: flex; // Use flex for better alignment of label and value
-        flex-wrap: wrap; // Allow wrapping if needed
-  
-        .vital-label { // Style the label part
-          color: var(--text-color-light); // Lighter color for label
-          font-weight: 500; // Normal weight
-          min-width: 100px; // Minimum width for label alignment
-          margin-right: 0.5rem; // Space between label and value
-          flex-shrink: 0; // Don't let label shrink
+        display: flex;
+        flex-wrap: wrap;
+        .vital-label {
+          color: var(--text-color-light);
+          font-weight: 500;
+          min-width: 100px; // Adjust if needed for alignment
+          margin-right: 0.5rem;
+          flex-shrink: 0;
         }
-  
-        // Value part takes remaining space
-        // No specific style needed unless for notes
       }
-      p:last-child { margin-bottom: 0; } // No margin on last item
-  
-      .notes-value { // Style for notes value specifically
-          white-space: pre-wrap;
-          word-break: break-word;
-      }
+      p:last-child { margin-bottom: 0; }
+      .notes-value { white-space: pre-wrap; word-break: break-word; }
     }
   }
   
@@ -129,4 +108,15 @@
       color: var(--text-color-light);
       i { font-size: 1.8rem; }
       p { margin-bottom: 0; }
+  }
+  
+  // --- Responsive Media Query ---
+  // Hides desktop table, shows mobile cards below 768px
+  @media (max-width: 767.98px) {
+      .vitals-desktop-table-wrapper {
+          display: none; // Hide table
+      }
+      .mobile-vitals-list {
+          display: block; // Show cards
+      }
   }
