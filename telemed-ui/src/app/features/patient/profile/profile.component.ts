@@ -3,7 +3,7 @@ import { Component, OnInit, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common'; // For *ngIf
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, AbstractControl } from '@angular/forms'; // For forms
 import { ApiService } from '../../../core/services/api.service';
-import { AuthService } from '../../../core/services/auth.service'; // To potentially update local user info after save
+import { AuthService } from '../../../core/services/auth.service';
 import { finalize, Subject, of } from 'rxjs'; // Import Subject, of
 import { catchError, takeUntil, tap } from 'rxjs/operators'; // Import takeUntil, tap, catchError
 import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component'; // Import spinner
@@ -21,182 +21,205 @@ import { LoadingSpinnerComponent } from '../../../shared/components/loading-spin
 })
 export class PatientProfileComponent implements OnInit, OnDestroy {
   profileForm: FormGroup;
-  isLoading = true; // Start in loading state
-  isSaving = false; // Controls save button loading state
+  isLoading = true;
+  isSaving = false;
   errorMessage: string | null = null;
   successMessage: string | null = null;
-  initialProfileData: any = null; // Store initial data to compare changes for 'dirty' check
-  private destroy$ = new Subject<void>(); // To manage observable subscriptions
+  initialProfileData: any = null;
+  private destroy$ = new Subject<void>();
 
   constructor(
     private fb: FormBuilder,
     private apiService: ApiService,
-    private authService: AuthService, // Inject if needed for refreshing user info after save
-    private cdRef: ChangeDetectorRef // Inject for manual change detection
+    private authService: AuthService, // Inject AuthService if needed for post-save updates
+    private cdRef: ChangeDetectorRef
   ) {
-    // Initialize the form structure in the constructor
+    // Initialize the form structure
     this.profileForm = this.fb.group({
-      // User fields (username often read-only)
-      username: [{value: '', disabled: true}],
+      username: [{value: '', disabled: true}], // Username usually not editable
       email: ['', [Validators.required, Validators.email]],
       first_name: ['', Validators.required],
       last_name: ['', Validators.required],
-      // UserProfile fields (now required)
       phone_number: ['', Validators.required],
       address: ['', Validators.required],
       date_of_birth: ['', Validators.required],
-      // PatientProfile specific fields (nested group)
-      patient_details: this.fb.group({
+      patient_details: this.fb.group({ // Nested group for patient-specific details
         emergency_contact_name: [''],
         emergency_contact_phone: [''],
-        emergency_contact_relationship: [''] // Added field
+        emergency_contact_relationship: ['']
       })
     });
   }
 
   ngOnInit(): void {
     console.log("PatientProfile OnInit");
-    this.loadProfile(); // Load profile data when component initializes
+    this.loadProfile();
   }
 
   ngOnDestroy(): void {
       console.log("PatientProfile OnDestroy");
-      this.destroy$.next(); // Trigger unsubscription
+      this.destroy$.next();
       this.destroy$.complete();
   }
 
   // Method to fetch profile data from the API
   loadProfile(): void {
     console.log("loadProfile called");
-    this.isLoading = true; // Set loading state
-    this.errorMessage = null; // Clear previous errors
-    this.successMessage = null; // Clear previous success message
-    this.cdRef.detectChanges(); // Ensure loading spinner shows
+    this.isLoading = true;
+    this.errorMessage = null;
+    this.successMessage = null; // Clear previous success message on reload
+    this.cdRef.detectChanges(); // Trigger loading view update
 
     this.apiService.getProfile().pipe(
-        tap(profile => console.log("SUCCESS: Profile data received:", profile)), // Log success
-        catchError(err => { // Handle API errors
+        tap(profile => console.log("SUCCESS: Profile data received:", profile)),
+        catchError(err => {
             console.error("CATCHERROR: Error loading profile:", err);
             this.errorMessage = "Failed to load profile data. Please try again.";
-            // Let finalize handle isLoading, return null/empty observable
-            return of(null);
+            return of(null); // Return null to allow finalize to run
         }),
-        finalize(() => { // <<< Runs on completion or error
+        finalize(() => {
             console.log("FINALIZE: Setting isLoading = false");
             this.isLoading = false;
-            this.cdRef.detectChanges(); // <<< Update view after loading finishes
+            this.cdRef.detectChanges(); // Update view after loading completes or errors
         }),
-        takeUntil(this.destroy$) // Auto-unsubscribe when component destroyed
+        takeUntil(this.destroy$)
     ).subscribe({
         next: (profile) => {
-          if (profile) { // Only patch form if data was successfully received
-              this.initialProfileData = JSON.parse(JSON.stringify(profile)); // Deep copy for dirty checking later
-              // Patch form values, including nested group
-               this.profileForm.patchValue({
-                 username: profile.user.username,
-                 email: profile.user.email,
-                 first_name: profile.user.first_name,
-                 last_name: profile.user.last_name,
-                 phone_number: profile.phone_number,
-                 address: profile.address,
-                 date_of_birth: this.formatDateForInput(profile.date_of_birth),
-                 // Safely patch nested patient details
-                 patient_details: {
-                    emergency_contact_name: profile.patient_details?.emergency_contact_name || '',
-                    emergency_contact_phone: profile.patient_details?.emergency_contact_phone || '',
-                    emergency_contact_relationship: profile.patient_details?.emergency_contact_relationship || ''
-                  }
-               });
-               this.profileForm.markAsPristine(); // <<< Mark form as clean after initial load
-               console.log("Profile form patched and marked pristine.");
+          if (profile) {
+              // Store a deep copy for dirty checking comparison later
+              this.initialProfileData = JSON.parse(JSON.stringify(profile));
+              this.patchForm(profile); // Use helper to patch form
+              this.profileForm.markAsPristine(); // Mark clean after load
+              console.log("Profile form patched and marked pristine.");
           } else {
-              // Error message already set by catchError
-              console.log("Profile data was null after API call (likely due to error).");
+              console.log("Profile data was null after API call (error handled by catchError).");
           }
         }
-        // No separate error block needed here if catchError returns 'of(null)'
+        // No error block needed here as catchError handles it
     });
   }
 
-   // Helper to format date string (YYYY-MM-DD) for date input control
+  // Helper function to patch form values
+  private patchForm(profile: any): void {
+       this.profileForm.patchValue({
+         username: profile.user?.username, // Use optional chaining for safety
+         email: profile.user?.email,
+         first_name: profile.user?.first_name,
+         last_name: profile.user?.last_name,
+         phone_number: profile.phone_number,
+         address: profile.address,
+         date_of_birth: this.formatDateForInput(profile.date_of_birth),
+         patient_details: {
+            emergency_contact_name: profile.patient_details?.emergency_contact_name || '',
+            emergency_contact_phone: profile.patient_details?.emergency_contact_phone || '',
+            emergency_contact_relationship: profile.patient_details?.emergency_contact_relationship || ''
+          }
+       });
+  }
+
+
+  // Helper to format date string (YYYY-MM-DD) for date input control
    formatDateForInput(dateStr: string | null): string | null {
      if (!dateStr) return null;
      try {
        const date = new Date(dateStr);
-       // Ensure date is valid before formatting
-       if (isNaN(date.getTime())) {
-           console.warn(`Invalid date string received: ${dateStr}`);
-           return null;
-       }
-       // Format to YYYY-MM-DD required by <input type="date">
+       if (isNaN(date.getTime())) return null;
        const year = date.getFullYear();
        const month = (date.getMonth() + 1).toString().padStart(2, '0');
        const day = date.getDate().toString().padStart(2, '0');
        return `${year}-${month}-${day}`;
-     } catch (e) {
-       console.error("Error formatting date:", e);
-       return null;
-     }
+     } catch (e) { return null; }
    }
 
   // Handles form submission to update profile
   onSubmit(): void {
     console.log("Profile onSubmit CALLED");
+
+    // Log form state before checks
+    console.log('Profile Form Value:', this.profileForm.getRawValue());
+    console.log('Profile Form Status:', this.profileForm.status);
+    console.log('Is Profile Form Valid?:', this.profileForm.valid);
+    console.log('Is Profile Form Dirty?:', this.profileForm.dirty); // <<< Check if changes were made
+
+    // Log individual control validity/dirty state if form is invalid or not dirty
+     if (!this.profileForm.valid || !this.profileForm.dirty) {
+        console.log('--- Profile Control States ---');
+        Object.keys(this.profileForm.controls).forEach(key => {
+            const control = this.profileForm.get(key);
+            console.log(`${key}: Status=${control?.status}, Dirty=${control?.dirty}, Touched=${control?.touched}, Errors=${JSON.stringify(control?.errors)}`);
+            if (control instanceof FormGroup) {
+                 Object.keys(control.controls).forEach(nestedKey => {
+                    const nestedControl = control.get(nestedKey);
+                    console.log(`  ${key}.${nestedKey}: Status=${nestedControl?.status}, Dirty=${nestedControl?.dirty}, Touched=${nestedControl?.touched}, Errors=${JSON.stringify(nestedControl?.errors)}`);
+                 });
+            }
+        });
+        console.log('-----------------------------');
+     }
+
+
     this.errorMessage = null; // Clear previous messages
     this.successMessage = null;
 
-    this.profileForm.markAllAsTouched(); // Show validation feedback
+    // Mark all fields as touched to show validation errors visually
+    this.profileForm.markAllAsTouched();
 
+    // Check #1: Is the form valid according to validators?
     if (this.profileForm.invalid) {
-      console.error("Profile Form IS INVALID.");
-      this.errorMessage = "Please correct the errors in the form.";
-      return;
+      console.error("Profile Form IS INVALID. Halting submission.");
+      this.errorMessage = "Please correct the errors highlighted in the form.";
+      this.cdRef.detectChanges(); // Make sure error message shows
+      return; // Prevent submission
     }
 
-    // Only save if changes were actually made
+    // Check #2: Have any changes actually been made?
     if (!this.profileForm.dirty) {
-        console.log("No changes detected in profile form.");
-        this.successMessage = "No changes detected.";
+        console.warn("No changes detected in profile form. Nothing to save.");
+        this.successMessage = "No changes were made to save."; // Inform user
+        this.cdRef.detectChanges(); // Make sure message shows
         setTimeout(() => this.successMessage = null, 3000);
-        return;
+        return; // Stop if nothing changed
       }
 
-    console.log("Profile form is valid and dirty, proceeding with update.");
+    // If valid and dirty, proceed with API call
+    console.log("Profile form is valid and dirty. Proceeding with update...");
     this.isSaving = true; // Set saving state for button
-    this.cdRef.detectChanges();
+    this.cdRef.detectChanges(); // Update view
 
-    // Prepare payload - getRawValue includes disabled fields (like username if needed by backend)
-    // Adjust structure based on backend API expectations for PUT/PATCH /api/profile/
+    // Prepare payload - getRawValue includes disabled fields
     const profileData = this.profileForm.getRawValue();
 
-    // **Modify payload structure if backend doesn't handle nested 'user' or 'patient_details' automatically**
-    // Example: const simplifiedPayload = { phone_number: profileData.phone_number, ... , patient_details: profileData.patient_details };
-    // Example: Separate calls might be needed: one for profile, one for user details (email/name) etc.
-
+    // **Adjust payload structure based on backend API expectations**
+    // Assuming backend handles nested user/patient_details via PUT/PATCH /api/profile/
     console.log("Submitting updated profile data:", profileData);
 
-    this.apiService.updateProfile(profileData) // Assuming backend handles this structure
+    this.apiService.updateProfile(profileData)
       .pipe(
           finalize(() => {
-              this.isSaving = false; // Reset saving state
+              this.isSaving = false; // Reset saving state regardless of outcome
               this.cdRef.detectChanges(); // Update button state
               console.log("updateProfile API call finalized.");
           }),
-          takeUntil(this.destroy$) // Unsubscribe on destroy
+          takeUntil(this.destroy$) // Unsubscribe on component destroy
       )
       .subscribe({
         next: (updatedProfile) => {
           console.log("Profile update SUCCESSFUL:", updatedProfile);
           this.successMessage = "Profile updated successfully!";
-           this.initialProfileData = JSON.parse(JSON.stringify(updatedProfile)); // Update initial state
-           this.profileForm.patchValue(updatedProfile); // Re-patch form with potentially processed data from backend
-           this.profileForm.markAsPristine(); // <<< Mark form as clean again after successful save
-           // Optionally re-fetch user info in AuthService if name/email changed
+           // Update initial data state with the response from backend
+           this.initialProfileData = JSON.parse(JSON.stringify(updatedProfile));
+           // Re-patch the form with potentially processed data from backend
+           this.patchForm(updatedProfile);
+           // Mark form as pristine again after successful save
+           this.profileForm.markAsPristine();
+           // Optionally trigger a refresh of user info in AuthService if name/email could change global state
            // this.authService.fetchAndSetUserProfile().subscribe();
-           setTimeout(() => this.successMessage = null, 4000); // Longer timeout for success
+           this.cdRef.detectChanges(); // Ensure success message shows
+           setTimeout(() => this.successMessage = null, 4000);
         },
         error: (err) => {
           console.error("Error updating profile:", err);
+          // Parse and display error message
            if (err.error && typeof err.error === 'object') {
               let backendErrors = '';
               for (const key in err.error) { if (err.error.hasOwnProperty(key)) { const messages = Array.isArray(err.error[key]) ? err.error[key].join(', ') : err.error[key]; backendErrors += `- ${key.replace(/_/g, ' ')}: ${messages}\n`; } }
@@ -204,6 +227,7 @@ export class PatientProfileComponent implements OnInit, OnDestroy {
            } else if (err.error?.detail) { this.errorMessage = err.error.detail; }
            else if(err.message) { this.errorMessage = `Update failed: ${err.message}`; }
            else { this.errorMessage = "Failed to update profile due to an unexpected error."; }
+           this.cdRef.detectChanges(); // Ensure error message shows
         }
       });
   }
@@ -215,7 +239,6 @@ export class PatientProfileComponent implements OnInit, OnDestroy {
    get phone_number(): AbstractControl | null { return this.profileForm.get('phone_number'); }
    get address(): AbstractControl | null { return this.profileForm.get('address'); }
    get date_of_birth(): AbstractControl | null { return this.profileForm.get('date_of_birth'); }
-   // Access nested controls carefully
    get emergency_contact_name(): AbstractControl | null { return this.profileForm.get('patient_details.emergency_contact_name'); }
    get emergency_contact_phone(): AbstractControl | null { return this.profileForm.get('patient_details.emergency_contact_phone'); }
    get emergency_contact_relationship(): AbstractControl | null { return this.profileForm.get('patient_details.emergency_contact_relationship'); }
